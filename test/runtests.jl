@@ -2,9 +2,6 @@ using Base.Test
 
 using EGR
 
-println(LOAD_PATH)
-
-
 function GradientTest(numVars::Integer, numDatapoints::Integer,gradientFunction::Function)
 
 	println("Starting Gradient test...")
@@ -74,12 +71,12 @@ features = float([-1  1
 		    -1 -2
 		    -1 -3])
 			
-labels=EGR.MinusPlusOneVector([1,1,1,-1,-1,-1])
+labels=MinusPlusOneVectorModule.MinusPlusOneVector([1,1,1,-1,-1,-1])
 
 numVars=2
 numDatapoints=6
 		
-gradientFunction(W,index)=EGR.get_f_g_cs(features,labels,W,index)
-gradientFunction(W)=EGR.get_f_g_cs(features,labels,W)
+gradientFunction(W,index)=BinaryLogisticRegressionModule.get_f_g_cs(features,labels,W,index)
+gradientFunction(W)=BinaryLogisticRegressionModule.get_f_g_cs(features,labels,W)
 
 @test GradientTest(numVars, numDatapoints,gradientFunction)
