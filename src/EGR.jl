@@ -1,7 +1,5 @@
 module EGR
 
-importall BinaryLogisticRegressionModule
-importall GenerateRandomModule
-importall MinusPlusOneVectorModule
+using BinaryLogisticRegressionModule, GenerateRandomModule, MinusPlusOneVectorModule
 
 end # module
