@@ -1,7 +1,6 @@
 println("Starting InitialScript.")
 using StatsBase;
 using Redis
-importall ScriptsModule;
 client=redis();
 datasetArray=Dict[]
 for thisKey in smembers(client,"dataset_ids")

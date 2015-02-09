@@ -2,7 +2,7 @@ module BinaryLogisticRegressionModule
 
 importall MinusPlusOneVectorModule
 
-export get_f_g_cs, get_f_g_cs, get_f_pcc, get_g_from_cs
+export get_f_g_cs, get_f_pcc, get_g_from_cs
 
 function get_f_g_cs(features::Matrix{Float64},labels::MinusPlusOneVector,W::Vector{Float64},index::Int64)
 	X = features[index,:];

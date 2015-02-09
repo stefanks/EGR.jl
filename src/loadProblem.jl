@@ -10,6 +10,8 @@ function loadAgaricus(datasetHT)
 
 	println("Reading binary...")
 	(features,labels) = readBin(datasetHT["path"]*datasetHT["name"]*".bin",numDatapoints,numVars)
+	println(features)
+	println(labels)
 	println("Finished")
 
 	println("Starting separation into train and test sets...")
@@ -49,4 +51,4 @@ function trainTestRandomSeparate(features,labels)
 end
 
 
-(mygradientOracle,numTrainingPoints,numVars,outputsFunction,restoreGradient)=loadAgaricus(datasetArray[2]);
+(mygradientOracle,numTrainingPoints,numVars,outputsFunction,restoreGradient)=loadAgaricus(datasetArray[1]);
