@@ -1,5 +1,7 @@
 module EGR
 
-# package code goes here
+importall BinaryLogisticRegressionModule
+importall GenerateRandomModule
+importall MinusPlusOneVectorModule
 
 end # module
