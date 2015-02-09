@@ -1,4 +1,4 @@
-using EGR-Julia
+using EGR
 using Base.Test
 
 # write your own tests here
