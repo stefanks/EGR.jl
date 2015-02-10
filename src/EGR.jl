@@ -2,16 +2,7 @@ module EGR
 
 importall Redis
 
-println(whos())
-
-println(Redis)
-
-
-println(Redis.smembers)
-
-println(Redis.redis)
-
-println(Redis.redis())
+println(whos(Redis))
 
 import Base.size
 
