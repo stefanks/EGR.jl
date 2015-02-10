@@ -1,8 +1,6 @@
 module EGR
 
-importall Redis
-
-println(whos(Redis))
+using Redis
 
 import Base.size
 
@@ -13,7 +11,7 @@ include("BinaryLogisticRegressionModule.jl")
 include("alg.jl")
 
 println("testing redis")
-client=Redis.redis();
+client = RedisConnection();
 datasetArray=Dict[]
 for thisKey in Redis.smembers(client,"dataset_ids")
 	push!(datasetArray,Redis.hgetall(client,thisKey))
