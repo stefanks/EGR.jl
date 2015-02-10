@@ -1,6 +1,6 @@
-using Redis
-
 module EGR
+
+import Redis
 
 import Base.size
 
@@ -13,8 +13,8 @@ include("alg.jl")
 println("testing redis")
 client=Redis.redis();
 datasetArray=Dict[]
-for thisKey in smembers(client,"dataset_ids")
-	push!(datasetArray,hgetall(client,thisKey))
+for thisKey in Redis.smembers(client,"dataset_ids")
+	push!(datasetArray,Redis.hgetall(client,thisKey))
 end
 sort!(datasetArray,by=x->int(x["numTotal"]))	
 println(datasetArray)

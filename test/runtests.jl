@@ -1,6 +1,5 @@
 using Base.Test
 using EGR
-using Redis
 
 function GradientTest(numVars::Integer, numDatapoints::Integer,gradientFunction::Function)
 
