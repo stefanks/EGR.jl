@@ -72,7 +72,20 @@ function M1P1Test()
 	true
 end
 
-function EGRTest()
+function EGRTest(numVars, numDatapoints,gradientFunction)
+	
+	# egr(
+	# 	numDatapoints::Integer,
+	# 	numVars::Integer,
+	# 	stepSize::Function,
+	# 	outputsFunction::Function,
+	# 	s::Function,
+	# 	u::Function,
+	# 	beta,
+	# 	getNextSampleFunction::Function,
+	# 	outputOpts;
+	# 	maxG=typemax(Int64),
+	# 	x=zeros(numVars))
 	true
 end
 features = float([-1  1
@@ -94,4 +107,4 @@ gradientFunction(W)=get_f_g_cs(features,labels,W)
 
 @test M1P1Test()
 
-@test EGRTest()
+@test EGRTest(numVars, numDatapoints,gradientFunction)
