@@ -1,7 +1,13 @@
 module EGR
 
-import Redis
+importall Redis
 
+println(whos())
+
+println(Redis)
+
+
+println(Redis.smembers)
 import Base.size
 
 export get_f_g_cs, get_f_pcc, get_g_from_cs, MinusPlusOneVector, OutputOpts, egr
