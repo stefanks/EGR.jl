@@ -137,11 +137,3 @@ outputsFunction(W) = (testFunction(W), gradientFunction(W)[1])
 	
 
 @test EGRTest(numVars, numDatapoints,gradientFunction,restoreGradient,outputsFunction)
-
-client=Redis.redis();
-datasetArray=Dict[]
-for thisKey in smembers(client,"dataset_ids")
-	push!(datasetArray,hgetall(client,thisKey))
-end
-sort!(datasetArray,by=x->int(x["numTotal"]))
-println(datasetArray)	
