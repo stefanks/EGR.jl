@@ -1,5 +1,4 @@
 using Base.Test
-
 using EGR
 
 function GradientTest(numVars::Integer, numDatapoints::Integer,gradientFunction::Function)
@@ -71,12 +70,12 @@ features = float([-1  1
 		    -1 -2
 		    -1 -3])
 			
-labels=MinusPlusOneVectorModule.MinusPlusOneVector([1,1,1,-1,-1,-1])
+labels=MinusPlusOneVector([1,1,1,-1,-1,-1])
 
 numVars=2
 numDatapoints=6
 		
-gradientFunction(W,index)=BinaryLogisticRegressionModule.get_f_g_cs(features,labels,W,index)
-gradientFunction(W)=BinaryLogisticRegressionModule.get_f_g_cs(features,labels,W)
+gradientFunction(W,index)=get_f_g_cs(features,labels,W,index)
+gradientFunction(W)=get_f_g_cs(features,labels,W)
 
 @test GradientTest(numVars, numDatapoints,gradientFunction)

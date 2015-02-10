@@ -1,8 +1,3 @@
-module BinaryLogisticRegressionModule
-
-importall MinusPlusOneVectorModule
-
-export get_f_g_cs, get_f_pcc, get_g_from_cs
 
 function get_f_g_cs(features::Matrix{Float64},labels::MinusPlusOneVector,W::Vector{Float64},index::Int64)
 	X = features[index,:];
@@ -63,6 +58,4 @@ function get_f_pcc(features::Matrix{Float64},labels::MinusPlusOneVector,W::Vecto
 	ym=Y.*margins
 	f=sum( log(1 + exp(-ym)) ) / examples 
 	(f , count(c -> c >= 0, ym) / examples  )
-end
-
 end

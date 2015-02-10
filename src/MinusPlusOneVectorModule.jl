@@ -1,9 +1,3 @@
-module MinusPlusOneVectorModule
-
-import Base.size
-
-export MinusPlusOneVector
-
 immutable MinusPlusOneVector
 	field  :: Vector{Float64}
 	numPlus :: Int64
@@ -59,6 +53,4 @@ end
 # This method is used ONLY because we import Base.size !
 function size(a::MinusPlusOneVector)
 	size(a.field)[1]
-end
-
 end
