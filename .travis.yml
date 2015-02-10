@@ -2,3 +2,10 @@ language: julia
 julia:
   - release
   - nightly
+script:
+- julia -e 'Pkg.init(); Pkg.clone(pwd()); Pkg.test("EGR")'
+- julia -e 'Pkg.build(\"EGR")'
+- julia -e --check-bounds=yes -e 'Pkg.test(\"EGR")'
+- julia --code-coverage test/runtests.jl
+after_success:
+- julia -e 'cd(Pkg.dir("EGR")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
