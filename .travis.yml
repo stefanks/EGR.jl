@@ -2,6 +2,8 @@ language: julia
 julia:
  - release
  - nightly
+notifications:
+  email: false
 services:
  - redis-server
 script:

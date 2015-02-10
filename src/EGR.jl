@@ -10,9 +10,8 @@ include("MinusPlusOneVectorModule.jl")
 include("BinaryLogisticRegressionModule.jl")
 include("alg.jl")
 
-
 println("testing redis")
-client=redis();
+client=Redis.redis();
 datasetArray=Dict[]
 for thisKey in smembers(client,"dataset_ids")
 	push!(datasetArray,hgetall(client,thisKey))
