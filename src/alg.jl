@@ -1,4 +1,5 @@
-tic()
+using StatsBase
+
 function egr(
 	numDatapoints::Integer,
 	numVars::Integer,
@@ -9,7 +10,7 @@ function egr(
 	beta,
 	getNextSampleFunction::Function,
 	outputOpts;
-	maxG=typemax(Int64),
+	maxG=typemax(Int64)-35328,
 	x=zeros(numVars))
 
 	println("Starting egr-s")
@@ -39,10 +40,6 @@ function egr(
 	kOutputs=1
 	timein=0
 	timeout=0
-
-	
-	println("Time until loop")
-	println(toq());
 	
 	println("      k    gnum       f         pcc      f-train")
 	
@@ -104,7 +101,7 @@ function egr(
 				xToTest =x;
 			end
 			((f, pcc),f_train) = outputsFunction(x)
-			@printf("%2.i %6.i %6.i % .3e % .3e % .3e\n", kOutputs,k, gnum,f, pcc,f_train)
+            @printf("%2.i %7.i %7.i % .3e % .3e % .3e\n", kOutputs,k, gnum,f, pcc,f_train)
 			push!(results_k,k)
 			push!(results_f,f )
 			push!(results_pcc,pcc )
@@ -129,30 +126,6 @@ function egr(
 	(results_k ,results_f ,results_pcc ,results_x )
 end
 
-
-stepSize(k)=1/sqrt(k+1)
-s(k,I)=min(k,I)
-u(k,I)= min(k+1, numTrainingPoints - I)
-
-
-k=0
-
-function getSequential(numTrainingPoints,gradientFunction,restoreGradient)
-	global k+=1
-	if k<=numTrainingPoints
-		k
-	else
-		error("Out of range")
-	end
-	g(x) = gradientFunction(x,k)
-	cs(cs) = restoreGradient(cs,k)
-	(g,cs)
-end
-
-getNextSampleFunction() = getSequential(numTrainingPoints,mygradientOracle,restoreGradient)
-
-#workspace();importall ScriptsModule;datasetArray=loadFromRedis();(gradientOracle,numTrainingPoints,numVars,testFunction,restoreGradient)=loadAgaricus(datasetArray); using StatsBase;
-
 immutable type OutputOpts
 	logarithmic::Bool
 	outputNum::Int64
@@ -164,5 +137,3 @@ immutable type OutputOpts
 		new(logarithmic,outputNum, average)
 	end
 end
-
-(results_k, results_f, results_pcc, results_x ) = egr(numTrainingPoints,numVars,stepSize,outputsFunction,s,u,1,getNextSampleFunction,OutputOpts(),maxG=50*numTrainingPoints)

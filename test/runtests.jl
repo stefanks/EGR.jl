@@ -72,20 +72,40 @@ function M1P1Test()
 	true
 end
 
-function EGRTest(numVars, numDatapoints,gradientFunction)
+k=0
+
+function getSequential(numDatapoints,gradientFunction,restoreGradient)
+	global k+=1
+	if k<=numDatapoints
+		k
+	else
+		error("Out of range")
+	end
+	g(x) = gradientFunction(x,k)
+	cs(cs) = restoreGradient(cs,k)
+	(g,cs)
+end
+
+function EGRTest(numVars, numDatapoints,gradientFunction,restoreGradient,outputsFunction)
+
+
+	getNextSampleFunction() = getSequential(numDatapoints,gradientFunction,restoreGradient)
 	
-	# egr(
-	# 	numDatapoints::Integer,
-	# 	numVars::Integer,
-	# 	stepSize::Function,
-	# 	outputsFunction::Function,
-	# 	s::Function,
-	# 	u::Function,
-	# 	beta,
-	# 	getNextSampleFunction::Function,
-	# 	outputOpts;
-	# 	maxG=typemax(Int64),
-	# 	x=zeros(numVars))
+	stepSize(k)=1/sqrt(k+1)
+	s(k,I)=min(k,I)
+	u(k,I)= min(k+1, numDatapoints - I)
+	beta = 1
+	egr(
+		numDatapoints,
+		numVars,
+		stepSize,
+		outputsFunction,
+		s,
+		u,
+		beta,
+		getNextSampleFunction,
+		OutputOpts();
+		maxG=1000)
 	true
 end
 features = float([-1  1
@@ -106,5 +126,13 @@ gradientFunction(W)=get_f_g_cs(features,labels,W)
 @test GradientTest(numVars, numDatapoints,gradientFunction)
 
 @test M1P1Test()
+	
+restoreGradient(cs,indices) = get_g_from_cs(features,labels,cs,indices)
 
-@test EGRTest(numVars, numDatapoints,gradientFunction)
+
+testFunction(W) = get_f_pcc(features,labels,W)
+	
+outputsFunction(W) = (testFunction(W), gradientFunction(W)[1])
+	
+
+@test EGRTest(numVars, numDatapoints,gradientFunction,restoreGradient,outputsFunction)
