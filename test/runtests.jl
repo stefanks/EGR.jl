@@ -71,8 +71,10 @@ function M1P1Test()
 	println(size(a))
 	true
 end
-@test 1 == 1
 
+function EGRTest()
+	true
+end
 features = float([-1  1
 			-1 -1
 			 1 -1
@@ -91,3 +93,5 @@ gradientFunction(W)=get_f_g_cs(features,labels,W)
 @test GradientTest(numVars, numDatapoints,gradientFunction)
 
 @test M1P1Test()
+
+@test EGRTest()
