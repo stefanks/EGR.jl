@@ -2,6 +2,8 @@ language: julia
 julia:
  - release
  - nightly
+ services:
+  - redis-server
 script:
  - julia -e 'Pkg.add("StatsBase"); Pkg.clone(pwd()); Pkg.test("EGR", coverage = true)'
 after_success:

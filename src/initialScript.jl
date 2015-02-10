@@ -1,5 +1,5 @@
 println("Starting InitialScript.")
-using StatsBase;
+using StatsBase
 using Redis
 client=redis();
 datasetArray=Dict[]
