@@ -67,7 +67,7 @@ function M1P1Test()
 	c=MinusPlusOneVector([1,1,-1],Set([-1]))	
 	println(a[1])
 	println(b[2:3])
-	println(c[1,3])
+	println(c[[1,3]])
 	println(size(a))
 	true
 end
