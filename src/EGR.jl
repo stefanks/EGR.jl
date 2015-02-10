@@ -1,6 +1,6 @@
-module EGR
-
 using Redis
+
+module EGR
 
 import Base.size
 
