@@ -61,6 +61,16 @@ function GradientTest(numVars::Integer, numDatapoints::Integer,gradientFunction:
 	passed
 end
 
+function M1P1Test()
+	a=MinusPlusOneVector([1,1,-1])
+	b=MinusPlusOneVector([1,1,-1.0])
+	c=MinusPlusOneVector([1,1,-1],Set([-1]))	
+	println(a[1])
+	println(b[2:3])
+	println(c[1,3])
+	println(size(a))
+	true
+end
 @test 1 == 1
 
 features = float([-1  1
@@ -79,3 +89,5 @@ gradientFunction(W,index)=get_f_g_cs(features,labels,W,index)
 gradientFunction(W)=get_f_g_cs(features,labels,W)
 
 @test GradientTest(numVars, numDatapoints,gradientFunction)
+
+@test M1P1Test()
