@@ -1,4 +1,3 @@
-println(pwd())
 
 fileNames = ("data/agaricus/agaricus",)
 

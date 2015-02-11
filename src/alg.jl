@@ -1,5 +1,17 @@
 using StatsBase
 
+immutable type OutputOpts
+	logarithmic::Bool
+	outputNum::Int64
+	average::Bool
+	function OutputOpts(;logarithmic::Bool = true,outputNum::Int64 = 10, average::Bool=false)
+		if outputNum>99
+			error("outputNum too big")
+		end
+		new(logarithmic,outputNum, average)
+	end
+end
+
 function egr(
 	numDatapoints::Integer,
 	numVars::Integer,
@@ -9,7 +21,7 @@ function egr(
 	u::Function,
 	beta,
 	getNextSampleFunction::Function,
-	outputOpts;
+	outputOpts::OutputOpts;
 	maxG=typemax(Int64)-35328,
 	x=zeros(numVars))
 
@@ -124,18 +136,6 @@ function egr(
 	
 	println("Finished egr-s")
 	(results_k ,results_f ,results_pcc ,results_x )
-end
-
-immutable type OutputOpts
-	logarithmic::Bool
-	outputNum::Int64
-	average::Bool
-	function OutputOpts(;logarithmic::Bool = true,outputNum::Int64 = 10, average::Bool=false)
-		if outputNum>99
-			error("outputNum too big")
-		end
-		new(logarithmic,outputNum, average)
-	end
 end
 
 function sg(gradientFunction::Function,
