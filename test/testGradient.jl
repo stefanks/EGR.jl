@@ -58,4 +58,7 @@ function GradientTest(numVars::Integer, numDatapoints::Integer,gradientFunction:
 	passed
 end
 
+include("Generate6dpProblem.jl")
+(numVars, numDatapoints,gradientFunction, restoreGradient,outputsFunction)=Generate6dpProblem()
+
 @test GradientTest(numVars, numDatapoints,gradientFunction)

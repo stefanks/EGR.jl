@@ -10,15 +10,15 @@ function trainTestRandomSeparate(features,labels)
 end
 
 
-function createOracles(features,labels,numFeatures,numDatapoints)
+function createOracles(features,labels,numFeatures,numDatapoints; L2reg=false,outputLevel=0)
 
-	println("Starting separation into train and test sets...")
+	# println("Starting separation into train and test sets...")
 	(trf,trl,numTrainingPoints, tef, tel) = trainTestRandomSeparate(features,labels)
-	println("Finished")
+	# println("Finished")
 	trl=MinusPlusOneVector(trl,Set([1.0]))
 	tel=MinusPlusOneVector(tel,Set([1.0]))
 
-	println("Defining functions...")
+	# println("Defining functions...")
 	gradientOracle(W,indices) = get_f_g_cs(trf, trl,W,indices)
 	gradientOracle(W) = get_f_g_cs(trf, trl,W)
 	testFunction(W) = get_f_pcc(tef, tel,W)
@@ -26,11 +26,13 @@ function createOracles(features,labels,numFeatures,numDatapoints)
 	outputsFunction(W) = (testFunction(W), gradientOracle(W)[1])
 		
 	restoreGradient(cs,indices) = get_g_from_cs(trf, trl,cs,indices)
-	println("Finished")
+	# println("Finished")
+	#
+	# println("Adding regularizer...")
+	if L2reg
+		gradientOracle(a,b) = L2regGradient(gradientOracle, 1e-3, a,b)
+	end
+	# println("Finished")
 
-	println("Adding regularizer...")
-	mygradientOracle(a,b) = L2regGradient(gradientOracle, 1e-3, a,b)
-	println("Finished")
-
-	(mygradientOracle,numTrainingPoints,numFeatures,outputsFunction,restoreGradient)
+	(gradientOracle,numTrainingPoints,numFeatures,outputsFunction,restoreGradient)
 end

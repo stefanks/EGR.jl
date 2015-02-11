@@ -5,9 +5,6 @@ try
 cd(Pkg.dir("EGR"))
 end
 
-include("Generate6dpProblem.jl")
-(numVars, numDatapoints,gradientFunction, restoreGradient,outputsFunction)=Generate6dpProblem()
-
 my_tests = [ "testData.jl", "testM1P1.jl", "testEGR.jl", "testGradient.jl"]
 
 for my_test in my_tests

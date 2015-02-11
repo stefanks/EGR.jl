@@ -34,4 +34,7 @@ end
 
 k=0
 
+include("Generate6dpProblem.jl")
+(numVars, numDatapoints,gradientFunction, restoreGradient,outputsFunction)=Generate6dpProblem()
+
 @test EGRTest(numVars, numDatapoints,gradientFunction,restoreGradient,outputsFunction)
