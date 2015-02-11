@@ -1,3 +1,5 @@
+import Base.size
+
 immutable MinusPlusOneVector
 	field  :: Vector{Float64}
 	numPlus :: Int64

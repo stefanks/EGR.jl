@@ -17,8 +17,8 @@ function readData(fname::String, shape, minFeatureInd::Integer)
 	(features, labels)
 end
 
-function readWrite(datasetHT::Dict)
-	(features, labels) = readData(datasetHT["path"]*datasetHT["filename"], (int(datasetHT["nDatapoints"]),int(datasetHT["nFeatures"])), int(datasetHT["minFeatureInd"]))
+function readWrite(fname::String, datasetHT::Dict)
+	(features, labels) = readData(fname, (int(datasetHT["nDatapoints"]),int(datasetHT["nFeatures"])), int(datasetHT["minFeatureInd"]))
 	fi = open(datasetHT["path"]*datasetHT["name"]*".bin", "w")
 	write(fi, features)
 	write(fi, labels)
