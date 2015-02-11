@@ -1,9 +1,9 @@
 using Base.Test
 using EGR
 
-try 
+# try
 cd(Pkg.dir("EGR"))
-end
+# end
 
 (numVars, numDatapoints,gradientFunction, restoreGradient,outputsFunction)=Generate6dpProblem()
 

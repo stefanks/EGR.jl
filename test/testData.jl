@@ -22,6 +22,8 @@ for thisKey in Redis.smembers(client,"test_dataset_ids")
 end
 sort!(datasetArray,by=x->int(x["numTotal"]))
 
-println(datasetArray)
+datasetHT = datasetArray[1]
 
-readWrite("data/agaricus/agaricus",datasetArray[1])
+readWrite("data/agaricus/agaricus",datasetHT)
+
+(features,labels) = readBin(datasetHT["path"]*datasetHT["name"]*".bin",int(datasetHT["nDatapoints"]),int(datasetHT["nFeatures"]))
