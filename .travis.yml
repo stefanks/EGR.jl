@@ -7,6 +7,6 @@ notifications:
 services:
  - redis-server
 script:
- - julia -e 'Pkg.add("StatsBase"); Pkg.add("Redis");Pkg.clone(pwd()); Pkg.test("EGR", coverage = true)'
+ - julia -e --code-coverage 'Pkg.add("StatsBase"); Pkg.add("Redis");Pkg.clone(pwd()); Pkg.test("EGR")'
 after_success:
  - julia -e 'cd(Pkg.dir("EGR")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'
