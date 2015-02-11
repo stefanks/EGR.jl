@@ -10,13 +10,11 @@ include("MinusPlusOneVectorModule.jl")
 include("BinaryLogisticRegressionModule.jl")
 include("alg.jl")
 
-println("testing redis")
 client = RedisConnection();
 datasetArray=Dict[]
 for thisKey in Redis.smembers(client,"dataset_ids")
 	push!(datasetArray,Redis.hgetall(client,thisKey))
 end
 sort!(datasetArray,by=x->int(x["numTotal"]))	
-println(datasetArray)
 
-end # module
+end

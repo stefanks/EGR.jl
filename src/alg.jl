@@ -41,7 +41,7 @@ function egr(
 	timein=0
 	timeout=0
 	
-	println("      k    gnum       f         pcc      f-train")
+	println("        k    gnum       f         pcc      f-train")
 	
 	tic()
 	while true
