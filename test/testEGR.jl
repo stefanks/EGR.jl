@@ -12,7 +12,6 @@ end
 
 function EGRTest(numVars, numDatapoints,gradientFunction,restoreGradient,outputsFunction)
 
-
 	getNextSampleFunction() = getSequential(numDatapoints,gradientFunction,restoreGradient)
 	
 	stepSize(k)=1/sqrt(k+1)
