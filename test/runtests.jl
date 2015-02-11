@@ -1,10 +1,11 @@
 using Base.Test
 using EGR
 
-# try
+try 
 cd(Pkg.dir("EGR"))
-# end
+end
 
+include("Generate6dpProblem.jl")
 (numVars, numDatapoints,gradientFunction, restoreGradient,outputsFunction)=Generate6dpProblem()
 
 my_tests = [ "testData.jl", "testM1P1.jl", "testEGR.jl", "testGradient.jl"]
