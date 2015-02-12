@@ -10,13 +10,13 @@ function trainTestRandomSeparate(features,labels)
 end
 
 
-function createOracles(features,labels,numFeatures,numDatapoints; L2reg=false,outputLevel=0)
+function createOracles(features,labels,numFeatures,numDatapoints, setOfOnes; L2reg=false,outputLevel=0)
 
 	# println("Starting separation into train and test sets...")
 	(trf,trl,numTrainingPoints, tef, tel) = trainTestRandomSeparate(features,labels)
 	# println("Finished")
-	trl=MinusPlusOneVector(trl,Set([1.0]))
-	tel=MinusPlusOneVector(tel,Set([1.0]))
+	trl=MinusPlusOneVector(trl,setOfOnes)
+	tel=MinusPlusOneVector(tel,setOfOnes)
 
 	# println("Defining functions...")
 	gradientOracle(W,indices) = get_f_g_cs(trf, trl,W,indices)
@@ -34,5 +34,6 @@ function createOracles(features,labels,numFeatures,numDatapoints; L2reg=false,ou
 	end
 	# println("Finished")
 
-	(gradientOracle,numTrainingPoints,numFeatures,outputsFunction,restoreGradient)
+	numVars = numFeatures
+	(gradientOracle,numTrainingPoints,numVars,outputsFunction,restoreGradient)
 end
