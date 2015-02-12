@@ -8,6 +8,6 @@ include("myIO.jl")
 include("CreateOracles.jl")
 include("L2Reg.jl")
 include("ComputeStep.jl")
-include("Algs.jl")
+include("Alg.jl")
 
 end
