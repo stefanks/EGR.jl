@@ -1,9 +1,13 @@
-function L2regGradient(gradientOracle::Function, L2param::Float64, a,b)
+function L2regGradient(gradientOracle::Function, L2param::Float64, W,b)
+	
+	res = gradientOracle(W,b)
 
- 	W = a
-	
-	res = gradientOracle(a,b)
-	
 	( res[1] + (1/2)*L2param*(W'*W),res[2]+ L2param*W, res[3])
+end
 
+function L2regGradient(gradientOracle::Function, L2param::Float64, W)
+	
+	res = gradientOracle(W)
+
+	( res[1] + (1/2)*L2param*(W'*W),res[2]+ L2param*W, res[3])
 end

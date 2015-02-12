@@ -32,10 +32,10 @@ end
 client = RedisConnection();
 Redis.hmset(client, "Toy", {"name" => "Toy", "path" => "data/Toy/", "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" =>numTotal })
 
-writeBin("data/agaricus/Toy.bin", features, labels)
+writeBin("data/Toy/Toy.bin", features, labels)
 
 datasetHT=Redis.hgetall(client,"Toy")
 
-(features,labels) = readBin("data/agaricus/Toy.bin",int(datasetHT["numDatapoints"]),int(datasetHT["numFeatures"]))
+(features,labels) = readBin("data/Toy/Toy.bin",int(datasetHT["numDatapoints"]),int(datasetHT["numFeatures"]))
 
 println()

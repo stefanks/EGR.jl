@@ -1,5 +1,5 @@
 
-(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,numFeatures,numDatapoints,Set([1.0]); L2reg=false,outputLevel=0)
+(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,numFeatures,numDatapoints,Set([1.0]); L2reg=true,outputLevel=0)
 
 println("Starting Gradient test...")
 	
@@ -7,7 +7,9 @@ tol = 1e-13
 	
 x=zeros(numVars)
 (f,g, margins)= gradientOracle(x)
+println((f,g, margins))
 (f,g1, margins)= gradientOracle(x,1:div(numTrainingPoints,2))
+println((f,g, margins))
 
 (f,g2, margins)= gradientOracle(x,(div(numTrainingPoints,2)+1):numTrainingPoints)
 
