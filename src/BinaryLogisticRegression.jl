@@ -6,6 +6,7 @@ function get_f_g_cs(features::Matrix{Float64},labels::MinusPlusOneVector,W::Vect
 	ym=Y*margin
 	f=log(1 + exp(-ym))
 	# TODO: CHECK IF THIS IS SLOW, MIGHT BE GOOD TO GET RID OF TRANSPOSE!!!
+	# TODO: check if better to store the X in columns vs rows!!!!!! 
 	g=X'*(-Y ./ (1 + exp(ym)))
 	(f ,g, margin)
 end

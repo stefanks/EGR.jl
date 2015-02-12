@@ -1,65 +1,58 @@
-function GradientTest(numVars::Integer, numDatapoints::Integer,gradientFunction::Function)
 
-	println("Starting Gradient test...")
-	
-	passed = true
-	
-	tol = 1e-13
-	
-	x=zeros(numVars)
-	(f,g, margins)= gradientFunction(x)
-	(f,g1, margins)= gradientFunction(x,1:div(numDatapoints,2))
-	(f,g2, margins)= gradientFunction(x,(div(numDatapoints,2)+1):numDatapoints)
-	est1=(div(numDatapoints,2)*g1+(numDatapoints-div(numDatapoints,2))*g2)/numDatapoints
-	relError = norm(est1-g)/norm(g)
-	println("relError = $relError")
-	if relError>tol 
-		error("Did not pass!")
-		passed=false
-	end
-	est2=zeros(numVars)
-	for i=1:numDatapoints
-		(f,g1, margins)= gradientFunction(x,i)
-		est2+=g1
-	end
-	est2=est2/numDatapoints
-	relError = norm(est2-g)/norm(g)
-	println("relError = $relError")
-	if relError>tol 
-		error("Did not pass!")
-		passed=false
-	end
-	
-	x=2*rand(numVars)-1
-	(f,g, margins)= gradientFunction(x)
-	(f,g1, margins)= gradientFunction(x,1:div(numDatapoints,2))
-	(f,g2, margins)= gradientFunction(x,(div(numDatapoints,2)+1):numDatapoints)
-	est1=(div(numDatapoints,2)*g1+(numDatapoints-div(numDatapoints,2))*g2)/numDatapoints
-	relError = norm(est1-g)/norm(g)
-	println("relError = $relError")
-	if relError>tol 
-		error("Did not pass!")
-		passed=false
-	end
-	est2=zeros(numVars)
-	for i=1:numDatapoints
-		(f,g1, margins)= gradientFunction(x,i)
-		est2+=g1
-	end
-	est2=est2/numDatapoints
-	relError = norm(est2-g)/norm(g)
-	println("relError = $relError")
-	if relError>tol 
-		error("Did not pass!")
-		passed=false
-	end
+(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,numFeatures,numDatapoints,Set([1.0]); L2reg=false,outputLevel=0)
 
-	println("Gradient test passed!")
-	passed
+println("Starting Gradient test...")
+	
+tol = 1e-13
+	
+x=zeros(numVars)
+(f,g, margins)= gradientOracle(x)
+(f,g1, margins)= gradientOracle(x,1:div(numTrainingPoints,2))
+
+(f,g2, margins)= gradientOracle(x,(div(numTrainingPoints,2)+1):numTrainingPoints)
+
+est1=(div(numTrainingPoints,2)*g1+(numTrainingPoints-div(numTrainingPoints,2))*g2)/numTrainingPoints
+relError = norm(est1-g)/norm(g)
+println("relError = $relError")
+if relError>tol 
+	error("Did not pass!")
+	passed=false
+end
+est2=zeros(numVars)
+for i=1:numTrainingPoints
+	(f,g1, margins)= gradientOracle(x,i)
+	est2+=g1
+end
+est2=est2/numTrainingPoints
+relError = norm(est2-g)/norm(g)
+println("relError = $relError")
+if relError>tol 
+	error("Did not pass!")
+	passed=false
+end
+	
+x=2*rand(numVars)-1
+(f,g, margins)= gradientOracle(x)
+(f,g1, margins)= gradientOracle(x,1:div(numTrainingPoints,2))
+(f,g2, margins)= gradientOracle(x,(div(numTrainingPoints,2)+1):numTrainingPoints)
+est1=(div(numTrainingPoints,2)*g1+(numTrainingPoints-div(numTrainingPoints,2))*g2)/numTrainingPoints
+relError = norm(est1-g)/norm(g)
+println("relError = $relError")
+if relError>tol 
+	error("Did not pass!")
+	passed=false
+end
+est2=zeros(numVars)
+for i=1:numTrainingPoints
+	(f,g1, margins)= gradientOracle(x,i)
+	est2+=g1
+end
+est2=est2/numTrainingPoints
+relError = norm(est2-g)/norm(g)
+println("relError = $relError")
+if relError>tol 
+	error("Did not pass!")
+	passed=false
 end
 
-include("Generate10dpProblem.jl")
-
-(gradientOracle,numTrainingPoints,numVars,outputsFunction,restoreGradient)=Generate10dpProblem()
-
-@test GradientTest(numVars, numTrainingPoints,gradientOracle)
+println("Gradient test passed!")

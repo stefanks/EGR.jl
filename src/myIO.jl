@@ -17,9 +17,8 @@ function readData(fname::String, shape, minFeatureInd::Integer)
 	(features, labels)
 end
 
-function readWrite(fname::String, datasetHT::Dict)
-	(features, labels) = readData(fname, (int(datasetHT["nDatapoints"]),int(datasetHT["nFeatures"])), int(datasetHT["minFeatureInd"]))
-	fi = open(datasetHT["path"]*datasetHT["name"]*".bin", "w")
+function writeBin(fname::String, features, labels)
+	fi = open(fname, "w")
 	write(fi, features)
 	write(fi, labels)
 	close(fi)
@@ -41,9 +40,11 @@ function getStats(fname::String)
 	maxfeatureInd=typemin(Int)
 	minfeature=typemax(Int)
 	maxfeature=typemin(Int)
+	mySetOfClasses = Set()
 	for line in eachline(fi)
 		n += 1
 		line = split(line, " ")
+		push!(mySetOfClasses, line[1])
 		line = line[2:end]
 		for itm in line
 			itm = split(itm, ":")
@@ -62,6 +63,6 @@ function getStats(fname::String)
 	
 	close(fi)
 	
-	return (n,minfeatureInd,maxfeatureInd,numTotal,minfeature,maxfeature)
+	return (n,minfeatureInd,maxfeatureInd-minfeatureInd+1,numTotal,minfeature,maxfeature, length(mySetOfClasses))
 end
 

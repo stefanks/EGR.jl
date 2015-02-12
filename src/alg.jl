@@ -108,7 +108,7 @@ function egr(
 		timeout+=toq()
 		if gnum>= expIndices[kOutputs]
 			if outputOpts.average == 1
-				xToTest =xSum/(k+1s);
+				xToTest =xSum/(k+1);
 			else
 				xToTest =x;
 			end
@@ -169,16 +169,56 @@ function sg(gradientFunction::Function,
 	(results_k ,results_f ,results_pcc ,results_x )
 end
 
-function gd(gradientFunction::Function,numDatapoints::Integer,numVars::Integer,stepSize::Function,testFunction::Function,iter=100)
+function gd(gradientOracle::Function, numVars::Integer, stepSize::Function, outputsFunction::Function,outputOpts::OutputOpts; maxG=typemax(Int64)-35328)
 	println("Starting gd")
+	
+	
+	if outputOpts.logarithmic == 1
+		expIndices=unique(int(round(logspace(0,log10(maxG),outputOpts.outputNum))));
+	else
+		expIndices=unique(int(round(linspace(0,maxG,outputOpts.outputNum))));
+	end
+	
+	maxCounter = min(maxG, expIndices[end]);
+	
+	
+	k=0
+	gnum=0
+	kOutputs=1
+	
+	
+	results_k = Int64[]
+	results_f = Float64[]
+	results_pcc = Float64[]
+	results_x = Array{Float64,1}[]
 	x=zeros(numVars)
-	for k=1:iter
-		(f,g, margins)= gradientFunction(x)
+
+	while true
+		(f,g, margins)= gradientOracle(x)
 		x-=stepSize(k)*g
-		if k%div(iter,40)==0
-			(f, pcc) = testFunction(x)
-			@printf("% .6f % .6f\n", f, pcc)
+		
+		gnum+=1
+		
+		if gnum>= expIndices[kOutputs]
+			if outputOpts.average == 1
+				xToTest =xSum/(k+1);
+			else
+				xToTest =x;
+			end
+			((f, pcc),f_train) = outputsFunction(x)
+            @printf("%2.i %7.i %7.i % .3e % .3e % .3e\n", kOutputs,k, gnum,f, pcc,f_train)
+			push!(results_k,k)
+			push!(results_f,f )
+			push!(results_pcc,pcc )
+			push!(results_x,x)
+			kOutputs = kOutputs+1;
 		end
+		
+		k+=1
+		
+			
+		gnum>=maxG && break
+		
 	end
 	println("Finished gd")
 end

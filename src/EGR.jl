@@ -1,6 +1,6 @@
 module EGR
 
-export get_f_g_cs, get_f_pcc, get_g_from_cs, MinusPlusOneVector, OutputOpts, egr, getStats, readWrite, readBin, createOracles, L2regGradient
+export get_f_g_cs, get_f_pcc, get_g_from_cs, MinusPlusOneVector, OutputOpts, egr, getStats, readBin, createOracles, L2regGradient, readData, writeBin, gd
 
 include("MinusPlusOneVector.jl")
 include("BinaryLogisticRegression.jl")

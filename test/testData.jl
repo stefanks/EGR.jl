@@ -1,29 +1,41 @@
 using Redis
 
-(n,minFeatureInd,maxFeatureInd,numTotal,minfeature,maxfeature) = getStats("data/agaricus/agaricus")
-println("Number of datapoints = $n")
+(numDatapoints,minFeatureInd,numFeatures,numTotal,minfeature,maxfeature,numClasses) = getStats("data/Toy/Toy")
+println("Number of datapoints = $numDatapoints")
 println("minFeatureInd   = $minFeatureInd")
-println("maxFeatureInd   = $maxFeatureInd")
-println("number of features   = $(maxFeatureInd-minFeatureInd+1)")
+println("number of features   = $numFeatures")
 println("numTotal   = $(numTotal)")
-println("sparsity   = $(numTotal/(n*(maxFeatureInd-minFeatureInd+1)))")
+println("sparsity   = $(numTotal/(numDatapoints*numFeatures))")
 println("minfeature   = $minfeature")
 println("maxfeature   = $maxfeature")
+println("numClasses   = $numClasses")
+
+(features, labels) = readData("data/Toy/Toy", (numDatapoints,numFeatures), minFeatureInd)
+
+# NORMALIZE FEATURES!!!
+if (numTotal/(numDatapoints*numFeatures))>0.99 && (minfeature<-1.01 || maxfeature>1.01)
+	minfeature=typemax(Int)
+	maxfeature=typemin(Int)
+	for i in 1:numFeatures
+		thismax = maximum(features[:,i])
+		thismin = minimum(features[:,i])
+		features[:,i] =(2* features[:,i]-thismax-thismin)/(thismax-thismin)
+		minfeature=min(minfeature, minimum(features[:,i] ))
+		maxfeature=max(maxfeature, maximum(features[:,i] ))
+	end
+	println("After normalization")
+	println("minfeature   = $minfeature")
+	println("maxfeature   = $maxfeature")
+end
 
 
 client = RedisConnection();
-Redis.hmset(client, "testDataset:1", {"name" => "agaricus", "path" => "data/agaricus/", "nDatapoints" => n, "nFeatures" => maxFeatureInd-minFeatureInd+1,"minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature , "numTotal" =>numTotal })
+Redis.hmset(client, "Toy", {"name" => "Toy", "path" => "data/Toy/", "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" =>numTotal })
 
-Redis.sadd(client, "test_dataset_ids", "testDataset:1")
+writeBin("data/agaricus/Toy.bin", features, labels)
 
-datasetArray=Dict[]
-for thisKey in Redis.smembers(client,"test_dataset_ids")
-	push!(datasetArray,Redis.hgetall(client,thisKey))
-end
-sort!(datasetArray,by=x->int(x["numTotal"]))
+datasetHT=Redis.hgetall(client,"Toy")
 
-datasetHT = datasetArray[1]
+(features,labels) = readBin("data/agaricus/Toy.bin",int(datasetHT["numDatapoints"]),int(datasetHT["numFeatures"]))
 
-readWrite("data/agaricus/agaricus",datasetHT)
-
-(features,labels) = readBin(datasetHT["path"]*datasetHT["name"]*".bin",int(datasetHT["nDatapoints"]),int(datasetHT["nFeatures"]))
+println()
