@@ -58,5 +58,5 @@ function get_f_pcc(features::Matrix{Float64},labels::MinusPlusOneVector,W::Vecto
 	margins = X*W;
 	ym=Y.*margins
 	f=sum( log(1 + exp(-ym)) ) / examples 
-	(f , count(c -> c >= 0, ym) / examples  )
+	(f , count(c -> c > 0, ym) / examples  )
 end
