@@ -6,6 +6,7 @@ immutable type OutputOpts
 	average::Bool
 	outputLevel::Int64
 	outputsFunction::Function
+	
 	function OutputOpts(outputsFunction::Function; logarithmic::Bool = true, maxOutputNum::Int64 = 10, average::Bool=false, outputLevel::Int64=1)
 		if maxOutputNum>99
 			error("maxOutputNum too big")
@@ -15,6 +16,7 @@ immutable type OutputOpts
 		outputLevel>2 && println("outputLevel is $outputLevel") 
 		new(logarithmic, maxOutputNum, average, outputLevel,outputsFunction)
 	end
+	
 end
 
 immutable type Opts
@@ -26,7 +28,7 @@ immutable type Opts
 	end
 end
 
-function alg(opts::Opts, sp::StepParams, dh::DataHold, oo::OutputOpts, computeStep::Function)
+function alg(opts::Opts, sd::StepData, oo::OutputOpts, computeStep::Function)
 	
 	oo.outputLevel>0 && println("Starting alg")
 	
@@ -71,7 +73,7 @@ function alg(opts::Opts, sp::StepParams, dh::DataHold, oo::OutputOpts, computeSt
 		
 		gnum>=opts.maxG && break
 		
-	    (g, gnum) = computeStep(x, k, gnum, sp, dh);
+	    (g, gnum) = computeStep(x, k, gnum, sd);
 		
 		
 		#  PUT IN ADAGRAD !!!

@@ -22,28 +22,44 @@ end
 #
 # k=0
 #
-# s(k,I)=min(k,I)
-# u(k,I)= min(k+1, numTrainingPoints - I)
-# beta = 1
+
 # alg(numTrainingPoints, numVars, stepSize, outputsFunction, EGRStepParams(s, u, beta, getNextSampleFunction), EGRdata_hold(numVars),OutputOpts(),naturalEGRS; maxG=1000)
 #
 
 
-## If s(k) = 0, u(k) = 1, gamma is natural, then egrs is equivalent to gd!!!
-	
+println("If s(k) = 0 and then numTrainingPoints, u(k) = numTrainingPoints, then 0 , gamma is natural, then egrs is equivalent to gd!!!")
+
 stepSize(k)=0.1
-
-getNextSampleFunction = Task(() -> getSequential(numTrainingPoints,gradientOracle,restoreGradient))
-
-println("If s(k) = 0, u(k) = 1, gamma is natural, then egrs is equivalent to gd!!!")
-
+function sLikeGd(k,numTrainingPoints)
+	k==0 ? 0 : numTrainingPoints
+end
+function uLikeGd(k,numTrainingPoints)
+	k==0 ? numTrainingPoints : 0
+end
+s(k,I) = sLikeGd(k,numTrainingPoints)
+u(k,I) =  uLikeGd(k,numTrainingPoints)
+beta(k) =1 - 1/sqrt(k+1)
 
 maxG = 10*numTrainingPoints
 
-alg(Opts(zeros(numVars),stepSize; maxG=maxG), SGStepParams(getNextSampleFunction), SGData_hold(), OutputOpts(outputsFunction,outputLevel=2), computeSGStep)
+
+getNextSampleFunction = Task(() -> getSequential(numTrainingPoints,gradientOracle,restoreGradient))
+
+
+alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars),  OutputOpts(outputsFunction,outputLevel=2), naturalEGRS)
+
+
+alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints),  OutputOpts(outputsFunction,outputLevel=2), naturalEGRS)
+
+stepSize(k)=0.1
+
+println("If s(k) = 0, u(k) = 1, gamma is natural, then egrs is equivalent to sgs!!!")
+
+
+
+alg(Opts(zeros(numVars),stepSize; maxG=maxG), SGsd(getNextSampleFunction), OutputOpts(outputsFunction,outputLevel=2), computeSGStep)
 
 s(k,I)=0
 u(k,I)= 1
-beta = 1
 
-alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRStepParams(s, u, beta, getNextSampleFunction), EGRdata_hold(numVars), OutputOpts(outputsFunction,outputLevel=2), naturalEGRS)
+alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars), OutputOpts(outputsFunction,outputLevel=2), naturalEGRS)
