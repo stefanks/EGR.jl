@@ -8,6 +8,14 @@ catch
 end
 
 
+
+function sLikeGd(k,numTrainingPoints)
+	k==0 ? 0 : numTrainingPoints
+end
+function uLikeGd(k,numTrainingPoints)
+	k==0 ? numTrainingPoints : 0
+end
+
 testProblems=["Toy", "agaricus"]
 
 for testProblem in testProblems
@@ -115,7 +123,7 @@ for testProblem in testProblems
 		println()
 	
 		function getSequential(numTrainingPoints,gradientOracle,restoreGradient)
-			indices = [1:numTrainingPoints]
+			indices = [1:numTrainingPoints;]
 			# println("A call to getSequential ")
 			while true
 				for i in indices
@@ -134,12 +142,6 @@ for testProblem in testProblems
 		println("If s(k) = 0 and then numTrainingPoints, u(k) = numTrainingPoints, then 0 , gamma is natural, then egrs is equivalent to gd!!!")
 
 		stepSize(k)=0.1
-		function sLikeGd(k,numTrainingPoints)
-			k==0 ? 0 : numTrainingPoints
-		end
-		function uLikeGd(k,numTrainingPoints)
-			k==0 ? numTrainingPoints : 0
-		end
 		s(k,I) = sLikeGd(k,numTrainingPoints)
 		u(k,I) =  uLikeGd(k,numTrainingPoints)
 		beta(k) =1 - 1/sqrt(k+1)

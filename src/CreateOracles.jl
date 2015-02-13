@@ -1,6 +1,6 @@
 function trainTestRandomSeparate(features,labels)
 	srand(1)
-	shuffledIndices = shuffle([1 : size(labels)[1]])
+	shuffledIndices = shuffle([1 : size(labels)[1];])
 	numTrainingPoints = div(size(labels)[1]*3,4)
 	(copy(features[shuffledIndices[1:numTrainingPoints      ],:]),
 	copy(labels  [shuffledIndices[1:numTrainingPoints      ]  ]),
