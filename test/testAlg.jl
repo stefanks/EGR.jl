@@ -45,11 +45,11 @@ maxG = 10*numTrainingPoints
 
 getNextSampleFunction = Task(() -> getSequential(numTrainingPoints,gradientOracle,restoreGradient))
 
-
 alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars),  OutputOpts(outputsFunction,outputLevel=2), naturalEGRS)
 
+getFullGradient(W) = gradientOracle(W)
 
-alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints),  OutputOpts(outputsFunction,outputLevel=2), naturalEGRS)
+alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints),  OutputOpts(outputsFunction,outputLevel=2), computeGDStep)
 
 stepSize(k)=0.1
 
