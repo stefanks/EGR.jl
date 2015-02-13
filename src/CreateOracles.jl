@@ -23,7 +23,11 @@ function createOracles(features,labels,numFeatures,numDatapoints, setOfOnes; L2r
 	gradientOracle(W) = get_f_g_cs(trf, trl,W)
 	testFunction(W) = get_f_pcc(tef, tel,W)
 		
-	outputsFunction(W) = (testFunction(W), gradientOracle(W)[1])
+	function outputsFunction(W)
+		ye = testFunction(W)
+		yo = gradientOracle(W)
+	   	(@sprintf("% .3e % .3e % .3e",ye[1], ye[2], yo[1]), [ye[1], ye[2], yo[1]])
+	 end
 		
 	restoreGradient(cs,indices) = get_g_from_cs(trf, trl,cs,indices)
 	# println("Finished")

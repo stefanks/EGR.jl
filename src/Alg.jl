@@ -2,73 +2,90 @@ using StatsBase
 
 immutable type OutputOpts
 	logarithmic::Bool
-	outputNum::Int64
+	maxOutputNum::Int64
 	average::Bool
-	function OutputOpts(;logarithmic::Bool = true,outputNum::Int64 = 10, average::Bool=false)
-		if outputNum>99
-			error("outputNum too big")
+	outputLevel::Int64
+	outputsFunction::Function
+	function OutputOpts(outputsFunction::Function; logarithmic::Bool = true, maxOutputNum::Int64 = 10, average::Bool=false, outputLevel::Int64=1)
+		if maxOutputNum>99
+			error("maxOutputNum too big")
+		elseif maxOutputNum<1
+			error("maxOutputNum too small")
 		end
-		new(logarithmic,outputNum, average)
+		outputLevel>2 && println("outputLevel is $outputLevel") 
+		new(logarithmic, maxOutputNum, average, outputLevel,outputsFunction)
 	end
 end
 
-function egr(numTrainingPoints::Integer, numVars::Integer, stepSize::Function, outputsFunction::Function, sp::StepParams, dh::DataHold, outputOpts::OutputOpts, computeStep::Function; maxG=typemax(Int64)-35328, x=zeros(numVars))
+immutable type Opts
+	stepSize::Function
+	init::Vector{Float64}
+	maxG::Int64
+	function Opts(init::Vector{Float64}, stepSize::Function; maxG::Int64=typemax(Int64)-35329)
+		new(stepSize, init, maxG)
+	end
+end
+
+function alg(opts::Opts, sp::StepParams, dh::DataHold, oo::OutputOpts, computeStep::Function)
 	
-	println("Starting egr-s")
+	oo.outputLevel>0 && println("Starting alg")
 	
-	if outputOpts.logarithmic == 1
-		expIndices=unique(int(round(logspace(0,log10(maxG),outputOpts.outputNum))));
+	if oo.logarithmic == 1
+		expIndices=unique(int(round(logspace(0,log10(opts.maxG+1),oo.maxOutputNum))))-1;
 	else
-		expIndices=unique(int(round(linspace(0,maxG,outputOpts.outputNum))));
+		expIndices=unique(int(round(linspace(0,opts.maxG,oo.maxOutputNum))));
 	end
 	
-	maxCounter = min(maxG, expIndices[end]);
+	maxCounter = min(opts.maxG, expIndices[end]);
 	
 	results_k = Int64[]
-	results_f = Float64[]
-	results_pcc = Float64[]
+	results_fromOutputsFunction = (String,Array{Float64,1})[]
 	results_x = Array{Float64,1}[]
-	x=zeros(numVars)
-	
+
+	x=opts.init
+	kOutputs=1
 	k=0
 	gnum=0
-	xSum=zeros(numVars)
-	kOutputs=1
+	xSum=copy(x)
 	
-	println("        k    gnum       f         pcc      f-train")
+	oo.outputLevel>0 && println("        k    gnum       f         pcc      f-train")
 	
 	while true
 		
-	    (g, gnum) = computeStep(x, k, gnum, sp, dh);
-		
-		x-=stepSize(k)*g
-
-		xSum = xSum+x;
-		
 		if gnum>= expIndices[kOutputs]
-			if outputOpts.average == 1
+			if oo.average == 1
 				xToTest =xSum/(k+1);
 			else
 				xToTest =x;
 			end
-			((f, pcc),f_train) = outputsFunction(x)
-            @printf("%2.i %7.i %7.i % .3e % .3e % .3e\n", kOutputs,k, gnum,f, pcc,f_train)
+			fromOutputsFunction = oo.outputsFunction(x)
+			if oo.outputLevel>1 
+				@printf("%2.i %7.i %7.i ", kOutputs, k, gnum)
+				println(fromOutputsFunction[1])
+			end
 			push!(results_k,k)
-			push!(results_f,f )
-			push!(results_pcc,pcc )
+			push!(results_fromOutputsFunction,fromOutputsFunction)
 			push!(results_x,x)
-			kOutputs = kOutputs+1;
+			kOutputs += 1
 		end
+		
+		gnum>=opts.maxG && break
+		
+	    (g, gnum) = computeStep(x, k, gnum, sp, dh);
+		
+		
+		#  PUT IN ADAGRAD !!!
+		x-=opts.stepSize(k)*g
+
+		xSum = xSum+x;
 		
 		k+=1
 		
-			
-		gnum>=maxG && break
-		
-		
 	end
 	
-	
-	println("Finished egr-s")
-	(results_k ,results_f ,results_pcc ,results_x )
+	if oo.outputLevel>0
+		println("Finished alg")
+		oo.outputLevel<=1 && println("Final Result:"*results_fromOutputsFunction[end][1])
+	end
+	(results_k, results_fromOutputsFunction, results_x )
 end
