@@ -11,26 +11,37 @@ type EGRsd <: StepData
 	u::Function
 	beta::Function
 	getNextSampleFunction::Task
+	getStep::Function
 		
 	function EGRsd(s::Function, u::Function, beta::Function, getNextSampleFunction::Task, numVars::Int64)
-		new(zeros(numVars),Function[],Function[],Array{Float64,1}[],0, s, u, beta, getNextSampleFunction)
+		new(zeros(numVars),Function[],Function[],Array{Float64,1}[],0, s, u, beta, getNextSampleFunction,naturalEGRS)
 	end
 end
 
 type SGsd <: StepData
 	getNextSampleFunction :: Task
+	getStep::Function
+	function SGsd(getNextSampleFunction)
+		new(getNextSampleFunction, computeSGStep)
+	end
 end
 
 type GDsd <: StepData
 	getFullGradient :: Function
 	numTrainingPoints :: Int64
+	getStep::Function
+	function GDsd(getFullGradient,numTrainingPoints)
+		new(getFullGradient,numTrainingPoints, computeGDStep)
+	end
 end
 
-function naturalEGRS(x, k, gnum, sd::StepData);
+function naturalEGRS(x, k, gnum, sd::EGRsd);
 		
 	U = (sd.I+1):(sd.I+sd.u(k,sd.I))
 		
 	for i in U
+		# println(typeof(sd.getNextSampleFunction))
+		# println( consume(sd.getNextSampleFunction))
 		(func,cs) = consume(sd.getNextSampleFunction)
 		push!(sd.functions,func)
 		push!(sd.restoreFunctions,cs)
@@ -64,7 +75,7 @@ function naturalEGRS(x, k, gnum, sd::StepData);
 	(g, gnum)
 end
 
-function computeGDStep(x, k, gnum, sd::StepData)
+function computeGDStep(x, k, gnum, sd::GDsd)
 
 	(f,g, margins)= sd.getFullGradient(x)
 	
@@ -74,7 +85,7 @@ function computeGDStep(x, k, gnum, sd::StepData)
 	
 end
 
-function computeSGStep(x, k, gnum, sd::StepData)
+function computeSGStep(x, k, gnum, sd::SGsd)
 
 	# println(typeof(sp.getNextSampleFunction))
 	(func,cs) = consume(sd.getNextSampleFunction)

@@ -28,7 +28,7 @@ immutable type Opts
 	end
 end
 
-function alg(opts::Opts, sd::StepData, oo::OutputOpts, computeStep::Function)
+function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 	
 	oo.outputLevel>0 && println("Starting alg")
 	
@@ -73,7 +73,7 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts, computeStep::Function)
 		
 		gnum>=opts.maxG && break
 		
-	    (g, gnum) = computeStep(x, k, gnum, sd);
+	    (g, gnum) = sd.getStep(x, k, gnum, sd);
 		
 		
 		#  PUT IN ADAGRAD !!!
