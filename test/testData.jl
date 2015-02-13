@@ -1,6 +1,6 @@
 using Redis
 
-(numDatapoints,minFeatureInd,numFeatures,numTotal,minfeature,maxfeature,numClasses) = getStats("data/Toy/Toy")
+(numDatapoints,minFeatureInd,numFeatures,numTotal,minfeature,maxfeature,numClasses) = getStats("data/agaricus/agaricus")
 println("Number of datapoints = $numDatapoints")
 println("minFeatureInd   = $minFeatureInd")
 println("number of features   = $numFeatures")
@@ -10,7 +10,7 @@ println("minfeature   = $minfeature")
 println("maxfeature   = $maxfeature")
 println("numClasses   = $numClasses")
 
-(features, labels) = readData("data/Toy/Toy", (numDatapoints,numFeatures), minFeatureInd)
+(features, labels) = readData("data/agaricus/agaricus", (numDatapoints,numFeatures), minFeatureInd)
 
 # NORMALIZE FEATURES!!!
 if (numTotal/(numDatapoints*numFeatures))>0.99 && (minfeature<-1.01 || maxfeature>1.01)
@@ -30,12 +30,12 @@ end
 
 
 client = RedisConnection();
-Redis.hmset(client, "Toy", {"name" => "Toy", "path" => "data/Toy/", "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" =>numTotal })
+Redis.hmset(client, "agaricus", {"name" => "agaricus", "path" => "data/agaricus/", "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" =>numTotal })
 
-writeBin("data/Toy/Toy.bin", features, labels)
+writeBin("data/agaricus/agaricus.bin", features, labels)
 
-datasetHT=Redis.hgetall(client,"Toy")
+datasetHT=Redis.hgetall(client,"agaricus")
 
-(features,labels) = readBin("data/Toy/Toy.bin",int(datasetHT["numDatapoints"]),int(datasetHT["numFeatures"]))
+(features,labels) = readBin("data/agaricus/agaricus.bin",int(datasetHT["numDatapoints"]),int(datasetHT["numFeatures"]))
 
 println()
