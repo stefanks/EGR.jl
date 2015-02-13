@@ -36,15 +36,15 @@ end
 type SGData_hold <: DataHold
 end
 
-function computeEGRStep(x, k, gnum, sp::StepParams, dh::DataHold);
+function naturalEGRS(x, k, gnum, sp::StepParams, dh::DataHold);
 		
 	
 	U = (dh.I+1):(dh.I+sp.u(k,dh.I))
 		
 	for i in U
-		(a,b) =sp.getNextSampleFunction()
-		push!(dh.functions,a)
-		push!(dh.restoreFunctions,b)
+		(func,cs) = consume(sp.getNextSampleFunction)
+		push!(dh.functions,func)
+		push!(dh.restoreFunctions,cs)
 	end
 		
 		
@@ -89,7 +89,8 @@ end
 
 function computeSGStep(x, k, gnum, sp::StepParams, dh::DataHold)
 
-	(func,cs)= sp.getNextSampleFunction()
+	# println(typeof(sp.getNextSampleFunction))
+	(func,cs) = consume(sp.getNextSampleFunction)
 	
 	(f, g, cs) = func(x)
 	
