@@ -7,16 +7,27 @@ catch
 	cd("/Users/stepa/Google Drive/Research/EGRproject/EGR.jl")
 end
 
+sLikeGd(k,numTrainingPoints) = k==0 ? 0 : numTrainingPoints
+uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
-
-function sLikeGd(k,numTrainingPoints)
-	k==0 ? 0 : numTrainingPoints
+function getSequential(numTrainingPoints,gradientOracle,restoreGradient)
+	indices = [1:numTrainingPoints;]
+	# println("A call to getSequential ")
+	while true
+		for i in indices
+			# println("i = $i")
+			# println(typeof(gradientOracle))
+			# println(methods(gradientOracle))
+			gg(x) = gradientOracle(x,i)
+			ccs(cs) = restoreGradient(cs,i)
+			# println("Ready to produce")
+			produce((gg,ccs))
+		end
+		shuffle!(indices)
+	end
 end
-function uLikeGd(k,numTrainingPoints)
-	k==0 ? numTrainingPoints : 0
-end
 
-testProblems=["Toy", "agaricus"]
+testProblems={"Toy","agaricus"}
 
 for testProblem in testProblems
 
@@ -36,12 +47,12 @@ for testProblem in testProblems
 	if (numTotal/(numDatapoints*numFeatures))>0.99 && (minfeature<-1.01 || maxfeature>1.01)
 		minfeature=typemax(Int)
 		maxfeature=typemin(Int)
-		for i in 1:numFeatures
-			thismax = maximum(features[:,i])
-			thismin = minimum(features[:,i])
-			features[:,i] =(2* features[:,i]-thismax-thismin)/(thismax-thismin)
-			minfeature=min(minfeature, minimum(features[:,i] ))
-			maxfeature=max(maxfeature, maximum(features[:,i] ))
+		for j in 1:numFeatures
+			thismax = maximum(features[:,j])
+			thismin = minimum(features[:,j])
+			features[:,j] =(2* features[:,j]-thismax-thismin)/(thismax-thismin)
+			minfeature=min(minfeature, minimum(features[:,j] ))
+			maxfeature=max(maxfeature, maximum(features[:,j] ))
 		end
 		println("After normalization")
 		println("minfeature   = $minfeature")
@@ -53,92 +64,24 @@ for testProblem in testProblems
 	Redis.hmset(client, testProblem, {"name" => testProblem, "path" => "data/"*testProblem, "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" =>numTotal })
 
 	println("Writing binary file")
-	
+
 	writeBin("data/"*testProblem*"/"*testProblem*".bin", features, labels)
 
 	datasetHT=Redis.hgetall(client,testProblem)
 
 	println("Reading binary file")
-	
-	(features,labels) = readBin("data/"*testProblem*"/"*testProblem*".bin", int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]))
+
+	(features,labels) = readBin("data/"*datasetHT["name"]*"/"*datasetHT["name"]*".bin", int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]))
 
 	println()
 
-	for L2reg in [true; false]
-		(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,numFeatures,numDatapoints,Set([1.0]); L2reg=L2reg,outputLevel=0)
+	for L2reg in [false; true]
+		
+		
+		(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]),Set([1.0]); L2reg=L2reg,outputLevel=0)
 
-		println("Starting Gradient test...")
+		VerifyGradient(numVars,gradientOracle,numTrainingPoints)
 	
-		tol = 1e-13
-	
-		x=zeros(numVars)
-		(f,g, margins)= gradientOracle(x)
-		(f,g1, margins)= gradientOracle(x,1:div(numTrainingPoints,2))
-		(f,g2, margins)= gradientOracle(x,(div(numTrainingPoints,2)+1):numTrainingPoints)
-		est1=(div(numTrainingPoints,2)*g1+(numTrainingPoints-div(numTrainingPoints,2))*g2)/numTrainingPoints
-		relError = norm(est1-g)/norm(g)
-		println("relError = $relError")
-		if relError>tol 
-			error("Did not pass!")
-			passed=false
-		end
-		est2=zeros(numVars)
-		for i=1:numTrainingPoints
-			(f,g1, margins)= gradientOracle(x,i)
-			est2+=g1
-		end
-		est2=est2/numTrainingPoints
-		relError = norm(est2-g)/norm(g)
-		println("relError = $relError")
-		if relError>tol 
-			error("Did not pass!")
-			passed=false
-		end
-	
-		x=2*rand(numVars)-1
-		(f,g, margins)= gradientOracle(x)
-		(f,g1, margins)= gradientOracle(x,1:div(numTrainingPoints,2))
-		(f,g2, margins)= gradientOracle(x,(div(numTrainingPoints,2)+1):numTrainingPoints)
-		est1=(div(numTrainingPoints,2)*g1+(numTrainingPoints-div(numTrainingPoints,2))*g2)/numTrainingPoints
-		relError = norm(est1-g)/norm(g)
-		println("relError = $relError")
-		if relError>tol 
-			error("Did not pass!")
-			passed=false
-		end
-		est2=zeros(numVars)
-		for i=1:numTrainingPoints
-			(f,g1, margins)= gradientOracle(x,i)
-			est2+=g1
-		end
-		est2=est2/numTrainingPoints
-		relError = norm(est2-g)/norm(g)
-		println("relError = $relError")
-		if relError>tol 
-			error("Did not pass!")
-			passed=false
-		end
-	
-		println("Gradient test passed!")
-		println()
-	
-		function getSequential(numTrainingPoints,gradientOracle,restoreGradient)
-			indices = [1:numTrainingPoints;]
-			# println("A call to getSequential ")
-			while true
-				for i in indices
-					# println("i = $i")
-					# println(typeof(gradientOracle))
-					# println(methods(gradientOracle))
-					gg(x) = gradientOracle(x,i)
-					ccs(cs) = restoreGradient(cs,i)
-					# println("Ready to produce")
-					produce((gg,ccs))
-				end
-				shuffle!(indices)
-			end
-		end
-
 		println("If s(k) = 0 and then numTrainingPoints, u(k) = numTrainingPoints, then 0 , gamma is natural, then egrs is equivalent to gd!!!")
 
 		stepSize(k)=0.1
@@ -160,6 +103,9 @@ for testProblem in testProblems
 		alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints),  OutputOpts(outputsFunction,outputLevel=2))
 
 		stepSize(k)=0.1
+
+
+
 
 		println("If s(k) = 0, u(k) = 1, gamma is natural, then egrs is equivalent to sgs!!!")
 

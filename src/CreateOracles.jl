@@ -10,7 +10,7 @@ function trainTestRandomSeparate(features,labels)
 end
 
 
-function createOracles(features,labels,numFeatures,numDatapoints, setOfOnes; L2reg=false,outputLevel=0)
+function createOracles(features,labels,numDatapoints,numFeatures, setOfOnes; L2reg=false,outputLevel=0)
 
 	# println("Starting separation into train and test sets...")
 	(trf,trl,numTrainingPoints, tef, tel) = trainTestRandomSeparate(features,labels)
