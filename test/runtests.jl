@@ -61,7 +61,7 @@ for testProblem in testProblems
 
 	println("Starting Redis connection")
 	client = RedisConnection();
-	Redis.hmset(client, testProblem, {"name" => testProblem, "path" => "data/"*testProblem, "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" =>numTotal })
+	Redis.hmset(client, testProblem, {"name" => testProblem, "path" => "data/"*testProblem*"/", "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" =>numTotal })
 
 	println("Writing binary file")
 
@@ -71,7 +71,7 @@ for testProblem in testProblems
 
 	println("Reading binary file")
 
-	(features,labels) = readBin("data/"*datasetHT["name"]*"/"*datasetHT["name"]*".bin", int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]))
+	(features,labels) = readBin(datasetHT["path"]*datasetHT["name"]*".bin", int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]))
 
 	println()
 
