@@ -15,19 +15,23 @@ function getSequential(numTrainingPoints,gradientOracle,restoreGradient)
 	# println("A call to getSequential ")
 	while true
 		for i in indices
-			# println("i = $i")
+			# println("i in sequential = $i")
 			# println(typeof(gradientOracle))
 			# println(methods(gradientOracle))
-			gg(x) = gradientOracle(x,i)
-			ccs(cs) = restoreGradient(cs,i)
-			# println("Ready to produce")
-			produce((gg,ccs))
+			let j=i
+				gg=(x)-> gradientOracle(x,j)
+				# println(gradientOracle([0.0,0],i)[2])
+				ccs=(cs)-> restoreGradient(cs,j)
+				# println("Ready to produce")
+				produce((gg,ccs))
+			end
 		end
 		shuffle!(indices)
 	end
 end
 
-testProblems={"Toy","agaricus"}
+
+testProblems={"TestToy","TestAgaricus"}
 
 for testProblem in testProblems
 
@@ -81,34 +85,24 @@ for testProblem in testProblems
 		(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]),Set([1.0]); L2reg=L2reg,outputLevel=0)
 
 		VerifyGradient(numVars,gradientOracle,numTrainingPoints)
+		VerifyRestoration(numVars,gradientOracle,restoreGradient)
 	
 		println("If s(k) = 0 and then numTrainingPoints, u(k) = numTrainingPoints, then 0 , gamma is natural, then egrs is equivalent to gd!!!")
-
-		stepSize(k)=0.1
-		s(k,I) = sLikeGd(k,numTrainingPoints)
-		u(k,I) =  uLikeGd(k,numTrainingPoints)
-		beta(k) =1 - 1/sqrt(k+1)
-
+		
+		stepSize(k)=1
+		
 		maxG = 10*numTrainingPoints
 
-
-		getNextSampleFunction = Task(() -> getSequential(numTrainingPoints,gradientOracle,restoreGradient))
-	
-		println(consume(getNextSampleFunction))
-
-		alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars),  OutputOpts(outputsFunction,outputLevel=2))
-
 		getFullGradient(W) = gradientOracle(W)
+		alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints),  OutputOpts(outputsFunction;outputLevel=2,maxOutputNum=11))
 
-		alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints),  OutputOpts(outputsFunction,outputLevel=2))
-
-		stepSize(k)=0.1
-
-
-
+		s(k,I) = sLikeGd(k,numTrainingPoints)
+		u(k,I) =  uLikeGd(k,numTrainingPoints)
+		beta(k) =1
+		alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars),  OutputOpts(outputsFunction;outputLevel=2,maxOutputNum=11))
+		
 
 		println("If s(k) = 0, u(k) = 1, gamma is natural, then egrs is equivalent to sgs!!!")
-
 
 
 		alg(Opts(zeros(numVars),stepSize; maxG=maxG), SGsd(getNextSampleFunction), OutputOpts(outputsFunction,outputLevel=2))

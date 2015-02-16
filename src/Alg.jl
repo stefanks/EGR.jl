@@ -75,7 +75,7 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 		
 	    (g, gnum) = sd.getStep(x, k, gnum, sd);
 		
-		# println(g)
+		# println("g = $g")
 		
 		#  PUT IN ADAGRAD !!!
 		x-=opts.stepSize(k)*g

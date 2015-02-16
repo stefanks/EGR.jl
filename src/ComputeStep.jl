@@ -45,22 +45,21 @@ function naturalEGRS(x, k, gnum, sd::EGRsd);
 		# println( consume(sd.getNextSampleFunction))
 		# (func,cs) = consume(sd.getNextSampleFunction)
 		# println(func([0.0,0])[2])
-		push!(sd.functions,(x -> (norm(x),norm(x)),x -> (norm(x),norm(x) ) ))
-		println(size(sd.functions))
-		println(sd.functions[1][1]([0.0,0])[2])
-		println(sd.functions[end][1]([0.0,0])[2])
-		show(sd.functions)
-		println()
-		sd.functions[i] = consume(sd.getNextSampleFunction)
-		show(sd.functions)
-		println()
-		println(sd.functions[1][1]([0.0,0])[2])
-		println(sd.functions[end][1]([0.0,0])[2])
+		# println(size(sd.functions))
+	# 	println(sd.functions[1][1]([0.0,0])[2])
+	# 	println(sd.functions[end][1]([0.0,0])[2])
+	# 	show(sd.functions)
+	# 	println()
+		push!(sd.functions,consume(sd.getNextSampleFunction))
+		# show(sd.functions)
+	# 	println()
+	# 	println(sd.functions[1][1]([0.0,0])[2])
+	# 	println(sd.functions[end][1]([0.0,0])[2])
 	end
-	
-	println("These should be different!!!")
-	println(sd.functions[1][1]([0.0,0])[2])
-	println(sd.functions[end][1]([0.0,0])[2])
+	#
+	# println("These should be different!!!")
+	# println(sd.functions[1][1]([0.0,0])[2])
+	# println(sd.functions[end][1]([0.0,0])[2])
 	
 	S = StatsBase.sample(1:sd.I,sd.s(k,sd.I);replace=false)
 	# println(S)
@@ -70,23 +69,35 @@ function naturalEGRS(x, k, gnum, sd::EGRsd);
 	for i in S
 		B +=sd.functions[i][2](sd.y[i])
 	end
+    # println("B/sd.s(k,sd.I) = $(B/sd.s(k,sd.I))")
 		
 	sumy=zeros(size(x))
 
-	for i in [U ; S]
+	for i in [U]
 		# println(i)
 		(f,sampleG,cs) = (sd.functions[i][1])(x)
 		# println("sampleG = $sampleG")
 		push!(sd.y,cs)
 		sumy += sampleG
 	end
+
+	for i in [S]
+		# println(i)
+		(f,sampleG,cs) = (sd.functions[i][1])(x)
+		# println("sampleG = $sampleG")
+		sd.y[i]=cs
+		sumy += sampleG
+	end
 		
 	gnum += sd.s(k,sd.I)+sd.u(k,sd.I)	
 	
-	println("sumy = $sumy")
-	println("sumy/sd.u(k,sd.I) = $(sumy/sd.u(k,sd.I))")
+	# println("sumy = $sumy")
+	#     println("sumy/sd.u(k,sd.I) = $(sumy/sd.u(k,sd.I))")
+	# println("sumy/sd.s(k,sd.I) = $(sumy/sd.s(k,sd.I))")
+	# println("sd.A = $(sd.A)")
+	# println("$((sd.s(k,sd.I) > 0  ? sd.s(k,sd.I)*((sd.beta(k)/sd.I)*sd.A): 0)- sd.beta(k)*B ) ")
 		
-	g = (sd.s(k,sd.I) > 0  ? sd.s(k,sd.I)*(sd.beta(k)/sd.I*sd.A): 0 - sd.beta(k)*B + sumy )/(sd.s(k,sd.I)+sd.u(k,sd.I))
+	g = ((sd.s(k,sd.I) > 0  ? sd.s(k,sd.I)*((sd.beta(k)/sd.I)*sd.A): 0) - sd.beta(k)*B + sumy )/(sd.s(k,sd.I)+sd.u(k,sd.I))
 		
 	sd.I = sd.I + sd.u(k,sd.I)
 		

@@ -69,3 +69,15 @@ function VerifyGradient(numVars,gradientOracle,numTrainingPoints)
 
 	println("Gradient verified!")
 end
+
+function VerifyRestoration(numVars,gradientOracle,restoreGradient)
+	tol = 1e-12
+	for x in {zeros(numVars),2*rand(numVars)-1}
+		(f,g,cs) = gradientOracle(x,1)
+		relError = norm(restoreGradient(cs,1)-g)/norm(g)
+		if relError>tol 
+			println("relError = $relError")
+			error("Did not pass!")
+		end
+	end
+end

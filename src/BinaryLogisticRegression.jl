@@ -33,7 +33,7 @@ function get_g_from_cs(features::Matrix{Float64},labels::MinusPlusOneVector,marg
 	Y = labels[indices];
 	examples = size(X)[1];
 	ym=Y.*margins
-	f=sum( log(1 + exp(-ym)) ) / examples 
+	# f=sum( log(1 + exp(-ym)) ) / examples
 	# TODO: CHECK IF THIS IS SLOW, MIGHT BE GOOD TO GET RID OF TRANSPOSE!!!
 	g=X'*(-Y ./ (1 + exp(ym))) / examples 
 end
