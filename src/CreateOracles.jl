@@ -10,13 +10,15 @@ function trainTestRandomSeparate(features,labels)
 end
 
 
-function createOracles(features,labels,numDatapoints,numFeatures, setOfOnes; L2reg=false,outputLevel=0)
+function createOracles(features,labels,numDatapoints,numFeatures, setOfOnes; L2reg=false, outputLevel=0)
 
 	# println("Starting separation into train and test sets...")
 	(trf,trl,numTrainingPoints, tef, tel) = trainTestRandomSeparate(features,labels)
 	# println("Finished")
 	trl=MinusPlusOneVector(trl,setOfOnes)
+	outputLevel > 0  && println("Fraction of ones in training set: $(trl.numPlus/length(trl))")
 	tel=MinusPlusOneVector(tel,setOfOnes)
+	outputLevel > 0  && println("Fraction of ones in testing  set: $(tel.numPlus/length(tel))")
 
 	# println("Defining functions...")
 	gradientOracle(W,indices) = get_f_g_cs(trf, trl,W,indices)

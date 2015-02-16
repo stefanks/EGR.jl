@@ -80,7 +80,7 @@ for testProblem in testProblems
 
 	for L2reg in [false; true]
 		
-		(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]),Set([1.0]); L2reg=L2reg,outputLevel=0)
+		(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]),Set([1.0]); L2reg=L2reg,outputLevel=1)
 
 		VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
 		VerifyRestoration(numVars,gradientOracle,restoreGradient; outputLevel=2)
@@ -137,6 +137,6 @@ c=MinusPlusOneVector([1,1,-1],Set([-1]))
 println(a[1])
 println(b[2:3])
 println(c[[1,3]])
-println(size(a))
+println(length(a))
 
 

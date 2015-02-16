@@ -1,4 +1,4 @@
-import Base.size
+import Base.length
 
 immutable MinusPlusOneVector
 	field  :: Vector{Float64}
@@ -52,7 +52,6 @@ function getindex(a::MinusPlusOneVector, b::Array{Int64,1})
 	getindex(a.field,b)
 end
 
-# This method is used ONLY because we import Base.size !
-function size(a::MinusPlusOneVector)
-	size(a.field)[1]
+function length(a::MinusPlusOneVector)
+	length(a.field)
 end

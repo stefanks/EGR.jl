@@ -11,17 +11,19 @@ type EGRsd <: StepData
 	beta::Function
 	getNextSampleFunction::Task
 	getStep::Function
+	stepString::String
 		
 	function EGRsd(s::Function, u::Function, beta::Function, getNextSampleFunction::Task, numVars::Int64)
-		new(zeros(numVars),(Function,Function)[],Array{Float64,1}[],0, s, u, beta, getNextSampleFunction,naturalEGRS)
+		new(zeros(numVars),(Function,Function)[],Array{Float64,1}[],0, s, u, beta, getNextSampleFunction,naturalEGRS,"EGR")
 	end
 end
 
 type SGsd <: StepData
 	getNextSampleFunction :: Task
 	getStep::Function
+	stepString::String
 	function SGsd(getNextSampleFunction)
-		new(getNextSampleFunction, computeSGStep)
+		new(getNextSampleFunction, computeSGStep,"SG")
 	end
 end
 
@@ -29,8 +31,9 @@ type GDsd <: StepData
 	getFullGradient :: Function
 	numTrainingPoints :: Int64
 	getStep::Function
+	stepString::String
 	function GDsd(getFullGradient,numTrainingPoints)
-		new(getFullGradient,numTrainingPoints, computeGDStep)
+		new(getFullGradient,numTrainingPoints, computeGDStep,"GD")
 	end
 end
 
