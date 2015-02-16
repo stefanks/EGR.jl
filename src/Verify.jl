@@ -1,10 +1,10 @@
-function VerifyGradient(numVars,gradientOracle,numTrainingPoints)
+function VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
 	
 	srand(1)
 	
-	println("Verifying Gradient...")
+	outputLevel>0 && println("Verifying Gradient...")
 
-	tol = 1e-7
+	tol = 1e-6
 	
 	for x in {zeros(numVars),2*rand(numVars)-1}
 	
@@ -32,7 +32,7 @@ function VerifyGradient(numVars,gradientOracle,numTrainingPoints)
 				gDiff[j] = (fa-fb)/(2*10.0^(-displacementAccuracy))
 			end
 			relError = norm(gDiff-g)/norm(g)
-			println("  At power = $displacementAccuracy, relError = $relError")
+			outputLevel>1 && println("  At power = $displacementAccuracy, relError = $relError")
 			if relError<=tol 
 				passedDiff = true
 				break
@@ -65,10 +65,11 @@ function VerifyGradient(numVars,gradientOracle,numTrainingPoints)
 			passed=false
 		end
 	end
-	println("Gradient verified!")
+	outputLevel>0 && println("Gradient verified!")
 end
 
-function VerifyRestoration(numVars,gradientOracle,restoreGradient)
+function VerifyRestoration(numVars,gradientOracle,restoreGradient; outputLevel=2)
+	outputLevel>0 && println("Verifying Restoration...")
 	tol = 1e-12
 	for x in {zeros(numVars),2*rand(numVars)-1}
 		(f,g,cs) = gradientOracle(x,1)
@@ -78,4 +79,5 @@ function VerifyRestoration(numVars,gradientOracle,restoreGradient)
 			error("Did not pass restoration verification!")
 		end
 	end
+	outputLevel>0 && println("Restoration verified!")
 end

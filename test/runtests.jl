@@ -82,8 +82,8 @@ for testProblem in testProblems
 		
 		(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]),Set([1.0]); L2reg=L2reg,outputLevel=0)
 
-		VerifyGradient(numVars,gradientOracle,numTrainingPoints)
-		VerifyRestoration(numVars,gradientOracle,restoreGradient)
+		VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
+		VerifyRestoration(numVars,gradientOracle,restoreGradient; outputLevel=2)
 
 		getNextSampleFunction = Task(() -> getSequential(numTrainingPoints,gradientOracle,restoreGradient))
 		
@@ -124,6 +124,9 @@ for testProblem in testProblems
 		# alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars), OutputOpts(outputsFunction,outputLevel=2))
 
 	end
+	
+	println()
+
 end
 
 println("Testing MinusPlusOneVector")
