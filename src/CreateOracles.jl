@@ -36,11 +36,13 @@ function createOracles(features,labels,numDatapoints,numFeatures, setOfOnes; L2r
 	if L2reg
 		mygradientOracle(a) = L2regGradient(gradientOracle, 1e-3,a)
 		mygradientOracle(a,b) = L2regGradient(gradientOracle, 1e-3,a,b)
+		myrestoreGradient(a,b) = L2RestoreGradient(restoreGradient, 1e-3,a,b)
 	else
 		mygradientOracle=gradientOracle
+		myrestoreGradient=restoreGradient
 	end
 	# println("Finished")
 
 	numVars = numFeatures
-	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,restoreGradient)
+	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient)
 end

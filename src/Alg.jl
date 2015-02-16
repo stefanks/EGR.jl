@@ -41,6 +41,7 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 	maxCounter = min(opts.maxG, expIndices[end]);
 	
 	results_k = Int64[]
+	results_gnum = Int64[]
 	results_fromOutputsFunction = (String,Array{Float64,1})[]
 	results_x = Array{Float64,1}[]
 
@@ -66,6 +67,7 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 				println(fromOutputsFunction[1])
 			end
 			push!(results_k,k)
+			push!(results_gnum,gnum)
 			push!(results_fromOutputsFunction,fromOutputsFunction)
 			push!(results_x,x)
 			kOutputs += 1
@@ -90,5 +92,5 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 		println("Finished alg")
 		oo.outputLevel<=1 && println("Final Result:"*results_fromOutputsFunction[end][1])
 	end
-	(results_k, results_fromOutputsFunction, results_x )
+	(results_k, results_gnum,results_fromOutputsFunction, results_x)
 end

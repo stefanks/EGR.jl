@@ -30,7 +30,6 @@ function getSequential(numTrainingPoints,gradientOracle,restoreGradient)
 	end
 end
 
-
 testProblems={"TestToy","TestAgaricus"}
 
 for testProblem in testProblems
@@ -81,12 +80,13 @@ for testProblem in testProblems
 
 	for L2reg in [false; true]
 		
-		
 		(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]),Set([1.0]); L2reg=L2reg,outputLevel=0)
 
 		VerifyGradient(numVars,gradientOracle,numTrainingPoints)
 		VerifyRestoration(numVars,gradientOracle,restoreGradient)
-	
+
+		getNextSampleFunction = Task(() -> getSequential(numTrainingPoints,gradientOracle,restoreGradient))
+		
 		println("If s(k) = 0 and then numTrainingPoints, u(k) = numTrainingPoints, then 0 , gamma is natural, then egrs is equivalent to gd!!!")
 		
 		stepSize(k)=1
@@ -94,23 +94,34 @@ for testProblem in testProblems
 		maxG = 10*numTrainingPoints
 
 		getFullGradient(W) = gradientOracle(W)
-		alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints),  OutputOpts(outputsFunction;outputLevel=2,maxOutputNum=11))
-
+		(results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints),  OutputOpts(outputsFunction;outputLevel=0,maxOutputNum=11))
+		
+		xFromGD = results_x[end]
+		
 		s(k,I) = sLikeGd(k,numTrainingPoints)
 		u(k,I) =  uLikeGd(k,numTrainingPoints)
 		beta(k) =1
-		alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars),  OutputOpts(outputsFunction;outputLevel=2,maxOutputNum=11))
+		(results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars),  OutputOpts(outputsFunction;outputLevel=0,maxOutputNum=11))
 		
-
-		println("If s(k) = 0, u(k) = 1, gamma is natural, then egrs is equivalent to sgs!!!")
-
-
-		alg(Opts(zeros(numVars),stepSize; maxG=maxG), SGsd(getNextSampleFunction), OutputOpts(outputsFunction,outputLevel=2))
-
-		s(k,I)=0
-		u(k,I)= 1
-
-		alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars), OutputOpts(outputsFunction,outputLevel=2))
+		xFromEGR = results_x[end]
+		
+		relError = norm(xFromEGR-xFromGD)/norm(xFromGD)
+		
+		println("relError between EGR and GD = $relError")
+		if relError>1e-13
+			error("GD and EGR do not coincide")
+		end
+		
+		
+		
+		# println("If s(k) = 0, u(k) = 1, gamma is natural, then egrs is equivalent to sgs!!!")
+		#
+		# alg(Opts(zeros(numVars),stepSize; maxG=maxG), SGsd(getNextSampleFunction), OutputOpts(outputsFunction,outputLevel=2))
+		#
+		# s(k,I)=0
+		# u(k,I)= 1
+		#
+		# alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars), OutputOpts(outputsFunction,outputLevel=2))
 
 	end
 end
