@@ -10,41 +10,89 @@ function trainTestRandomSeparate(features,labels)
 end
 
 
-function createBLOracles(features,labels,numDatapoints,numFeatures, setOfOnes; L2reg=false, outputLevel=0)
-
-	# println("Starting separation into train and test sets...")
+function createBLOracles(features,labels, setOfOnes, L2reg::Float64, outputLevel)
+	numDatapoints = length(labels)
+	numFeatures = size(features)[2] 
+	
+	outputLevel > 0  && println("Creating oracles")
 	(trf,trl,numTrainingPoints, tef, tel) = trainTestRandomSeparate(features,labels)
-	# println("Finished")
 	trl=MinusPlusOneVector(trl,setOfOnes)
 	outputLevel > 0  && println("Fraction of ones in training set: $(trl.numPlus/length(trl))")
 	tel=MinusPlusOneVector(tel,setOfOnes)
 	outputLevel > 0  && println("Fraction of ones in testing  set: $(tel.numPlus/length(tel))")
 
-	# println("Defining functions...")
 	gradientOracle(W,indices) = BL_get_f_g(trf, trl,W,indices)
 	gradientOracle(W) = BL_get_f_g(trf, trl,W)
 	testFunction(W) = BL_for_output(tef, tel,W)
 		
 	function outputsFunction(W)
 		ye = testFunction(W)
+		isnan(ye[1]) && return false
 		yo = gradientOracle(W)
-	   	(@sprintf("% .3e % .3e % .3e % .3e % .3e",ye[1], ye[2], ye[3], ye[4], yo[1]), [ye[1], ye[2], ye[3], ye[4], yo[1]])
-	 end
+		(@sprintf("% .3e % .3e % .3e % .3e % .3e",ye[1], ye[2], ye[3], ye[4], yo[1]), [ye[1], ye[2], ye[3], ye[4], yo[1]])
+	end
 		
 	restoreGradient(cs,indices) = BL_restore_gradient(trf, trl,cs,indices)
-	# println("Finished")
-	#
-	# println("Adding regularizer...")
-	if L2reg
-		mygradientOracle(a) = L2regGradient(gradientOracle, 1e-3,a)
-		mygradientOracle(a,b) = L2regGradient(gradientOracle, 1e-3,a,b)
-		myrestoreGradient(a,b) = L2RestoreGradient(restoreGradient, 1e-3,a,b)
+	if L2reg>0
+		mygradientOracle(a) = L2regGradient(gradientOracle, L2reg, a)
+		mygradientOracle(a, b) = L2regGradient(gradientOracle, L2reg, a, b)
+		myrestoreGradient(a, b) = L2RestoreGradient(restoreGradient, L2reg, a, b)
 	else
 		mygradientOracle=gradientOracle
 		myrestoreGradient=restoreGradient
 	end
-	# println("Finished")
 
 	numVars = numFeatures
-	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient)
+	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"       f         pcc        fp         fn       f-train  ")
+end
+
+function createMLOracles(features,labels, L2reg::Float64, outputLevel)
+	numDatapoints = length(labels)
+	numFeatures = size(features)[2] 
+	
+	outputLevel > 0  && println("Creating oracles")
+	
+	classesDict=(Float64 => (Int64, Int64))[]
+
+	currentClass =0
+	classLabels = zeros(Int64,numDatapoints )
+	for i in 1:numDatapoints
+		if haskey(classesDict, labels[i])
+			classesDict[labels[i]]=(classesDict[labels[i]][1],classesDict[labels[i]][2]+ 1)
+			classLabels[i] = classesDict[labels[i]][1]
+		else
+			currentClass +=1
+			classesDict[labels[i]] = (currentClass,1)
+			classLabels[i] = currentClass
+		end
+	end
+	
+	outputLevel > 1  && println(classesDict)
+	outputLevel > 0  && println("Number of classes is $(length(classesDict))")
+	
+	(trf,trl,numTrainingPoints, tef, tel) = trainTestRandomSeparate(features,classLabels)
+
+	gradientOracle(W,indices) = ML_get_f_g(trf, trl,W,indices)
+	gradientOracle(W) = ML_get_f_g(trf, trl,W)
+	testFunction(W) = ML_for_output(tef, tel,W)
+	
+	function outputsFunction(W)
+		ye = testFunction(W)
+		isnan(ye[1]) && return false
+		yo = gradientOracle(W)
+		(@sprintf("% .3e % .3e % .3e",ye[1], ye[2], yo[1]), [ye[1], ye[2], yo[1]])
+	end
+	
+	restoreGradient(cs,indices) = ML_restore_gradient(trf, trl,cs,indices)
+	if L2reg>0
+		mygradientOracle(a) = L2regGradient(gradientOracle, L2reg, a)
+		mygradientOracle(a, b) = L2regGradient(gradientOracle, L2reg, a, b)
+		myrestoreGradient(a, b) = L2RestoreGradient(restoreGradient, L2reg, a, b)
+	else
+		mygradientOracle=gradientOracle
+		myrestoreGradient=restoreGradient
+	end
+	
+	numVars = numFeatures*length(classesDict)
+	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"      f         pcc       f-train  ")
 end

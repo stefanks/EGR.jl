@@ -13,8 +13,8 @@ type EGRsd <: StepData
 	getStep::Function
 	stepString::String
 		
-	function EGRsd(s::Function, u::Function, beta::Function, getNextSampleFunction::Task, numVars::Int64)
-		new(zeros(numVars),(Function,Function)[],Array{Float64,1}[],0, s, u, beta, getNextSampleFunction,naturalEGRS,"EGR")
+	function EGRsd(s::Function, u::Function, beta::Function, getNextSampleFunction::Task, numVars::Int64, stepString)
+		new(zeros(numVars),(Function,Function)[],Array{Float64,1}[],0, s, u, beta, getNextSampleFunction,naturalEGRS,stepString)
 	end
 end
 
@@ -22,8 +22,8 @@ type SGsd <: StepData
 	getNextSampleFunction :: Task
 	getStep::Function
 	stepString::String
-	function SGsd(getNextSampleFunction)
-		new(getNextSampleFunction, computeSGStep,"SG")
+	function SGsd(getNextSampleFunction, stepString)
+		new(getNextSampleFunction, computeSGStep,stepString)
 	end
 end
 
@@ -32,8 +32,8 @@ type GDsd <: StepData
 	numTrainingPoints :: Int64
 	getStep::Function
 	stepString::String
-	function GDsd(getFullGradient,numTrainingPoints)
-		new(getFullGradient,numTrainingPoints, computeGDStep,"GD")
+	function GDsd(getFullGradient,numTrainingPoints, stepString)
+		new(getFullGradient,numTrainingPoints, computeGDStep,stepString)
 	end
 end
 
@@ -80,6 +80,7 @@ function naturalEGRS(x, k, gnum, sd::EGRsd);
 		# println(i)
 		(f,sampleG,cs) = (sd.functions[i][1])(x)
 		# println("sampleG = $sampleG")
+		# println(size(cs))
 		push!(sd.y,cs)
 		sumy += sampleG
 	end

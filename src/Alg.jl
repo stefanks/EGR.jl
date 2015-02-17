@@ -6,15 +6,16 @@ immutable type OutputOpts
 	average::Bool
 	outputLevel::Int64
 	outputsFunction::Function
+	outputStringHeader::String
 	
-	function OutputOpts(outputsFunction::Function; logarithmic::Bool = true, maxOutputNum::Int64 = 10, average::Bool=false, outputLevel::Int64=1)
+	function OutputOpts(outputsFunction::Function,outputStringHeader::String; logarithmic::Bool = true, maxOutputNum::Int64 = 10, average::Bool=false, outputLevel::Int64=1)
 		if maxOutputNum>99
 			error("maxOutputNum too big")
 		elseif maxOutputNum<1
 			error("maxOutputNum too small")
 		end
 		outputLevel>2 && println("outputLevel is $outputLevel") 
-		new(logarithmic, maxOutputNum, average, outputLevel,outputsFunction)
+		new(logarithmic, maxOutputNum, average, outputLevel,outputsFunction,outputStringHeader)
 	end
 	
 end
@@ -51,7 +52,7 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 	gnum=0
 	xSum=copy(x)
 	
-	oo.outputLevel>1 && println("        k    gnum       f         pcc        fp         fn       f-train")
+	oo.outputLevel>1 && println("        k    gnum"*oo.outputStringHeader)
 	
 	while true
 		
@@ -62,6 +63,7 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 				xToTest =x;
 			end
 			fromOutputsFunction = oo.outputsFunction(x)
+			fromOutputsFunction == false && break
 			if oo.outputLevel>1 
 				@printf("%2.i %7.i %7.i ", kOutputs, k, gnum)
 				println(fromOutputsFunction[1])
@@ -79,8 +81,11 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 		
 		# println("g = $g")
 		
+		# println(norm(x))
+		
 		#  PUT IN ADAGRAD !!!
 		x-=opts.stepSize(k)*g
+		
 
 		xSum = xSum+x;
 		
@@ -89,6 +94,8 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 	end
 	
 	if oo.outputLevel>0
+		oo.outputLevel <= 1 && println(oo.outputStringHeader)
+		oo.outputLevel <= 1 && println(results_fromOutputsFunction[end][1])
 		println("Finished alg: $(sd.stepString)")
 	end
 	(results_k, results_gnum,results_fromOutputsFunction, results_x)

@@ -45,11 +45,12 @@ function VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
 		(f,g1, margins)= gradientOracle(x,1:div(numTrainingPoints,2))
 		(f,g2, margins)= gradientOracle(x,(div(numTrainingPoints,2)+1):numTrainingPoints)
 		est1=(div(numTrainingPoints,2)*g1+(numTrainingPoints-div(numTrainingPoints,2))*g2)/numTrainingPoints
+		# println("est1 =$est1")
+		# println("g =$g")
 		relError = norm(est1-g)/norm(g)
 		if relError>tol 
 			println("relError = $relError")
-			error("Did not pass!")
-			passed=false
+			error("Did not pass the splitting training points in half test. Average not equal to true gradient!")
 		end
 		
 		est2=zeros(numVars)
@@ -61,9 +62,9 @@ function VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
 		relError = norm(est2-g)/norm(g)
 		if relError>tol 
 			println("relError = $relError")
-			error("Did not pass!")
-			passed=false
+			error("Did not pass the splitting training points into individuals. Average not equal to true gradient!")
 		end
+		
 	end
 	outputLevel>0 && println("Gradient verified!")
 end
