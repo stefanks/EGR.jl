@@ -80,7 +80,7 @@ for testProblem in testProblems
 
 	for L2reg in [false; true]
 		
-		(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createOracles(features,labels,int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]),Set([1.0]); L2reg=L2reg,outputLevel=1)
+		(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient) = createBLOracles(features,labels,int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]),Set([1.0]); L2reg=L2reg,outputLevel=1)
 
 		VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
 		VerifyRestoration(numVars,gradientOracle,restoreGradient; outputLevel=2)
@@ -94,14 +94,14 @@ for testProblem in testProblems
 		maxG = 10*numTrainingPoints
 
 		getFullGradient(W) = gradientOracle(W)
-		(results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints),  OutputOpts(outputsFunction;outputLevel=0,maxOutputNum=11))
+		(results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Opts(zeros(numVars),stepSize; maxG=maxG), GDsd(getFullGradient, numTrainingPoints), OutputOpts(outputsFunction;outputLevel=2,maxOutputNum=11))
 		
 		xFromGD = results_x[end]
 		
 		s(k,I) = sLikeGd(k,numTrainingPoints)
 		u(k,I) =  uLikeGd(k,numTrainingPoints)
 		beta(k) =1
-		(results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars),  OutputOpts(outputsFunction;outputLevel=0,maxOutputNum=11))
+		(results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Opts(zeros(numVars),stepSize; maxG=maxG), EGRsd(s, u, beta, getNextSampleFunction,numVars), OutputOpts(outputsFunction;outputLevel=2,maxOutputNum=11))
 		
 		xFromEGR = results_x[end]
 		

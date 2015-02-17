@@ -32,7 +32,7 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 	
 	oo.outputLevel>0 && println("Starting alg: $(sd.stepString)")
 	
-	if oo.logarithmic == 1
+	if oo.logarithmic == true
 		expIndices=unique(int(round(logspace(0,log10(opts.maxG+1),oo.maxOutputNum))))-1;
 	else
 		expIndices=unique(int(round(linspace(0,opts.maxG,oo.maxOutputNum))));
@@ -51,7 +51,7 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 	gnum=0
 	xSum=copy(x)
 	
-	oo.outputLevel>1 && println("        k    gnum       f         pcc      f-train")
+	oo.outputLevel>1 && println("        k    gnum       f         pcc        fp         fn       f-train")
 	
 	while true
 		

@@ -10,7 +10,7 @@ function trainTestRandomSeparate(features,labels)
 end
 
 
-function createOracles(features,labels,numDatapoints,numFeatures, setOfOnes; L2reg=false, outputLevel=0)
+function createBLOracles(features,labels,numDatapoints,numFeatures, setOfOnes; L2reg=false, outputLevel=0)
 
 	# println("Starting separation into train and test sets...")
 	(trf,trl,numTrainingPoints, tef, tel) = trainTestRandomSeparate(features,labels)
@@ -21,17 +21,17 @@ function createOracles(features,labels,numDatapoints,numFeatures, setOfOnes; L2r
 	outputLevel > 0  && println("Fraction of ones in testing  set: $(tel.numPlus/length(tel))")
 
 	# println("Defining functions...")
-	gradientOracle(W,indices) = get_f_g_cs(trf, trl,W,indices)
-	gradientOracle(W) = get_f_g_cs(trf, trl,W)
-	testFunction(W) = get_f_pcc(tef, tel,W)
+	gradientOracle(W,indices) = BL_get_f_g(trf, trl,W,indices)
+	gradientOracle(W) = BL_get_f_g(trf, trl,W)
+	testFunction(W) = BL_for_output(tef, tel,W)
 		
 	function outputsFunction(W)
 		ye = testFunction(W)
 		yo = gradientOracle(W)
-	   	(@sprintf("% .3e % .3e % .3e",ye[1], ye[2], yo[1]), [ye[1], ye[2], yo[1]])
+	   	(@sprintf("% .3e % .3e % .3e % .3e % .3e",ye[1], ye[2], ye[3], ye[4], yo[1]), [ye[1], ye[2], ye[3], ye[4], yo[1]])
 	 end
 		
-	restoreGradient(cs,indices) = get_g_from_cs(trf, trl,cs,indices)
+	restoreGradient(cs,indices) = BL_restore_gradient(trf, trl,cs,indices)
 	# println("Finished")
 	#
 	# println("Adding regularizer...")
