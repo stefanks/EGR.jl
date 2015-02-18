@@ -10,8 +10,8 @@ end
 sLikeGd(k,numTrainingPoints) = k==0 ? 0 : numTrainingPoints
 uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
+# testProblems=["TestToy","TestAgaricus"]
 testProblems=["TestToy","TestAgaricus"]
-testProblems=["TestToy"]
 
 L2regs =  [0.0, 1e-10, 1e-5,1]
 
@@ -23,7 +23,7 @@ stepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BES
 
 createOracleFunctionArray = 
 [
-(features, labels, L2reg, outputLevel) -> createMLOracles(features, labels, L2reg, outputLevel),
+# (features, labels, L2reg, outputLevel) -> createMLOracles(features, labels, L2reg, outputLevel),
 (features, labels, L2reg, outputLevel) -> createBLOracles(features, labels, Set([1.0]), L2reg, outputLevel)
 ]
 
