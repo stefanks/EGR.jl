@@ -2,6 +2,8 @@ function findBestStepsizeFactor(whatWeCareAbout::String, origStepsize::Function,
 	
 	mid = 50
 	
+	outputLevel>0 && println("Starting findBestStepsizeFactor, with $(2*mid-1) possible stepsizes")
+	
 	function getThisRunValue(res)
 		
 		if whatWeCareAbout == "f"
