@@ -43,7 +43,7 @@ function createBLOracles(features,labels, setOfOnes, L2reg::Float64, outputLevel
 	end
 
 	numVars = numFeatures
-	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"       f         pcc        fp         fn       f-train  ")
+	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"       f         pcc        fp         fn       f-train  ", "BL")
 end
 
 function createMLOracles(features,labels, L2reg::Float64, outputLevel)
@@ -94,5 +94,5 @@ function createMLOracles(features,labels, L2reg::Float64, outputLevel)
 	end
 	
 	numVars = numFeatures*length(classesDict)
-	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"      f         pcc       f-train  ")
+	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"      f         pcc       f-train  ", "ML")
 end
