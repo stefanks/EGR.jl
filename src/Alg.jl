@@ -28,15 +28,18 @@ end
 
 function alg(opts::Opts, sd::StepData, oo::OutputOpts, writeFunction::Function)
 	
-	# oo.outputLevel>0 && println("Starting alg: $(sd.stepString)")
+	oo.outputLevel>0 && println("Starting alg: $(sd.stepString)")
 	
 	# oo.outputLevel>0 && println("getting writeLoc")
 	
 	writeLoc = writeFunction(opts.stepSize(0)) 
 	
-	# oo.outputLevel>0 && println("typeof(writeLoc) = $(typeof(writeLoc))")
+	oo.outputLevel>0 && println("typeof(writeLoc) = $(typeof(writeLoc))")
 	
 	if ~isa(writeLoc, String)
+		if typeof(writeLoc) != (String, Vector{Int64}, Vector{Int64},Vector{(String,Array{Float64,1})}, Vector{Array{Float64,1}})
+			error("writeLoc type is wrong: $(typeof(writeLoc))")
+		end
 		# oo.outputLevel>0 && println("Returning!!")
 		# oo.outputLevel>0 && println(writeLoc)
 		return(writeLoc)
