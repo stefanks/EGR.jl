@@ -7,17 +7,12 @@ immutable type OutputOpts
 	outputLevel::Int64
 	outputsFunction::Function
 	outputStringHeader::String
-	
 	function OutputOpts(outputsFunction::Function,outputStringHeader::String; logarithmic::Bool = true, maxOutputNum::Int64 = 10, average::Bool=false, outputLevel::Int64=1)
-		if maxOutputNum>99
-			error("maxOutputNum too big")
-		elseif maxOutputNum<1
-			error("maxOutputNum too small")
-		end
+		maxOutputNum>99 && error("maxOutputNum too big")
+		maxOutputNum<1 && error("maxOutputNum too small")
 		outputLevel>2 && println("outputLevel is $outputLevel") 
 		new(logarithmic, maxOutputNum, average, outputLevel,outputsFunction,outputStringHeader)
 	end
-	
 end
 
 immutable type Opts
@@ -25,13 +20,27 @@ immutable type Opts
 	init::Vector{Float64}
 	maxG::Int64
 	function Opts(init::Vector{Float64}, stepSize::Function; maxG::Int64=typemax(Int64)-35329)
+		(maxG>typemax(Int64)-35329 || maxG<0) && error("maxG is $maxG, and is out of range")
+		typeof(stepSize(0)) != Float64 && error("typeof(stepSize(0)) = $(typeof(stepSize(0)))")
 		new(stepSize, init, maxG)
 	end
 end
 
-function alg(opts::Opts, sd::StepData, oo::OutputOpts)
+function alg(opts::Opts, sd::StepData, oo::OutputOpts, writeFunction::Function)
 	
-	oo.outputLevel>0 && println("Starting alg: $(sd.stepString)")
+	# oo.outputLevel>0 && println("Starting alg: $(sd.stepString)")
+	
+	# oo.outputLevel>0 && println("getting writeLoc")
+	
+	writeLoc = writeFunction(opts.stepSize(0)) 
+	
+	# oo.outputLevel>0 && println("typeof(writeLoc) = $(typeof(writeLoc))")
+	
+	if ~isa(writeLoc, String)
+		# oo.outputLevel>0 && println("Returning!!")
+		# oo.outputLevel>0 && println(writeLoc)
+		return(writeLoc)
+	end
 	
 	if oo.logarithmic == true
 		expIndices=unique(int(round(logspace(0,log10(opts.maxG+1),oo.maxOutputNum))))-1;
@@ -52,6 +61,8 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 	gnum=0
 	xSum=copy(x)
 	
+	# oo.outputLevel>0 && println("oo.outputLevel = $(oo.outputLevel)")
+	
 	oo.outputLevel>1 && println("        k    gnum"*oo.outputStringHeader)
 	
 	while true
@@ -68,6 +79,7 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 				@printf("%2.i %7.i %7.i ", kOutputs, k, gnum)
 				println(fromOutputsFunction[1])
 			end
+			writeFunction(writeLoc, k, gnum, fromOutputsFunction, x)
 			push!(results_k,k)
 			push!(results_gnum,gnum)
 			push!(results_fromOutputsFunction,fromOutputsFunction)
@@ -86,7 +98,6 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 		#  PUT IN ADAGRAD !!!
 		x-=opts.stepSize(k)*g
 		
-
 		xSum = xSum+x;
 		
 		k+=1
@@ -94,9 +105,11 @@ function alg(opts::Opts, sd::StepData, oo::OutputOpts)
 	end
 	
 	if oo.outputLevel>0
-		oo.outputLevel <= 1 && println(oo.outputStringHeader)
-		oo.outputLevel <= 1 && println(results_fromOutputsFunction[end][1])
+		oo.outputLevel == 1 && println(oo.outputStringHeader)
+		oo.outputLevel == 1 && println(results_fromOutputsFunction[end][1])
 		println("Finished alg: $(sd.stepString)")
 	end
-	(results_k, results_gnum,results_fromOutputsFunction, results_x)
+	
+	## Write answer!
+	("Finished nicely", results_k, results_gnum,results_fromOutputsFunction, results_x)
 end
