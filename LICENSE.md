@@ -1,6 +1,6 @@
-The EGR-Julia.jl package is licensed under the MIT "Expat" License:
+The EGR.jl package is licensed under the MIT "Expat" License:
 
-> Copyright (c) 2015: stepa.
+> Copyright (c) 2015: Stefan S.
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the
