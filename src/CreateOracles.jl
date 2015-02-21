@@ -10,7 +10,7 @@ function trainTestRandomSeparate(features,labels)
 end
 
 
-function createBLOracles(features,labels, setOfOnes, L2reg::Float64, outputLevel)
+function createBLOracles(features,labels, setOfOnes, L2reg::Bool, outputLevel)
 	numDatapoints = length(labels)
 	numFeatures = size(features)[2] 
 	
@@ -27,26 +27,26 @@ function createBLOracles(features,labels, setOfOnes, L2reg::Float64, outputLevel
 		
 	function outputsFunction(W)
 		ye = testFunction(W)
-		isnan(ye[1]) && return false
+		isnan(ye[1]) && return ResultFromOO("isnan", Vector{Float64}[])
 		yo = gradientOracle(W)
-		(@sprintf("% .3e % .3e % .3e % .3e % .3e",ye[1], ye[2], ye[3], ye[4], yo[1]), [ye[1], ye[2], ye[3], ye[4], yo[1]])
+		ResultFromOO(@sprintf("% .3e % .3e % .3e % .3e % .3e",ye[1], ye[2], ye[3], ye[4], yo[1]), [ye[1], ye[2], ye[3], ye[4], yo[1]])
 	end
 		
 	restoreGradient(cs,indices) = BL_restore_gradient(trf, trl,cs,indices)
-	if L2reg>0
-		mygradientOracle(a) = L2regGradient(gradientOracle, L2reg, a)
-		mygradientOracle(a, b) = L2regGradient(gradientOracle, L2reg, a, b)
-		myrestoreGradient(a, b) = L2RestoreGradient(restoreGradient, L2reg, a, b)
+	if L2reg
+		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTrainingPoints, a)
+		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTrainingPoints, a, b)
+		myrestoreGradient(a, b) = L2RestoreGradient(restoreGradient, 1/numTrainingPoints, a, b)
 	else
 		mygradientOracle=gradientOracle
 		myrestoreGradient=restoreGradient
 	end
 
 	numVars = numFeatures
-	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"       f         pcc        fp         fn       f-train  ", "BL")
+	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"       f         pcc        fp         fn       f-train  ", "BL", 5)
 end
 
-function createMLOracles(features,labels, L2reg::Float64, outputLevel)
+function createMLOracles(features,labels, L2reg::Bool, outputLevel)
 	numDatapoints = length(labels)
 	numFeatures = size(features)[2] 
 	
@@ -78,21 +78,21 @@ function createMLOracles(features,labels, L2reg::Float64, outputLevel)
 	
 	function outputsFunction(W)
 		ye = testFunction(W)
-		isnan(ye[1]) && return false
+		isnan(ye[1]) && return ResultFromOO("isnan", Vector{Float64}[])
 		yo = gradientOracle(W)
-		(@sprintf("% .3e % .3e % .3e",ye[1], ye[2], yo[1]), [ye[1], ye[2], yo[1]])
+		ResultFromOO(@sprintf("% .3e % .3e % .3e",ye[1], ye[2], yo[1]), [ye[1], ye[2], yo[1]])
 	end
 	
 	restoreGradient(cs,indices) = ML_restore_gradient(trf, trl,cs,indices)
-	if L2reg>0
-		mygradientOracle(a) = L2regGradient(gradientOracle, L2reg, a)
-		mygradientOracle(a, b) = L2regGradient(gradientOracle, L2reg, a, b)
-		myrestoreGradient(a, b) = L2RestoreGradient(restoreGradient, L2reg, a, b)
+	if L2reg
+		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTrainingPoints, a)
+		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTrainingPoints, a, b)
+		myrestoreGradient(a, b) = L2RestoreGradient(restoreGradient, 1/numTrainingPoints, a, b)
 	else
 		mygradientOracle=gradientOracle
 		myrestoreGradient=restoreGradient
 	end
 	
 	numVars = numFeatures*length(classesDict)
-	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"      f         pcc       f-train  ", "ML")
+	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,"      f         pcc       f-train  ", "ML", 3 )
 end

@@ -1,6 +1,6 @@
-using Base.Test
 using EGR
 using Redis
+
 try 
 	cd(Pkg.dir("EGR"))
 catch
@@ -10,16 +10,27 @@ end
 sLikeGd(k,numTrainingPoints) = k==0 ? 0 : numTrainingPoints
 uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
-# testProblems=["TestToy","TestAgaricus"]
-testProblems=["TestToy"]
 
-L2regs =  [0.0, 1e-10, 1e-5,1]
+
+testProblems = ["TestToy"]
 
 findBests = ["f", "pcc"]
 
-numEquivalentPasses = 5
+L2regs=[false, true]
 
-stepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
+createOracleOutputLevel = 1
+numEquivalentPasses = 5
+algOutputLevel = 2
+maxOutputNum=20
+constStepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
+
+sds = [
+(n,ntp)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, "EGR.s(k)=k.u(k)=k+1.beta(k)=1"),
+(n,ntp)->EGRsd((k,I)->  int(floor(k==0 ? 0 : 1*(101/100)^(k-1)))  >I ? I : int(floor(k==0 ? 0 : 1*(101/100)^(k-1))), (k,I)->             int(floor(k==0 ? 100*1 : 1*(101/100)^(k-1)))              > ntp - I ? ntp-I : int(floor(k==0 ? 100*1 : 1*(101/100)^(k-1))), (k)->1, n, "EGR.s(k)=u(k)=1*(101/100)^(k-1).beta(k)=1"),
+(n,ntp)->EGRsd((k,I)->  int(floor(k==0 ? 0 : (1/10)*(101/100)^(k-1)))  >I ? I : int(floor(k==0 ? 0 : (1/10)*(101/100)^(k-1))), (k,I)->             int(floor(k==0 ? 100*(1/10) : (1/10)*(101/100)^(k-1)))              > ntp - I ? ntp-I : int(floor(k==0 ? 100*(1/10) : (1/10)*(101/100)^(k-1))), (k)->1, n, "EGR.s(k)=u(k)=(1/10)*(101/100)^(k-1).beta(k)=1"),
+(n,ntp)->EGRsd((k,I)->  int(floor(k==0 ? 0 : (1/100)*(101/100)^(k-1)))  >I ? I : int(floor(k==0 ? 0 : (1/100)*(101/100)^(k-1))), (k,I)->             int(floor(k==0 ? 100*(1/100) : (1/100)*(101/100)^(k-1)))              > ntp - I ? ntp-I : int(floor(k==0 ? 100*(1/100) : (1/10)*(101/100)^(k-1))), (k)->1, n, "EGR.s(k)=u(k)=(1/100)*(101/100)^(k-1).beta(k)=1"),
+(n,ntp)->SGsd( "SG")
+]
 
 createOracleFunctionArray = 
 [
@@ -27,8 +38,12 @@ createOracleFunctionArray =
 (features, labels, L2reg, outputLevel) -> createMLOracles(features, labels, L2reg, outputLevel)
 ]
 
-myWriteFunction(stepSizeFactor::Float64) = "ok"
-myWriteFunction(writeLoc, k, gnum, fromOutputsFunction, x) = "ok"
+
+myREfunction(problem, opts, sd, wantOutputs) = false
+
+myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction, x) = false
+
+
 
 for testProblem in testProblems
 
@@ -74,36 +89,37 @@ for testProblem in testProblems
 
 	(features,labels) = readBin(datasetHT["path"]*datasetHT["name"]*".bin", int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]))
 
-	for L2reg in L2regs
-		println("L2reg = $L2reg")
-		
-		
-		for createOracleFunctions in createOracleFunctionArray
-		
-			(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient,outputStringHeader) = createOracleFunctions(features, labels, L2reg, 1)
-
+	for createOracleFunctions in createOracleFunctionArray
+		for L2reg in L2regs
+			
+			(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient, outputStringHeader, LossFunctionString,numOutputsFromOutputsFunction ) = createOracleFunctions(features, labels, L2reg, createOracleOutputLevel)
+			
+			myOutputter = Outputter(outputsFunction, outputStringHeader,numOutputsFromOutputsFunction )
+			
+			myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
+			
+			myOpts(stepSizePower) = Opts(zeros(numVars); stepSizeFunction=constStepSize, stepSizePower=stepSizePower, maxG=int(round(numEquivalentPasses*numTrainingPoints)), outputLevel=algOutputLevel)
+			
 			VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
 			VerifyRestoration(numVars,gradientOracle,restoreGradient; outputLevel=2)
 			
-			getNextSampleFunction = Task(() -> getSequential(numTrainingPoints,gradientOracle,restoreGradient))
-			
-
+			#By now the oracles are created. 
+			# From now on only concerned with the algorithm
 		
 			println("If s(k) = 0 and then numTrainingPoints, u(k) = numTrainingPoints, then 0 , gamma is natural, then egrs is equivalent to gd!!!")
 		
 			stepSize(k)=1.0
-		
-			maxG = 10*numTrainingPoints
+	
 
 			getFullGradient(W) = gradientOracle(W)
-			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Opts(zeros(numVars),stepSize; maxG=numEquivalentPasses*numTrainingPoints), GDsd(getFullGradient, numTrainingPoints,"GD"), OutputOpts(outputsFunction, outputStringHeader;outputLevel=2,maxOutputNum=11),myWriteFunction)
+			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, getFullGradient, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0),GDsd( "GD") , myOutputOpts, myWriteFunction, myREfunction)
 		
 			xFromGD = results_x[end]
 		
 			s(k,I) = sLikeGd(k,numTrainingPoints)
 			u(k,I) =  uLikeGd(k,numTrainingPoints)
 			beta(k) =1
-			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Opts(zeros(numVars),stepSize; maxG=numEquivalentPasses*numTrainingPoints), EGRsd(s, u, beta, getNextSampleFunction,numVars,"EGR gd-like"), OutputOpts(outputsFunction, outputStringHeader;outputLevel=2,maxOutputNum=11),myWriteFunction)
+			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, "EGR.GDlike"), myOutputOpts, myWriteFunction, myREfunction)
 		
 			xFromEGR = results_x[end]
 		
@@ -114,28 +130,55 @@ for testProblem in testProblems
 				error("GD and EGR do not coincide")
 			end
 			
-			# sds = [EGRsd((k,I)->k, (k,I)->k+1, (k)->1, getNextSampleFunction,numVars), SGsd(getNextSampleFunction)]
-			sds = [EGRsd((k,I)->k, (k,I)->k+1, (k)->1, getNextSampleFunction,numVars,"EGR.s(k)=k.u(k)=k+1.beta(k)=1") , SGsd(getNextSampleFunction,"SG"),GDsd(getFullGradient,numTrainingPoints,"GD")]
 		
-			for sd in sds
-				println("sd = $(sd.stepString)")
-
-				algForSearch(stepSize) = alg(Opts(zeros(numVars), stepSize; maxG=int(round(numEquivalentPasses*numTrainingPoints))), sd, OutputOpts(outputsFunction, outputStringHeader; outputLevel=0, maxOutputNum=11), myWriteFunction)[4][end][2]
-				
-				println("Successfully defined algForSearch")
+			println("If s(k) = 0, u(k) = 1, then 0, then egrs is equivalent to sg!!!")
 			
+			
+			stepSize(k)=1.0
+		
+			thismaxG = numTrainingPoints
+			
+			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0),SGsd( "SG") , myOutputOpts, myWriteFunction, myREfunction)
+		
+			xFromSG = results_x[end]
+		
+			s(k,I) = 0
+			u(k,I) = 1
+			beta(k) = 1
+			
+			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, "EGR.GDlike"), myOutputOpts, myWriteFunction, myREfunction)
+		
+			xFromEGR = results_x[end]
+		
+			relError = norm(xFromEGR-xFromSG)/norm(xFromSG)
+		
+			println("relError between EGR and SG = $relError")
+			if relError>1e-13
+				error("SG and EGR do not coincide")
+			end
+			
+			
+			
+			
+			
+			
+
+			for sd in sds
+				
+				mySd = sd(numVars,numTrainingPoints)
+				
+				
+				algForSearch(stepSizePower) =alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower), mySd, myOutputOpts, myWriteFunction, myREfunction)
+				
+				
 				for findBest in findBests
-					findBestStepsizeFactor(findBest, stepSize, algForSearch; outputLevel=2)
+					findBestStepsizeFactor(findBest, algForSearch; outputLevel=2)
 				end
+				
 			end
 		end
 	end
 end
-
-
-
-
-
 
 
 
