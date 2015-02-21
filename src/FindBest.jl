@@ -1,19 +1,31 @@
-function findBestStepsizeFactor(whatWeCareAbout::String, origStepsize::Function, alg::Function; outputLevel::Int64=0)
+function findBestStepsizeFactor(whatWeCareAbout::String, alg::Function; outputLevel::Int64=0)
 	
 	mid = 50
 	
 	outputLevel>0 && println("Starting findBestStepsizeFactor, with $(2*mid-1) possible stepsizes")
 	
 	function getThisRunValue(res)
-		
-		if whatWeCareAbout == "f"
-			thisRunValue = res[1]
-		elseif whatWeCareAbout == "pcc"
-			thisRunValue = -res[2]
-		else
-			error(whatWeCareAbout*" is not an option")
+		currentBest = Inf
+		# println("getting the run value")
+		for i in 1:size(res[4], 1)
+			if whatWeCareAbout == "f"
+				thisRunValue = res[4][i,1]
+			elseif whatWeCareAbout == "pcc"
+				thisRunValue = -res[4][i,2]
+			else
+				error(whatWeCareAbout*" is not an option")
+			end
+			# println(res)
+			# println(res[4])
+			# println(res[4][i])
+			# println(res[4][i][2][1])
+			# println(res[4][i][2][2])
+			# println(thisRunValue)
+			if thisRunValue<currentBest
+				currentBest=thisRunValue
+			end
 		end
-		thisRunValue
+		currentBest
 	end
 	
 	function checkValues(values, whatWeCareAbout)
@@ -38,10 +50,11 @@ function findBestStepsizeFactor(whatWeCareAbout::String, origStepsize::Function,
 	values=ones(2*mid-1)*NaN
 	
 	# Always start with 0.5,1,2
-	
+
+	outputLevel>1 && println("Getting ready to run algorithms!")
 	for currentI in [mid-1,mid,mid+1]
-		stepsize(k) = 2.0^(currentI-mid) * origStepsize(k)
-		theValue = getThisRunValue(alg(stepsize))
+		stepsizePower = currentI-mid
+		theValue = getThisRunValue(alg(stepsizePower))
 		outputLevel>1 && println("For index $currentI the value is $theValue")
 		values[currentI] = theValue
 	end
@@ -51,8 +64,8 @@ function findBestStepsizeFactor(whatWeCareAbout::String, origStepsize::Function,
 		outputLevel>1 && println("Exploring down!")
 		currentI=mid-2
 		while true
-			stepsize(k) = 2.0^(currentI-mid) * origStepsize(k)
-			theValue = getThisRunValue(alg(stepsize))
+			stepsizePower = currentI-mid
+			theValue = getThisRunValue(alg(stepsizePower))
 			outputLevel>1 && println("For index $currentI the value is $theValue")
 			values[currentI] = theValue
 			if checkValues(values, whatWeCareAbout) == true
@@ -76,8 +89,8 @@ function findBestStepsizeFactor(whatWeCareAbout::String, origStepsize::Function,
 		outputLevel>1 && println("Exploring up!")
 		currentI=mid+2
 		while true
-			stepsize(k) = 2.0^(currentI-mid) * origStepsize(k)
-			theValue = getThisRunValue(alg(stepsize))
+			stepsizePower = currentI-mid
+			theValue = getThisRunValue(alg(stepsizePower))
 			outputLevel>1 && println("For index $currentI the value is $theValue")
 			values[currentI] = theValue
 			if checkValues(values, whatWeCareAbout) == true
@@ -105,8 +118,8 @@ function findBestStepsizeFactor(whatWeCareAbout::String, origStepsize::Function,
 		exploreUp  = true
 		while true
 			if exploreUp  == true
-				stepsize(k) = 2.0^(currentIup-mid) * origStepsize(k)
-				theValue = getThisRunValue(alg(stepsize))
+				stepsizePower = currentIup-mid
+				theValue = getThisRunValue(alg(stepsizePower))
 				outputLevel>1 && println("For index $currentIup the value is $theValue")
 				values[currentIup] = theValue
 				if checkValues(values, whatWeCareAbout) == true
@@ -121,8 +134,8 @@ function findBestStepsizeFactor(whatWeCareAbout::String, origStepsize::Function,
 				currentIup+=1
 			end
 			if exploreDown ==true
-				stepsize(k) = 2.0^(currentIdown-mid) * origStepsize(k)
-				theValue = getThisRunValue(alg(stepsize))
+				stepsizePower = currentIdown-mid
+				theValue = getThisRunValue(alg(stepsizePower))
 				outputLevel>1 && println("For index $currentIdown the value is $theValue")
 				values[currentIdown] = theValue
 				if checkValues(values, whatWeCareAbout) == true
@@ -150,13 +163,12 @@ function findBestStepsizeFactor(whatWeCareAbout::String, origStepsize::Function,
 		end
 	end
 	(bestVal, bestI) = findmin(values)
-	outputLevel>0 && println("Best index is: $bestI")
-	outputLevel>0 && println("Best stepsize found: 2^($(bestI-mid)) = $(2.0^(bestI-mid))")
+	outputLevel>0 && println("Best stepsize power found: $(bestI-mid)")
 	if whatWeCareAbout == "f" 
-		 myval = bestVal
-	 elseif whatWeCareAbout == "pcc" 
-		 myval = -bestVal
-	 end
+		myval = bestVal
+	elseif whatWeCareAbout == "pcc" 
+		myval = -bestVal
+	end
 	outputLevel>0 && println("Best $whatWeCareAbout found: $myval")
-	(bestI, 2.0^(bestI-mid), myval)
+	(bestI-mid, myval)
 end
