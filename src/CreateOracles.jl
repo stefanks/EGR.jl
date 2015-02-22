@@ -27,7 +27,6 @@ function createBLOracles(features,labels, setOfOnes, L2reg::Bool, outputLevel)
 		
 	function outputsFunction(W)
 		ye = testFunction(W)
-		isnan(ye[1]) && return ResultFromOO("isnan", Vector{Float64}[])
 		yo = gradientOracle(W)
 		ResultFromOO(@sprintf("% .3e % .3e % .3e % .3e % .3e",ye[1], ye[2], ye[3], ye[4], yo[1]), [ye[1], ye[2], ye[3], ye[4], yo[1]])
 	end

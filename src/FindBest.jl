@@ -28,140 +28,96 @@ function findBestStepsizeFactor(whatWeCareAbout::String, alg::Function; outputLe
 		currentBest
 	end
 	
-	function checkValues(values, whatWeCareAbout)
-		# println(values)
-		for i in 1:2*mid-3
+	function checkValues(values, whatWeCareAbout, startValue, checkDown, checkUp)
+		
+		if whatWeCareAbout == "f" 
+			bestPossible = 0.0
+			worstPossible = Inf
+		elseif whatWeCareAbout == "pcc" 
+			bestPossible = -1.0
+			worstPossible = 0.0
+		end
+		
+		if ~isnan(values[1]) 
+			checkDown = false
+		end
+		if ~isnan(values[end]) 
+			checkUp = false
+		end
+		
+		for i in values
+			if i==bestPossible
+				return (false, false)
+			end
+		end
+		
+		
+		
+		## Search for good start sequence!
+		for i in 1:length(values)-2
 			if values[i]>=values[i+1]>values[i+2]
-				for j in i+2:2*mid-3
+				checkDown = false
+				## Search for the end sequence!
+				for j in i+2:length(values)-2
 					if values[j]<values[j+1]<=values[j+2]
 						outputLevel>1 && println("$(values[i]) $(values[i+1]) $(values[i+2]) $(values[j]) $(values[j+1]) $(values[j+2])")
-						return true
+						return (false, false)
 					end
 				end
 			end
+			if values[i]==values[i+1]==values[i+2]
+				checkUp = false
+			end
 		end
-		if whatWeCareAbout == "pcc" && minimum(values) == -1.0
-			return true
-		end
-		return false
+
+		return (checkDown, checkUp)
 	end
 	
 	# The middle one corresponds to 1 (or to 2^0) !!
 	values=ones(2*mid-1)*NaN
+	startValue = NaN
 	
-	# Always start with 0.5,1,2
+	# Always start with zero power
 
-	outputLevel>1 && println("Getting ready to run algorithms!")
-	for currentI in [mid-1,mid,mid+1]
-		stepsizePower = currentI-mid
-		theValue = getThisRunValue(alg(stepsizePower))
-		outputLevel>1 && println("For index $currentI the value is $theValue")
-		values[currentI] = theValue
-	end
+	stepsizePower = 0
+	res = alg(0)
+	if whatWeCareAbout == "f"
+		startValue = res[4][1,1]
+	elseif whatWeCareAbout == "pcc"
+		startValue = -res[4][1,2]
+		end
+	theValue = getThisRunValue(res)
+	outputLevel>1 && println("For stepsizePower 0 the value is $theValue")
+	values[mid] = theValue
 	
-	# For sure explore down!
-	if (values[mid-1]<values[mid]<=values[mid+1]) ||(isinf(values[mid-1]) && isinf(values[mid]) && isinf(values[mid+1]) )
-		outputLevel>1 && println("Exploring down!")
-		currentI=mid-2
-		while true
-			stepsizePower = currentI-mid
+	currentIup = mid+1
+	currentIdown = mid-1
+	checkDown=true
+	checkUp=true
+	(checkDown, checkUp) = checkValues(values, whatWeCareAbout, startValue, checkDown, checkUp)
+	while (checkDown, checkUp) != (false, false)
+		if  checkDown==true
+			outputLevel>1 && println("Exploring down!")
+			stepsizePower = currentIdown-mid
 			theValue = getThisRunValue(alg(stepsizePower))
-			outputLevel>1 && println("For index $currentI the value is $theValue")
-			values[currentI] = theValue
-			if checkValues(values, whatWeCareAbout) == true
-				outputLevel>1 && println("Found the best step!")
-				break
-			end
-			currentI-=1
-			if ~isinf(maximum(values)) && maximum(values) == minimum(values)
-				outputLevel>1 && println("~isinf(maximum(values)) && maximum(values) == minimum(values)")
-				outputLevel>1 && println("Quitting!")
-				break
-			end
-			if currentI<1 || currentI>length(values)
-				outputLevel>1 && println("currentI = $currentI")
-				outputLevel>1 && println("currentI<1 || currentI>length(values)")
-				outputLevel>1 && println("Quitting!")
-				break
-			end
+			outputLevel>1 && println("For stepsizePower $stepsizePower the value is $theValue")
+			values[currentIdown] = theValue
+			currentIdown -= 1
+			(checkDown, checkUp) = checkValues(values, whatWeCareAbout, startValue, checkDown, checkUp)
+			println((checkDown, checkUp))
 		end
-	elseif values[mid-1]>=values[mid]>values[mid+1]
-		outputLevel>1 && println("Exploring up!")
-		currentI=mid+2
-		while true
-			stepsizePower = currentI-mid
+		if  checkUp==true
+			outputLevel>1 && println("Exploring up!")
+			stepsizePower = currentIup-mid
 			theValue = getThisRunValue(alg(stepsizePower))
-			outputLevel>1 && println("For index $currentI the value is $theValue")
-			values[currentI] = theValue
-			if checkValues(values, whatWeCareAbout) == true
-				outputLevel>1 && println("Found the best step!")
-				break
-			end
-			currentI+=1
-			if ~isinf(maximum(values)) && maximum(values) == minimum(values)
-				outputLevel>1 && println("~isinf(maximum(values)) && maximum(values) == minimum(values)")
-				outputLevel>1 && println("Quitting!")
-				break
-			end
-			if currentI<1 || currentI>length(values)
-				outputLevel>1 && println("currentI = $currentI")
-				outputLevel>1 && println("currentI<1 || currentI>length(values)")
-				outputLevel>1 && println("Quitting!")
-				break
-			end
-		end
-	else
-		outputLevel>1 && println("Exploring both up and down!")
-		currentIup=mid+2
-		currentIdown=mid-2
-		exploreDown  = true
-		exploreUp  = true
-		while true
-			if exploreUp  == true
-				stepsizePower = currentIup-mid
-				theValue = getThisRunValue(alg(stepsizePower))
-				outputLevel>1 && println("For index $currentIup the value is $theValue")
-				values[currentIup] = theValue
-				if checkValues(values, whatWeCareAbout) == true
-					outputLevel>1 && println("Found the best step!")
-					break
-				end
-				if values[currentIup-2]<values[currentIup-1]<=values[currentIup]
-					outputLevel>1 && println("$(values[currentIup-2]) $(values[currentIup-1]) $(values[currentIup])")
-					outputLevel>1 && println("exploreUp=false")
-					exploreUp=false
-				end
-				currentIup+=1
-			end
-			if exploreDown ==true
-				stepsizePower = currentIdown-mid
-				theValue = getThisRunValue(alg(stepsizePower))
-				outputLevel>1 && println("For index $currentIdown the value is $theValue")
-				values[currentIdown] = theValue
-				if checkValues(values, whatWeCareAbout) == true
-					outputLevel>1 && println("Found the best step!")
-					break
-				end
-				if values[currentIdown]>=values[currentIdown+1]>values[currentIdown+2]
-					outputLevel>1 && println("$(values[currentIdown]) $(values[currentIdown+1]) $(values[currentIdown+2])")
-					outputLevel>1 && println("exploreDown=false")
-					exploreDown=false
-				end
-				currentIdown-=1
-			end
-			if ~isinf(maximum(values)) && maximum(values) == minimum(values)
-				outputLevel>1 && println("~isinf(maximum(values)) && maximum(values) == minimum(values)")
-				outputLevel>1 && println("Quitting!")
-				break
-			end
-			if currentIdown<1 || currentIup>length(values)
-				outputLevel>1 && println("currentI = $currentI")
-				outputLevel>1 && println("currentI<1 || currentI>length(values)")
-				outputLevel>1 && println("Quitting!")
-				break
-			end
+			outputLevel>1 && println("For stepsizePower $stepsizePower the value is $theValue")
+			values[currentIup] = theValue
+			currentIup += 1
+			(checkDown, checkUp) = checkValues(values, whatWeCareAbout, startValue, checkDown, checkUp)
+			println((checkDown, checkUp))
 		end
 	end
+
 	(bestVal, bestI) = findmin(values)
 	outputLevel>0 && println("Best stepsize power found: $(bestI-mid)")
 	if whatWeCareAbout == "f" 

@@ -32,7 +32,14 @@ type GDsd <: StepData
 end
 
 function naturalEGRS(x, k, gnum, sd::EGRsd, problem::Problem);
-		
+	
+	# println("sd.I = $(sd.I)")
+	# println("k = $k")
+	# println("sd.u(k,sd.I) = $(sd.u(k,sd.I))")
+	# println("sd.s(k,sd.I) = $(sd.s(k,sd.I))")
+	
+	
+	
 	U = (sd.I+1):(sd.I+sd.u(k,sd.I))
 	# println(U)
 		
@@ -90,7 +97,7 @@ function naturalEGRS(x, k, gnum, sd::EGRsd, problem::Problem);
 	gnum += sd.s(k,sd.I)+sd.u(k,sd.I)	
 	
 	# println("sumy = $sumy")
-	#     println("sumy/sd.u(k,sd.I) = $(sumy/sd.u(k,sd.I))")
+	# println("sumy/sd.u(k,sd.I) = $(sumy/sd.u(k,sd.I))")
 	# println("sumy/sd.s(k,sd.I) = $(sumy/sd.s(k,sd.I))")
 	# println("sd.A = $(sd.A)")
 	# println("$((sd.s(k,sd.I) > 0  ? sd.s(k,sd.I)*((sd.beta(k)/sd.I)*sd.A): 0)- sd.beta(k)*B ) ")

@@ -164,11 +164,9 @@ for testProblem in testProblems
 			
 
 			for sd in sds
+			
 				
-				mySd = sd(numVars,numTrainingPoints)
-				
-				
-				algForSearch(stepSizePower) =alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower), mySd, myOutputOpts, myWriteFunction, myREfunction)
+				algForSearch(stepSizePower) =alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower), sd(numVars,numTrainingPoints), myOutputOpts, myWriteFunction, myREfunction)
 				
 				
 				for findBest in findBests

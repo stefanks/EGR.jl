@@ -56,6 +56,8 @@ end
 
 function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFunction::Function, returnResultIfExists::Function)
 	
+	opts.outputLevel>0 && println("Starting alg")
+	
 	if oo.logarithmic == true
 		expIndices=unique(int(round(logspace(0,log10(opts.maxG+1),oo.maxOutputNum))))-1
 	else
@@ -63,6 +65,9 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	end
 	
 	trueOutputNum = length(expIndices)
+	
+	# println("trueOutputNum = $trueOutputNum")
+	# println("expIndices = $expIndices")
 	
 	existingResult = returnResultIfExists(problem, opts, sd, trueOutputNum)
 
@@ -73,7 +78,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		return existingResult
 	end
 	
-	opts.outputLevel>0 && println("Starting alg")
+	opts.outputLevel>0 && println("Start confirmed")
 	opts.outputLevel>0 && println("Opts: $(opts.optsString)")
 	opts.outputLevel>0 && println("OutputOpts: $(oo.ooString)")
 	
@@ -103,12 +108,12 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 				xToTest =x
 			end
 			fromOutputsFunction::ResultFromOO = oo.outputter.outputsFunction(xToTest)
-			fromOutputsFunction.resultString == "isnan" && break
 			if opts.outputLevel>1 
 				@printf("%2.i %7.i %7.i ", kOutputs, k, gnum)
 				println(fromOutputsFunction.resultString)
 			end
 			writeFunction(problem, sd, opts, k, gnum, fromOutputsFunction, xToTest)
+			isnan(fromOutputsFunction.resultLine[1]) && return ("NaN found", results_k, results_gnum,results_fromOutputsFunction, results_x)
 			push!(results_k,k)
 			push!(results_gnum,gnum)
 			results_fromOutputsFunction = [results_fromOutputsFunction ; fromOutputsFunction.resultLine']
@@ -120,12 +125,15 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		
 	    (g, gnum) = sd.getStep(x, k, gnum, sd, problem);
 		
-		# println("g = $g")
+		opts.outputLevel>2 && println("norm(g) = $(norm(g))")
 		
-		# println(norm(x))
+		opts.outputLevel>2 && println("norm(x) before step = $(norm(x))")
 		
 		#  PUT IN ADAGRAD !!!
 		x-=(2.0^opts.stepSizePower)*opts.stepSizeFunction(k)*g
+		
+		opts.outputLevel>2 && println("norm(x) after step = $(norm(x))")
+		
 		
 		xSum = xSum+x;
 		
