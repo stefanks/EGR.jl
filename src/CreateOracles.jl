@@ -42,7 +42,7 @@ function createBLOracles(features,labels, setOfOnes, L2reg::Bool, outputLevel)
 	else
 		mygradientOracle=gradientOracle
 		myrestoreGradient=restoreGradient
-		csDataType = Vector{Float64}
+		csDataType = Float64
 	end
 
 	numVars = numFeatures
@@ -50,6 +50,12 @@ function createBLOracles(features,labels, setOfOnes, L2reg::Bool, outputLevel)
 end
 
 function createMLOracles(features,labels, L2reg::Bool, outputLevel)
+	
+	# Need for parallel batch graident evaluation!
+	if nworkers()<4
+			addprocs(nprocs()-nworkers())
+	end
+	
 	numDatapoints = length(labels)
 	numFeatures = size(features)[2] 
 	
@@ -74,10 +80,12 @@ function createMLOracles(features,labels, L2reg::Bool, outputLevel)
 	outputLevel > 0  && println("Number of classes is $(length(classesDict))")
 	
 	(trf,trl,numTrainingPoints, tef, tel) = trainTestRandomSeparate(features,classLabels)
-
-	gradientOracle(W,indices) = ML_get_f_g(trf, trl,W,indices)
-	gradientOracle(W) = ML_get_f_g(trf, trl,W)
-	testFunction(W) = ML_for_output(tef, tel,W)
+	
+	trft=trf'
+	teft=tef'
+	gradientOracle(W,indices) = ML_get_f_g(trft, trl,W,indices)
+	gradientOracle(W) = ML_get_f_g(trft, trl,W)
+	testFunction(W) = ML_for_output(teft, tel,W)
 	
 	function outputsFunction(W)
 		ye = testFunction(W)
@@ -85,16 +93,18 @@ function createMLOracles(features,labels, L2reg::Bool, outputLevel)
 		ResultFromOO(@sprintf("% .3e % .3e % .3e",ye[1], ye[2], yo[1]), [ye[1], ye[2], yo[1]])
 	end
 	
-	restoreGradient(cs,indices) = ML_restore_gradient(trf, trl,cs,indices)
+	restoreGradient(cs,indices) = ML_restore_gradient(trft, trl,cs,indices)
 	if L2reg
 		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTrainingPoints, a)
 		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTrainingPoints, a, b)
 		myrestoreGradient(a, b) = L2RestoreGradient(restoreGradient, 1/numTrainingPoints, a, b)
+		csDataType=Vector{Float64}
 	else
 		mygradientOracle=gradientOracle
 		myrestoreGradient=restoreGradient
+		csDataType=Matrix{Float64}
 	end
 	
 	numVars = numFeatures*length(classesDict)
-	(mygradientOracle, numTrainingPoints, numVars, outputsFunction, myrestoreGradient, Vector{Float64}, "      f         pcc       f-train  ", "ML", 3 )
+	(mygradientOracle, numTrainingPoints, numVars, outputsFunction, myrestoreGradient, csDataType,  "      f         pcc       f-train  ", "ML", 3 )
 end

@@ -39,7 +39,7 @@ sds = [
 (n,ntp,dt)->EGRexp(1.0,1000.0,n,ntp, (k)->1, true,  dt,"alg4.s_k=u_k=(1001/1000)^(k-1).b_k=1"),
 (n,ntp,dt)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, false, dt,"alg2.s_k=k.u_k=k+1.b_k=1"),
 (n,ntp,dt)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, true, dt, "alg4.s_k=k.u_k=k+1.b_k=1"),
-(n,ntp)->SGsd( "SG")
+(n,ntp,dt)->SGsd( "SG")
 ]
 
 createOracleFunctionArray = 

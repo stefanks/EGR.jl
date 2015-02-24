@@ -1,124 +1,54 @@
-function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64}, index::Int64)
-	# X = featuresTP[:,index]
-	# Y = labels[index]
-	# ym=Y*dot(X,W)
-	# (log(1 + exp(-ym)), X*(-Y / (1 + exp(ym))), ym)
-	
-
-	numFeatures = size(features)[2]
+function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64}, index::Int64)
+	numFeatures = size(featuresTP)[1]
 	numClasses = div(length(W),numFeatures)
-	W=reshape(W,(numFeatures,numClasses));
-
-	f=0;
-
+	W=reshape(W,(numFeatures,numClasses))
 	class=labels[index]
-	# get the feature row-vector
-	x = features[index,:]
-        
-	a=exp(x*W);  #1 by numClasses
-	b=sum(a);  
-		
-	aDb=a/b; #1 by numClasses
-	g=x'*aDb;
-        
-	g[:,class]=g[:,class]-x';
-        
-	f-=log(a[class]/b);
-
-	(v,chosenclass) = findmax(a);
-	
-	g=vec(g);
-	(f,g,g)
-	
-	
+	x = featuresTP[:,index]
+	a=exp(x'*W) 
+	aDb=a/sum(a) 
+	g=x*aDb
+	g[:,class]-=x
+	(-log(aDb[class]),vec(g),aDb)
 end
 
-function ML_restore_gradient(featuresTP::Matrix{Float64}, labels::Vector{Int64}, cs::Vector{Float64}, index::Int64)
-	# X = featuresTP[:,index]
-	# Y = labels[index]
-	# X*(-Y / (1 + exp(ym)))
-	cs
+function ML_restore_gradient(featuresTP::Matrix{Float64}, labels::Vector{Int64}, aDb::Matrix{Float64}, index::Int64)
+	numFeatures = size(featuresTP)[1]
+	numClasses = size(aDb)[2]
+	class=labels[index]
+	x = featuresTP[:,index]
+	g=x*aDb
+	g[:,class]-=x
+	vec(g)
 end
 
-function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64})
-	# ym=labels.field.*(features*W)
-	# (mean(log(1 + exp(-ym))) ,features'*(-labels.field ./ (1 + exp(ym)))/size(features)[1])
-	numFeatures = size(features)[2]
-		numClasses = div(length(W),numFeatures)
-		W=reshape(W,(numFeatures,numClasses));
-		g=zeros(size(W));
-
-		f=0;
-	
-		for k in 1:length(labels)
-		
-			class=labels[k]
-			# get the feature row-vector
-			x= features[k,:] #1 by numFeatures
-        
-			a=exp(x*W);  #1 by numClasses
-			b=sum(a);  
-		
-			aDb=a/b; #1 by numClasses
-			g+=x'*aDb;
-        
-			g[:,class]=g[:,class]-x';
-        
-			f-=log(a[class]/b);
-
-			(v,chosenclass) = findmax(a);
-        
-		end
-
-		f=f/length(labels);
-		g=vec(g)/length(labels);
-		(f,g,g)
+function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64})
+	numFeatures = size(featuresTP)[1]
+	numClasses = div(length(W),numFeatures)
+	W=reshape(W,(numFeatures,numClasses))
+	(g,f) = @parallel ((a,b)->(a[1]+b[1], a[2]+b[2])) for k in 1:length(labels)
+		class=labels[k]
+		x= featuresTP[:,k]
+		a=exp(x'*W)
+		aDb=a/sum(a)
+		myAdd = x*aDb
+		myAdd[:,class]-=x
+		(myAdd, log(aDb[class]))
+	end
+	(-f/length(labels),vec(g)/length(labels))
 end
 
 # Returns f, percent correctly classified
-function ML_for_output(features::Matrix{Float64},labels::Vector{Int64},W::Vector{Float64})
-	# ym=labels.field.*(features*W)
-	# (pcc, fp, fn) = (0,0,0)
-	# for i in 1:size(features)[1]
-	# 	if ym[i]<0
-	# 		if labels.field[i]<0
-	# 			fp += 1
-	# 		elseif labels.field[i]>0
-	# 			fn += 1
-	# 		end
-	# 	elseif ym[i]>0
-	# 		pcc += 1
-	# 	end
-	# end
-	# (mean(log(1 + exp(-ym))), pcc / size(features)[1], fp/(size(features)[1] - labels.numPlus), fn/labels.numPlus )	
-	numFeatures = size(features)[2]
+function ML_for_output(featuresTP::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64})
+	numFeatures = size(featuresTP)[1]
 	numClasses = div(length(W),numFeatures)
-	W=reshape(W,(numFeatures,numClasses));
-
-	f=0;
-	pcc=0
-	
-	for k in 1:length(labels)
-		
+	W=reshape(W,(numFeatures,numClasses))
+	(pcc,f) = @parallel ((a,b)->(a[1]+b[1], a[2]+b[2])) for k in 1:length(labels)
 		class=labels[k]
-		# get the feature row-vector
-		x= features[k,:] #1 by numFeatures
-        
-		a=exp(x*W);  #1 by numClasses
-		b=sum(a);  
-
-		f-=log(a[class]/b);
-
+		x= featuresTP[:,k] 
+		a=exp(x'*W) 
+		aDb=a/sum(a) 
 		(v,chosenclass) = findmax(a);
-        
-		if chosenclass == class
-			pcc+= 1;
-		end
-		
+		(chosenclass == class ? 1 : 0 , log(aDb[class]))
 	end
-
-	f=f/length(labels);
-	pcc = pcc/length(labels)
-	(f,pcc)
-	
+	(-f/length(labels),pcc/length(labels))
 end
