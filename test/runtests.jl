@@ -14,9 +14,15 @@ uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
 testProblems = ["TestToy"]
 
-findBests = ["f", "pcc"]
+findBests = [
+"f", 
+"pcc"
+]
 
-L2regs=[false, true]
+L2regs=[
+false,
+true
+]
 
 createOracleOutputLevel = 1
 numEquivalentPasses = 5
@@ -25,10 +31,14 @@ maxOutputNum=20
 constStepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
 
 sds = [
-(n,ntp)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, "EGR.s(k)=k.u(k)=k+1.beta(k)=1"),
-(n,ntp)->EGRsd((k,I)->  int(floor(k==0 ? 0 : 1*(101/100)^(k-1)))  >I ? I : int(floor(k==0 ? 0 : 1*(101/100)^(k-1))), (k,I)->             int(floor(k==0 ? 100*1 : 1*(101/100)^(k-1)))              > ntp - I ? ntp-I : int(floor(k==0 ? 100*1 : 1*(101/100)^(k-1))), (k)->1, n, "EGR.s(k)=u(k)=1*(101/100)^(k-1).beta(k)=1"),
-(n,ntp)->EGRsd((k,I)->  int(floor(k==0 ? 0 : (1/10)*(101/100)^(k-1)))  >I ? I : int(floor(k==0 ? 0 : (1/10)*(101/100)^(k-1))), (k,I)->             int(floor(k==0 ? 100*(1/10) : (1/10)*(101/100)^(k-1)))              > ntp - I ? ntp-I : int(floor(k==0 ? 100*(1/10) : (1/10)*(101/100)^(k-1))), (k)->1, n, "EGR.s(k)=u(k)=(1/10)*(101/100)^(k-1).beta(k)=1"),
-(n,ntp)->EGRsd((k,I)->  int(floor(k==0 ? 0 : (1/100)*(101/100)^(k-1)))  >I ? I : int(floor(k==0 ? 0 : (1/100)*(101/100)^(k-1))), (k,I)->             int(floor(k==0 ? 100*(1/100) : (1/100)*(101/100)^(k-1)))              > ntp - I ? ntp-I : int(floor(k==0 ? 100*(1/100) : (1/10)*(101/100)^(k-1))), (k)->1, n, "EGR.s(k)=u(k)=(1/100)*(101/100)^(k-1).beta(k)=1"),
+(n,ntp,dt)->EGRexp(1.0,10.0,n,ntp, (k)->1, false, dt, "alg2.s_k=u_k=(11/10)^(k-1).b_k=1"),
+(n,ntp,dt)->EGRexp(1.0,10.0,n,ntp, (k)->1, true, dt, "alg4.s_k=u_k=(11/10)^(k-1).b_k=1"),
+(n,ntp,dt)->EGRexp(1.0,100.0,n,ntp, (k)->1, false, dt,"alg2.s_k=u_k=(101/100)^(k-1).b_k=1"),
+(n,ntp,dt)->EGRexp(1.0,100.0,n,ntp, (k)->1, true, dt, "alg4.s_k=u_k=(101/100)^(k-1).b_k=1"),
+(n,ntp,dt)->EGRexp(1.0,1000.0,n,ntp, (k)->1, false, dt,"alg2.s_k=u_k=(1001/1000)^(k-1).b_k=1"),
+(n,ntp,dt)->EGRexp(1.0,1000.0,n,ntp, (k)->1, true,  dt,"alg4.s_k=u_k=(1001/1000)^(k-1).b_k=1"),
+(n,ntp,dt)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, false, dt,"alg2.s_k=k.u_k=k+1.b_k=1"),
+(n,ntp,dt)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, true, dt, "alg4.s_k=k.u_k=k+1.b_k=1"),
 (n,ntp)->SGsd( "SG")
 ]
 
@@ -92,7 +102,7 @@ for testProblem in testProblems
 	for createOracleFunctions in createOracleFunctionArray
 		for L2reg in L2regs
 			
-			(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient, outputStringHeader, LossFunctionString,numOutputsFromOutputsFunction ) = createOracleFunctions(features, labels, L2reg, createOracleOutputLevel)
+			(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient, csDataType, outputStringHeader,  LossFunctionString,numOutputsFromOutputsFunction ) = createOracleFunctions(features, labels, L2reg, createOracleOutputLevel)
 			
 			myOutputter = Outputter(outputsFunction, outputStringHeader,numOutputsFromOutputsFunction )
 			
@@ -119,7 +129,7 @@ for testProblem in testProblems
 			s(k,I) = sLikeGd(k,numTrainingPoints)
 			u(k,I) =  uLikeGd(k,numTrainingPoints)
 			beta(k) =1
-			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, "EGR.GDlike"), myOutputOpts, myWriteFunction, myREfunction)
+			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, true, csDataType, "EGR.GDlike"), myOutputOpts, myWriteFunction, myREfunction)
 		
 			xFromEGR = results_x[end]
 		
@@ -146,7 +156,7 @@ for testProblem in testProblems
 			u(k,I) = 1
 			beta(k) = 1
 			
-			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, "EGR.GDlike"), myOutputOpts, myWriteFunction, myREfunction)
+			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, true,csDataType,  "EGR.GDlike"), myOutputOpts, myWriteFunction, myREfunction)
 		
 			xFromEGR = results_x[end]
 		
@@ -166,7 +176,7 @@ for testProblem in testProblems
 			for sd in sds
 			
 				
-				algForSearch(stepSizePower) =alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower), sd(numVars,numTrainingPoints), myOutputOpts, myWriteFunction, myREfunction)
+				algForSearch(stepSizePower) =alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower), sd(numVars,numTrainingPoints,csDataType), myOutputOpts, myWriteFunction, myREfunction)
 				
 				
 				for findBest in findBests
@@ -191,15 +201,15 @@ end
 
 
 
-
-
-
-println("Testing MinusPlusOneVector")
-
-a=MinusPlusOneVector([1,1,-1])
-b=MinusPlusOneVector([1,1,-1.0])
-c=MinusPlusOneVector([1,1,-1],Set([-1]))	
-println(a[1])
-println(b[2:3])
-println(c[[1,3]])
-println(length(a))
+#
+#
+#
+# println("Testing MinusPlusOneVector")
+#
+# a=MinusPlusOneVector([1,1,-1])
+# b=MinusPlusOneVector([1,1,-1.0])
+# c=MinusPlusOneVector([1,1,-1],Set([-1]))
+# println(a[1])
+# println(b[2:3])
+# println(c[[1,3]])
+# println(length(a))

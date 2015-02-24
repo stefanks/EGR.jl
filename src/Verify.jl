@@ -6,9 +6,9 @@ function VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
 
 	tol = 1e-6
 	
-	for x in {zeros(numVars),2*rand(numVars)-1}
+	for x in {zeros(numVars),2*rand(numVars)-1, randn(numVars)}
 	
-		(f,g, margins)= gradientOracle(x)
+		(f,g)= gradientOracle(x)
 		# println("now f # is of type")
 		# 		println(typeof(f))
 		
@@ -22,8 +22,8 @@ function VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
 				b[j] = -10.0^(-displacementAccuracy)
 				a+=x
 				b+=x
-				(fa,g, margins)= gradientOracle(a)
-				(fb,g, margins)= gradientOracle(b)
+				(fa,g)= gradientOracle(a)
+				(fb,g)= gradientOracle(b)
 				# println(typeof(ff))
 				# 			println("f = $f")
 				# 			println("ff = $ff")
@@ -42,24 +42,13 @@ function VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
 			error("F values do not work with gradient!")
 		end
 		
-		(f,g1, margins)= gradientOracle(x,1:div(numTrainingPoints,2))
-		(f,g2, margins)= gradientOracle(x,(div(numTrainingPoints,2)+1):numTrainingPoints)
-		est1=(div(numTrainingPoints,2)*g1+(numTrainingPoints-div(numTrainingPoints,2))*g2)/numTrainingPoints
-		# println("est1 =$est1")
-		# println("g =$g")
-		relError = norm(est1-g)/norm(g)
-		if relError>tol 
-			println("relError = $relError")
-			error("Did not pass the splitting training points in half test. Average not equal to true gradient!")
-		end
-		
-		est2=zeros(numVars)
+		est=zeros(numVars)
 		for i=1:numTrainingPoints
 			(f,g1, margins)= gradientOracle(x,i)
-			est2+=g1
+			est+=g1
 		end
-		est2=est2/numTrainingPoints
-		relError = norm(est2-g)/norm(g)
+		est=est/numTrainingPoints
+		relError = norm(est-g)/norm(g)
 		if relError>tol 
 			println("relError = $relError")
 			error("Did not pass the splitting training points into individuals. Average not equal to true gradient!")
@@ -72,7 +61,7 @@ end
 function VerifyRestoration(numVars,gradientOracle,restoreGradient; outputLevel=2)
 	outputLevel>0 && println("Verifying Restoration...")
 	tol = 1e-12
-	for x in {zeros(numVars),2*rand(numVars)-1}
+	for x in {zeros(numVars), 2*rand(numVars)-1, randn(numVars)}
 		(f,g,cs) = gradientOracle(x,1)
 		relError = norm(restoreGradient(cs,1)-g)/norm(g)
 		if relError>tol 
