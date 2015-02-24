@@ -12,7 +12,8 @@ uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
 
 
-testProblems = ["TestToy"]
+# testProblems = ["TestToy"]
+testProblems = ["agaricus"]
 
 findBests = [
 "f", 
