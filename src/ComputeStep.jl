@@ -8,11 +8,16 @@ type EGRsd <: StepData
 	u::Function
 	beta::Function
 	getStep::Function
+	newS::Bool
 	stepString::String
 		
-	function EGRsd(s::Function, u::Function, beta::Function, numVars::Int64, stepString)
-		new(zeros(numVars),(Function,Function)[],Array{Float64,1}[],0, s, u, beta, naturalEGRS, stepString)
+	function EGRsd(s::Function, u::Function, beta::Function, numVars::Int64, newS::Bool,dt::DataType, stepString::String)
+		new(zeros(numVars),(Function,Function)[], dt[],0, s, u, beta, naturalEGRS, newS, stepString)
 	end
+end
+
+function EGRexp(c::Float64,r::Float64,numVars::Int64,ntp::Int64, beta::Function, newS::Bool, dt::DataType, stepString::String)
+	EGRsd( (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1))),  (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) , beta,  numVars, newS, dt,	stepString)
 end
 
 type SGsd <: StepData
@@ -50,15 +55,15 @@ function naturalEGRS(x, k, gnum, sd::EGRsd, problem::Problem);
 		# (func,cs) = consume(sd.getNextSampleFunction)
 		# println(func([0.0,0])[2])
 		# println(size(sd.functions))
-	# 	println(sd.functions[1][1]([0.0,0])[2])
-	# 	println(sd.functions[end][1]([0.0,0])[2])
-	# 	show(sd.functions)
-	# 	println()
+		# 	println(sd.functions[1][1]([0.0,0])[2])
+		# 	println(sd.functions[end][1]([0.0,0])[2])
+		# 	show(sd.functions)
+		# 	println()
 		push!(sd.functions,consume(problem.getNextSampleFunction))
 		# show(sd.functions)
-	# 	println()
-	# 	println(sd.functions[1][1]([0.0,0])[2])
-	# 	println(sd.functions[end][1]([0.0,0])[2])
+		# 	println()
+		# 	println(sd.functions[1][1]([0.0,0])[2])
+		# 	println(sd.functions[end][1]([0.0,0])[2])
 	end
 	#
 	# println("These should be different!!!")
@@ -73,7 +78,7 @@ function naturalEGRS(x, k, gnum, sd::EGRsd, problem::Problem);
 	for i in S
 		B +=sd.functions[i][2](sd.y[i])
 	end
-    # println("B/sd.s(k,sd.I) = $(B/sd.s(k,sd.I))")
+	# println("B/sd.s(k,sd.I) = $(B/sd.s(k,sd.I))")
 		
 	sumy=zeros(size(x))
 
@@ -102,8 +107,11 @@ function naturalEGRS(x, k, gnum, sd::EGRsd, problem::Problem);
 	# println("sd.A = $(sd.A)")
 	# println("$((sd.s(k,sd.I) > 0  ? sd.s(k,sd.I)*((sd.beta(k)/sd.I)*sd.A): 0)- sd.beta(k)*B ) ")
 		
-	g = ((sd.s(k,sd.I) > 0  ? sd.s(k,sd.I)*((sd.beta(k)/sd.I)*sd.A): 0) - sd.beta(k)*B + sumy )/(sd.s(k,sd.I)+sd.u(k,sd.I))
-		
+	if sd.newS == true
+		g = ((sd.s(k,sd.I) > 0  ? sd.s(k,sd.I)*((sd.beta(k)/sd.I)*sd.A): 0) - sd.beta(k)*B + sumy )/(sd.s(k,sd.I)+sd.u(k,sd.I))
+	else
+		g = (sd.A- B + sumy )/(sd.I+sd.u(k,sd.I))
+	end
 	sd.I = sd.I + sd.u(k,sd.I)
 		
 	# println(size(sd.A))
@@ -116,7 +124,7 @@ end
 
 function computeGDStep(x, k, gnum, sd::GDsd,problem::Problem)
 
-	(f,g, margins)= problem.getFullGradient(x)
+	(f,g)= problem.getFullGradient(x)
 	
 	gnum += problem.numTrainingPoints
 	
