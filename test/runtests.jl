@@ -26,7 +26,7 @@ true
 
 createOracleOutputLevel = 1
 numEquivalentPasses = 5
-algOutputLevel = 2
+algOutputLevel = 0
 maxOutputNum=20
 constStepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
 
@@ -180,7 +180,7 @@ for testProblem in testProblems
 				
 				
 				for findBest in findBests
-					findBestStepsizeFactor(findBest, algForSearch; outputLevel=2)
+					findBestStepsizeFactor(findBest, algForSearch; outputLevel=1)
 				end
 				
 			end

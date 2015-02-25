@@ -104,7 +104,7 @@ function findBestStepsizeFactor(whatWeCareAbout::String, alg::Function; outputLe
 			values[currentIdown] = theValue
 			currentIdown -= 1
 			(checkDown, checkUp) = checkValues(values, whatWeCareAbout, startValue, checkDown, checkUp)
-			println((checkDown, checkUp))
+			outputLevel>1 && println((checkDown, checkUp))
 		end
 		if  checkUp==true
 			outputLevel>1 && println("Exploring up!")
@@ -114,7 +114,7 @@ function findBestStepsizeFactor(whatWeCareAbout::String, alg::Function; outputLe
 			values[currentIup] = theValue
 			currentIup += 1
 			(checkDown, checkUp) = checkValues(values, whatWeCareAbout, startValue, checkDown, checkUp)
-			println((checkDown, checkUp))
+			outputLevel>1 && println((checkDown, checkUp))
 		end
 	end
 

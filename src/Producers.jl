@@ -18,7 +18,7 @@ function getSequential(numTrainingPoints,gradientOracle,restoreGradient)
 				produce((gg,ccs))
 			end
 		end
-		println("Shuffling!")
+		# println("Shuffling!")
 		shuffle!(r, indices)
 		# shuffle!(indices)
 	end
