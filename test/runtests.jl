@@ -11,6 +11,8 @@ sLikeGd(k,numTrainingPoints) = k==0 ? 0 : numTrainingPoints
 uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
 
+println("Starting Redis connection")
+client = RedisConnection();
 
 testProblems = ["TestToy"]
 
@@ -84,8 +86,6 @@ for testProblem in testProblems
 		println("maxfeature   = $maxfeature")
 	end
 
-	println("Starting Redis connection")
-	client = RedisConnection();
 	Redis.hmset(client, testProblem, {"name" => testProblem, "path" => "data/"*testProblem*"/", "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" =>numTotal })
 
 	println("Writing binary file")
