@@ -61,7 +61,9 @@ function ML_for_output(features::Matrix{Float64}, labels::Vector{Int64}, W::Vect
 		x=features[k,:]
 		a=exp(x*W)
 		(v,chosenclass) = findmax(a);
+		# println((class,chosenclass))
 		if chosenclass == class
+			# println("Found good!")
 			pcc+=1
 		end
 		aDb=a/sum(a)

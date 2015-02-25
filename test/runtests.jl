@@ -12,7 +12,7 @@ uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
 
 
-testProblems = ["TestToy", "TestAgaricus"]
+testProblems = ["TestToy"]
 
 findBests = [
 "f", 
@@ -49,9 +49,8 @@ createOracleFunctionArray =
 ]
 
 
-myREfunction(problem, opts, sd, wantOutputs) = false
-
-myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction, x) = false
+myREfunction(problem, opts, sd, wantOutputs) = returnIfExists(client, problem, opts, sd, wantOutputs)
+myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction, x) = writeFunction(client, problem,  opts, sd,k, gnum, fromOutputsFunction, x)
 
 
 
@@ -180,6 +179,7 @@ for testProblem in testProblems
 				
 				
 				for findBest in findBests
+					findBestStepsizeFactor(findBest, algForSearch; outputLevel=1)
 					findBestStepsizeFactor(findBest, algForSearch; outputLevel=1)
 				end
 				
