@@ -1,10 +1,11 @@
 module EGR
 
-export BL_get_f_g, BL_restore_gradient, BL_for_output, MinusPlusOneVector, OutputOpts, alg, getStats, readBin, createBLOracles, L2regGradient, readData, writeBin, EGRsd, GDsd, SGsd, Opts, VerifyGradient, VerifyRestoration, findBestStepsizeFactor, getSequential, createMLOracles, ML_for_output, StepData, writeFunction, Outputter, ResultFromOO, Problem, returnIfExists,EGRexp
+export BL_get_f_g, BL_restore_gradient, BL_for_output, MinusPlusOneVector, OutputOpts, alg, getStats, readBin, createBLOracles, L2regGradient, readData, writeBin, EGRsd, GDsd, SGsd, Opts, VerifyGradient, VerifyRestoration, findBestStepsizeFactor, getSequential, createMLOracles, ML_for_output, StepData, writeFunction, Outputter, ResultFromOO, Problem, returnIfExists, EGRexp, createSBLOracles
 
 include("MinusPlusOneVector.jl")
-include("BinaryLogisticRegression.jl")
-include("MulticlassLogisticRegression.jl")
+include("BL.jl")
+include("SBL.jl")
+include("ML.jl")
 include("myIO.jl")
 include("CreateOracles.jl")
 include("L2Reg.jl")

@@ -6,6 +6,7 @@ function BL_get_f_g(featuresTP::Matrix{Float64}, labels::MinusPlusOneVector, W::
 end
 
 function BL_restore_gradient(featuresTP::Matrix{Float64}, labels::MinusPlusOneVector, ym::Float64, index::Int64)
+	# println("restoring BL")
 	X = featuresTP[:,index]
 	Y = labels[index]
 	X*(-Y / (1 + exp(ym)))

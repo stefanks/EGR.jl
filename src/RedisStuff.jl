@@ -72,14 +72,11 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 		int(lrange(client, longKey*":gnum",0, -1))
 		,
 		kk
-		,
-		Float64[]
-		# float(lrange(client, longKey*":x",0,-1))
 		)
 	end
 end
 
-function writeFunction(client::RedisConnection, problem::Problem, opts::Opts, sd::StepData,  k, gnum, fromOutputsFunction, x)
+function writeFunction(client::RedisConnection, problem::Problem, opts::Opts, sd::StepData,  k, gnum, fromOutputsFunction)
 
 	writeLoc = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*"const"*":"*string(opts.stepSizePower)
 	

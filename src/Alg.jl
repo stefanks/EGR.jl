@@ -27,13 +27,13 @@ immutable type OutputOpts
 end
 
 immutable type Opts
-	init::Vector{Float64}
+	init::Union(Vector{Float64},Matrix{Float64})
 	stepSizeFunction::Function
 	stepSizePower::Int64
 	maxG::Int64
 	outputLevel::Int64
 	optsString::String
-	function Opts(init::Vector{Float64}; stepSizeFunction::Function=(k)->1/(k+1), stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::String="stepSizePower = $stepSizePower, maxG = $maxG")
+	function Opts(init::Union(Vector{Float64},Matrix{Float64}); stepSizeFunction::Function=(k)->1/(k+1), stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::String="stepSizePower = $stepSizePower, maxG = $maxG")
 		outputLevel>2 && println("outputLevel is $outputLevel") 
 		(maxG>typemax(Int64)-35329 || maxG<0) && error("maxG is $maxG, and is out of range")
 		stepSizeFunction(0) != 1 && error("stepSizeFunction(0) is $(stepSizeFunction(0)) instead of 1")
@@ -72,7 +72,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	existingResult = returnResultIfExists(problem, opts, sd, trueOutputNum)
 
 	if existingResult != false
-		if typeof(existingResult) != (ASCIIString,Array{Int64,1},Array{Int64,1},Array{Float64,2},Array{Float64,1})
+		if typeof(existingResult) != (ASCIIString,Array{Int64,1},Array{Int64,1},Array{Float64,2})
 			error("existingResult type is wrong: $(typeof(existingResult))")
 		end
 		return existingResult
@@ -87,12 +87,14 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	results_k = Int64[]
 	results_gnum = Int64[]
 	results_fromOutputsFunction = zeros(0,oo.outputter.numOutputsFromOutputsFunction)
-	results_x = Vector{Float64}[]
 
 	kOutputs=1
 	k=0
 	gnum=0
 	x=opts.init
+
+	# println("x = $x")
+	# println("typeof(x) = $(typeof(x))")
 	xSum=copy(x)
 	
 	# opts.outputLevel>0 && println("opts.outputLevel = $(opts.outputLevel)")
@@ -107,17 +109,18 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 			else
 				xToTest =x
 			end
+			# println("xToTest = $xToTest")
+			# println("typeof(xToTest) = $(typeof(xToTest))")
 			fromOutputsFunction::ResultFromOO = oo.outputter.outputsFunction(xToTest)
 			if opts.outputLevel>1 
 				@printf("%2.i %7.i %7.i ", kOutputs, k, gnum)
 				println(fromOutputsFunction.resultString)
 			end
-			writeFunction(problem, sd, opts, k, gnum, fromOutputsFunction, xToTest)
-			isnan(fromOutputsFunction.resultLine[1]) && return ("NaN found", results_k, results_gnum,results_fromOutputsFunction, results_x)
+			writeFunction(problem, sd, opts, k, gnum, fromOutputsFunction)
+			isnan(fromOutputsFunction.resultLine[1]) && return ("NaN found", results_k, results_gnum,results_fromOutputsFunction)
 			push!(results_k,k)
 			push!(results_gnum,gnum)
 			results_fromOutputsFunction = [results_fromOutputsFunction ; fromOutputsFunction.resultLine']
-			push!(results_x,xToTest)
 			kOutputs += 1
 		end
 		
@@ -128,9 +131,16 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		opts.outputLevel>2 && println("norm(g) = $(norm(g))")
 		
 		opts.outputLevel>2 && println("norm(x) before step = $(norm(x))")
-		
+
+		# println("x = $x")
+		# println("typeof(x) = $(typeof(x))")
+		# println("g = $g")
+		# println("typeof(g) = $(typeof(g))")
 		#  PUT IN ADAGRAD !!!
 		x-=(2.0^opts.stepSizePower)*opts.stepSizeFunction(k)*g
+
+		# println("x = $x")
+		# println("typeof(x) = $(typeof(x))")
 		
 		opts.outputLevel>2 && println("norm(x) after step = $(norm(x))")
 		
@@ -148,5 +158,5 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	end
 	
 	## Write answer!
-	("Finished nicely", results_k, results_gnum,results_fromOutputsFunction, results_x)
+	("Finished nicely", results_k, results_gnum,results_fromOutputsFunction)
 end
