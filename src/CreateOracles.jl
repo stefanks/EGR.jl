@@ -51,11 +51,6 @@ end
 
 function createMLOracles(features,labels, L2reg::Bool, outputLevel)
 	
-	# Need for parallel batch graident evaluation!
-	if nworkers()<4
-			addprocs(nprocs()-nworkers())
-	end
-	
 	numDatapoints = length(labels)
 	numFeatures = size(features)[2] 
 	
@@ -82,10 +77,9 @@ function createMLOracles(features,labels, L2reg::Bool, outputLevel)
 	(trf,trl,numTrainingPoints, tef, tel) = trainTestRandomSeparate(features,classLabels)
 	
 	trft=trf'
-	teft=tef'
-	gradientOracle(W,indices) = ML_get_f_g(trft, trl,W,indices)
-	gradientOracle(W) = ML_get_f_g(trft, trl,W)
-	testFunction(W) = ML_for_output(teft, tel,W)
+	gradientOracle(W,index) = ML_get_f_g(trft, trl,W,index)
+	gradientOracle(W) = ML_get_f_g(trf, trl,W)
+	testFunction(W) = ML_for_output(tef, tel,W)
 	
 	function outputsFunction(W)
 		ye = testFunction(W)

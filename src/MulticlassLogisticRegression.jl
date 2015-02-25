@@ -8,10 +8,15 @@ function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Int64}, W::Vecto
 	aDb=a/sum(a) 
 	g=x*aDb
 	g[:,class]-=x
+	# println("aDb = ")
+	# println(aDb)
 	(-log(aDb[class]),vec(g),aDb)
 end
 
 function ML_restore_gradient(featuresTP::Matrix{Float64}, labels::Vector{Int64}, aDb::Matrix{Float64}, index::Int64)
+	# println("IN restoration")
+	# println("aDb = ")
+	# println(aDb)
 	numFeatures = size(featuresTP)[1]
 	numClasses = size(aDb)[2]
 	class=labels[index]
@@ -21,34 +26,46 @@ function ML_restore_gradient(featuresTP::Matrix{Float64}, labels::Vector{Int64},
 	vec(g)
 end
 
-function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64})
-	numFeatures = size(featuresTP)[1]
+function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64})
+	numFeatures = size(features)[2]
 	numClasses = div(length(W),numFeatures)
 	W=reshape(W,(numFeatures,numClasses))
-	(g,f) = @parallel ((a,b)->(a[1]+b[1], a[2]+b[2])) for k in 1:length(labels)
+	g=zeros(size(W));
+	f=0
+	 @inbounds @simd for k=1:length(labels)
 		class=labels[k]
-		x= featuresTP[:,k]
-		a=exp(x'*W)
+		x=features[k,:]
+		a=exp(x*W)
 		aDb=a/sum(a)
-		myAdd = x*aDb
-		myAdd[:,class]-=x
-		(myAdd, log(aDb[class]))
+		for j in 1:size(g)[2]
+			for i in 1:size(g)[1]
+				g[i,j] =g[i,j]+ x[i]*aDb[j]
+			end
+		end
+		g[:,class]=g[:,class]-x'
+		f+=log(aDb[class])
 	end
-	(-f/length(labels),vec(g)/length(labels))
+	(-f/length(labels), vec(g)/length(labels))
 end
 
 # Returns f, percent correctly classified
-function ML_for_output(featuresTP::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64})
-	numFeatures = size(featuresTP)[1]
+function ML_for_output(features::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64})
+	numFeatures = size(features)[2]
 	numClasses = div(length(W),numFeatures)
 	W=reshape(W,(numFeatures,numClasses))
-	(pcc,f) = @parallel ((a,b)->(a[1]+b[1], a[2]+b[2])) for k in 1:length(labels)
+	g=zeros(size(W));
+	f=0
+	pcc=0
+	 @inbounds @simd for k=1:length(labels)
 		class=labels[k]
-		x= featuresTP[:,k] 
-		a=exp(x'*W) 
-		aDb=a/sum(a) 
+		x=features[k,:]
+		a=exp(x*W)
 		(v,chosenclass) = findmax(a);
-		(chosenclass == class ? 1 : 0 , log(aDb[class]))
+		if chosenclass == class
+			pcc+=1
+		end
+		aDb=a/sum(a)
+		f+=log(aDb[class])
 	end
 	(-f/length(labels),pcc/length(labels))
 end

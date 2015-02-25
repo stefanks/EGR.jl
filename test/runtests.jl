@@ -12,8 +12,7 @@ uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
 
 
-# testProblems = ["TestToy"]
-testProblems = ["agaricus"]
+testProblems = ["TestToy", "TestAgaricus"]
 
 findBests = [
 "f", 
@@ -105,7 +104,7 @@ for testProblem in testProblems
 			
 			(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient, csDataType, outputStringHeader,  LossFunctionString,numOutputsFromOutputsFunction ) = createOracleFunctions(features, labels, L2reg, createOracleOutputLevel)
 			
-			myOutputter = Outputter(outputsFunction, outputStringHeader,numOutputsFromOutputsFunction )
+			myOutputter = Outputter(outputsFunction, outputStringHeader,numOutputsFromOutputsFunction)
 			
 			myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
