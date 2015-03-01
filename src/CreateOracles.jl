@@ -1,7 +1,9 @@
 function trainTestRandomSeparate(features,labels)
 	srand(1)
-	shuffledIndices = shuffle([1 : size(labels)[1];])
-	numTrainingPoints = div(size(labels)[1]*3,4)
+	shuffledIndices = shuffle([1 : length(labels)])
+	numTrainingPoints = div(length(labels)*3,4)
+	println("numTrainingPoints = $numTrainingPoints")
+	println("numTestingPoints = $(length(labels)-numTrainingPoints)")
 	(copy(features[shuffledIndices[1:numTrainingPoints      ],:]),
 	copy(labels  [shuffledIndices[1:numTrainingPoints      ]  ]),
 	numTrainingPoints,
@@ -121,7 +123,7 @@ function createMLOracles(features,labels, L2reg::Bool, outputLevel)
 			classLabels[i] = currentClass
 		end
 	end
-	
+	println(classesDict)
 	outputLevel > 1  && println(classesDict)
 	outputLevel > 0  && println("Number of classes is $(length(classesDict))")
 	

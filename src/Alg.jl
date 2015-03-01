@@ -54,7 +54,7 @@ immutable type Problem
 	end
 end
 
-function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFunction::Function, returnResultIfExists::Function)
+function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFunction::Function, returnResultIfExists::Function, writeFinal::Function)
 	
 	opts.outputLevel>0 && println("Starting alg")
 	
@@ -72,7 +72,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	existingResult = returnResultIfExists(problem, opts, sd, trueOutputNum)
 
 	if existingResult != false
-		if typeof(existingResult) != (ASCIIString,Array{Int64,1},Array{Int64,1},Array{Float64,2})
+		if typeof(existingResult) != (ASCIIString,Vector{Int64},Vector{Int64},Array{Float64,2},Vector{Float64})
 			error("existingResult type is wrong: $(typeof(existingResult))")
 		end
 		return existingResult
@@ -96,6 +96,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	# println("x = $x")
 	# println("typeof(x) = $(typeof(x))")
 	xSum=copy(x)
+	xToTest = zeros(size(x))
 	
 	# opts.outputLevel>0 && println("opts.outputLevel = $(opts.outputLevel)")
 	
@@ -156,7 +157,9 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		opts.outputLevel == 1 && println(results_fromOutputsFunction[end].resultString)
 		println("Finished alg: $(sd.stepString)")
 	end
-	
+
+	writeFinal(problem, opts, sd, xToTest)
+	 
 	## Write answer!
-	("Finished nicely", results_k, results_gnum,results_fromOutputsFunction)
+	("Finished nicely", results_k, results_gnum,results_fromOutputsFunction,xToTest)
 end

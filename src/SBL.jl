@@ -15,35 +15,14 @@ function SBL_restore_gradient(features::Vector{SparseMatrixCSC{ Bool,Int64}}, la
 	vec(X*(-Y / (1 + exp(ym))))
 end
 
-function SBL_get_f_g(features::Vector{SparseMatrixCSC{ Bool,Int64}}, labels::MinusPlusOneVector, W::Matrix{Float64})
-	ym=zeros(length(labels))
-	for i in 1:length(labels)
-		ym[i] = labels[i]*(W'*features[i])[1]
-	end
+function SBL_get_f_g(features::SparseMatrixCSC{Bool,Int64}, labels::MinusPlusOneVector, W::Matrix{Float64})
+	ym=labels.field.*(features*W)
 	(mean(log(1 + exp(-ym))) ,features'*(-labels.field ./ (1 + exp(ym)))/size(features)[1])
 end
 
 # Returns f, percent correctly classified, false positives, false negatives
-function SBL_for_output(features::Vector{SparseMatrixCSC{ Bool,Int64}},labels::MinusPlusOneVector,W::Matrix{Float64})
-	ym=zeros(length(labels))
-	@inbounds @simd for i in 1:length(labels)
-		# println(features[i])
-		# println(W)
-		# println(size(features[i]))
-		# println(size(W))
-		# println(W*features[i])
-		# println((W*features[i])[1])
-		# println(labels[i])
-		# println(size(W))
-		# 	    println(size(features[i]))
-		# println(W)
-		# println(features[i])
-		# println(W'*features[i])
-		# println(W*features[i])
-		# println(W*features[i]')
-		# println(W'*features[i]')
-		ym[i] = labels[i]*(W'*features[i])[1]
-	end
+function SBL_for_output(features::SparseMatrixCSC{Bool,Int64},labels::MinusPlusOneVector,W::Matrix{Float64})
+	ym=labels.field.*(features*W)
 	(pcc, fp, fn) = (0,0,0)
 	for i in 1:size(features)[1]
 		if ym[i]<0

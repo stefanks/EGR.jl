@@ -10,11 +10,13 @@ end
 sLikeGd(k,numTrainingPoints) = k==0 ? 0 : numTrainingPoints
 uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
-
 println("Starting Redis connection")
 client = RedisConnection();
 
-testProblems = ["TestToy"]
+run(`redis-cli keys "TestToy:*"` |> `xargs redis-cli del`)
+run(`redis-cli keys "TestAgaricus:*"` |> `xargs redis-cli del`)
+
+testProblems = ["TestToy", "TestAgaricus"]
 
 findBests = [
 "f", 
@@ -51,10 +53,9 @@ createOracleFunctionArray =
 ]
 
 
-myREfunction(problem, opts, sd, wantOutputs) = returnIfExists(client, problem, opts, sd, wantOutputs)
-myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction, x) = writeFunction(client, problem,  opts, sd,k, gnum, fromOutputsFunction, x)
-
-
+myREfunction(problem, opts, sd, wantOutputs) = returnIfExists(client, problem, opts, sd, wantOutputs,0)
+myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction) = writeFunction(client, problem,  opts, sd,k, gnum, fromOutputsFunction)
+myWfinal(problem, sd, opts, x) = writeFinal(client, problem,  sd, opts,x)
 
 for testProblem in testProblems
 
@@ -121,18 +122,23 @@ for testProblem in testProblems
 	
 
 			getFullGradient(W) = gradientOracle(W)
-			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, getFullGradient, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0),GDsd( "GD") , myOutputOpts, myWriteFunction, myREfunction)
-		
-			xFromGD = results_x[end]
+			# Problem(L2reg, datasetHT["name"], LossFunctionString, getFullGradient, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient)))
+			#  myOpts(0)
+			#  GDsd( "GD")
+			#  myOutputOpts
+			#   myWriteFunction
+			#    myREfunction
+			
+			(outString, results_k, results_gnum,results_fromOutputsFunction,xFromGD) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, getFullGradient, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0),GDsd( "GD") , myOutputOpts, myWriteFunction, myREfunction,myWfinal)
+	
 		
 			s(k,I) = sLikeGd(k,numTrainingPoints)
 			u(k,I) =  uLikeGd(k,numTrainingPoints)
 			beta(k) =1
-			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, true, csDataType, "EGR.GDlike"), myOutputOpts, myWriteFunction, myREfunction)
+			(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGRgd) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, true, csDataType, "EGR.GDlike"), myOutputOpts, myWriteFunction, myREfunction,myWfinal)
 		
-			xFromEGR = results_x[end]
 		
-			relError = norm(xFromEGR-xFromGD)/norm(xFromGD)
+			relError = norm(xFromEGRgd-xFromGD)/norm(xFromGD)
 		
 			println("relError between EGR and GD = $relError")
 			if relError>1e-13
@@ -147,17 +153,15 @@ for testProblem in testProblems
 		
 			thismaxG = numTrainingPoints
 			
-			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0),SGsd( "SG") , myOutputOpts, myWriteFunction, myREfunction)
+			(outString, results_k, results_gnum,results_fromOutputsFunction,xFromSG) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0),SGsd( "SG") , myOutputOpts, myWriteFunction, myREfunction,myWfinal)
 		
-			xFromSG = results_x[end]
 		
 			s(k,I) = 0
 			u(k,I) = 1
 			beta(k) = 1
 			
-			(outString, results_k, results_gnum,results_fromOutputsFunction, results_x) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, true,csDataType,  "EGR.GDlike"), myOutputOpts, myWriteFunction, myREfunction)
+			(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, true,csDataType,  "EGR.SGlike"), myOutputOpts, myWriteFunction, myREfunction,myWfinal)
 		
-			xFromEGR = results_x[end]
 		
 			relError = norm(xFromEGR-xFromSG)/norm(xFromSG)
 		
@@ -175,11 +179,10 @@ for testProblem in testProblems
 			for sd in sds
 			
 				
-				algForSearch(stepSizePower) =alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower), sd(numVars,numTrainingPoints,csDataType), myOutputOpts, myWriteFunction, myREfunction)
+				algForSearch(stepSizePower) =alg(Problem(L2reg, datasetHT["name"], LossFunctionString, ()->0, numTrainingPoints, Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower), sd(numVars,numTrainingPoints,csDataType), myOutputOpts, myWriteFunction, myREfunction,myWfinal)
 				
 				
 				for findBest in findBests
-					findBestStepsizeFactor(findBest, algForSearch; outputLevel=1)
 					findBestStepsizeFactor(findBest, algForSearch; outputLevel=1)
 				end
 				
