@@ -11,6 +11,18 @@ function trainTestRandomSeparate(features,labels)
 	copy(labels[  shuffledIndices[(numTrainingPoints+1):end]  ]))
 end
 
+function bs(val::Float64)
+	if isfinite(val)
+		out = @sprintf("% .3e", val)
+	elseif isnan(val)
+		out = "       NaN"
+	else
+		out = "       Inf"
+	end	
+	out
+end
+
+
 function StrainTestRandomSeparate(features,labels)
 	srand(1)
 	shuffledIndices = shuffle([1 : size(labels)[1];])
@@ -42,9 +54,9 @@ function createBLOracles(features,labels, setOfOnes, L2reg::Bool, outputLevel)
 	testFunction(W) = BL_for_output(tef, tel,W)
 		
 	function outputsFunction(W)
-		ye = testFunction(W)
+		(f,pcc, mcc, tp, tn, fp, fn) = testFunction(W)
 		yo = gradientOracle(W)
-		ResultFromOO(@sprintf("% .3e % .3e % .3e % .3e % .3e",ye[1], ye[2], ye[3], ye[4], yo[1]), [ye[1], ye[2], ye[3], ye[4], yo[1]])
+		ResultFromOO(bs(yo[1])*" "*bs(f)*" "*bs(pcc)*" "*bs(mcc),[f, pcc, mcc, tp, tn, fp, fn, yo[1]])
 	end
 		
 	restoreGradient(cs,indices) = BL_restore_gradient(trft, trl,cs,indices)
@@ -61,7 +73,7 @@ function createBLOracles(features,labels, setOfOnes, L2reg::Bool, outputLevel)
 	end
 
 	numVars = numFeatures
-	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,csDataType, "       f         pcc        fp         fn       f-train  ", "BL", 5)
+	(mygradientOracle,numTrainingPoints,numVars,outputsFunction,myrestoreGradient,csDataType, "    f-train       f         pcc        mcc", "BL", 8)
 end
 
 function createSBLOracles(features,labels, setOfOnes, L2reg::Bool, outputLevel)

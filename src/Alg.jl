@@ -54,7 +54,7 @@ immutable type Problem
 	end
 end
 
-function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFunction::Function, returnResultIfExists::Function, writeFinal::Function)
+function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFunction::Function, returnResultIfExists::Function)
 	
 	opts.outputLevel>0 && println("Starting alg")
 	
@@ -72,7 +72,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	existingResult = returnResultIfExists(problem, opts, sd, trueOutputNum)
 
 	if existingResult != false
-		if typeof(existingResult) != (ASCIIString,Vector{Int64},Vector{Int64},Array{Float64,2},Vector{Float64})
+		if typeof(existingResult) != (ASCIIString,Vector{Int64},Vector{Int64},Array{Float64,2})
 			error("existingResult type is wrong: $(typeof(existingResult))")
 		end
 		return existingResult
@@ -118,7 +118,9 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 				println(fromOutputsFunction.resultString)
 			end
 			writeFunction(problem, sd, opts, k, gnum, fromOutputsFunction)
-			isnan(fromOutputsFunction.resultLine[1]) && return ("NaN found", results_k, results_gnum,results_fromOutputsFunction)
+			if isnan(fromOutputsFunction.resultLine[end])
+				 return ("NaN found", results_k, results_gnum,results_fromOutputsFunction,xToTest)
+			 end
 			push!(results_k,k)
 			push!(results_gnum,gnum)
 			results_fromOutputsFunction = [results_fromOutputsFunction ; fromOutputsFunction.resultLine']
@@ -157,9 +159,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		opts.outputLevel == 1 && println(results_fromOutputsFunction[end].resultString)
 		println("Finished alg: $(sd.stepString)")
 	end
-
-	writeFinal(problem, opts, sd, xToTest)
 	 
 	## Write answer!
-	("Finished nicely", results_k, results_gnum,results_fromOutputsFunction,xToTest)
+	("Finished nicely", results_k, results_gnum, results_fromOutputsFunction, xToTest)
 end

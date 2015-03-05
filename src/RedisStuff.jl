@@ -64,12 +64,6 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 			kk=hcat(kk, arrayss)
 		end
 			
-		x = Float64[]
-		fullRange = lrange(client, longKey*":x",0,-1)
-		for i in fullRange
-			push!(x, float(i))
-		end
-		
 		return (
 		"Already exists!"
 		, 
@@ -78,8 +72,6 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 		int(lrange(client, longKey*":gnum",0, -1))
 		,
 		kk
-		,
-		x
 		)
 	end
 end
@@ -123,19 +115,3 @@ function writeFunction(client::RedisConnection, problem::Problem, opts::Opts, sd
 		end
 	end
 end
-
-
-
-function writeFinal(client::RedisConnection, problem::Problem, opts::Opts, sd::StepData, x)
-
-	writeLoc = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*"const"*":"*string(opts.stepSizePower)
-	
-	if exists(client, writeLoc*":x")
-		del(client,writeLoc*":x")
-	end
-	for i in x
-		rpush(client, writeLoc*":x",i)
-	end
-end
-
-

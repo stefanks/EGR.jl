@@ -17,20 +17,22 @@ function BL_get_f_g(features::Matrix{Float64}, labels::MinusPlusOneVector, W::Ve
 	(mean(log(1 + exp(-ym))) ,features'*(-labels.field ./ (1 + exp(ym)))/size(features)[1])
 end
 
-# Returns f, percent correctly classified, false positives, false negatives
+# Returns f, pcc, mcc, tp, tn, fp, fn
 function BL_for_output(features::Matrix{Float64},labels::MinusPlusOneVector,W::Vector{Float64})
 	ym=labels.field.*(features*W)
-	(pcc, fp, fn) = (0,0,0)
-	for i in 1:size(features)[1]
-		if ym[i]<0
+	fp, fn = 0,0 
+	for i in 1:length(labels)
+		if ym[i]<=0
 			if labels.field[i]<0 
 				fp += 1
 			elseif labels.field[i]>0 
 				fn += 1
 			end
-		elseif ym[i]>0
-			pcc += 1
 		end
 	end
-	(mean(log(1 + exp(-ym))), pcc / size(features)[1], fp/(size(features)[1] - labels.numPlus), fn/labels.numPlus )
+	tp = labels.numPlus - fn
+	tn = length(labels) - labels.numPlus - fp
+	pcc = (tp+tn)/(tp+tn+fp+fn)
+	mcc = (tp*tn - fp*fn)/(sqrt(tp+fp)*sqrt(tp+fn)*sqrt(tn+fp)*sqrt(tn+fn))
+	(mean(log(1 + exp(-ym))), pcc, mcc, tp, tn, fp, fn)
 end
