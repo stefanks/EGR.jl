@@ -5,11 +5,14 @@ function readData(fname::String, shape, minFeatureInd::Integer)
 	cnt = 1
 	for line in eachline(fi)
 		line = split(line, " ")
-		push!(labels, float(line[1]))
+		# println(line)
+		# println(line[1])
+		# println(float64(line[1]))
+		push!(labels, float64(line[1]))
 		line = line[2:end]
 		for itm in line
 			itm = split(itm, ":")
-			features[cnt, int(itm[1]) + 1-minFeatureInd] = float(chomp(itm[2]))
+			features[cnt, int(itm[1]) + 1-minFeatureInd] = float64(chomp(itm[2]))
 		end
 		cnt += 1
 	end
