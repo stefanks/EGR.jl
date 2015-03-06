@@ -40,7 +40,7 @@ for thisOracle in Oracles
 	u(k,I) = 1
 	beta(k) = 1
 			
-	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient)))	, myOpts(0), EGRsd(s,u,beta, thisProblem.numVars, true,thisProblem.csDataType,  "EGR.SGlike"), myOutputOpts, myWriteFunction, myREfunction)
+	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient)))	, myOpts(0), EGRsd(s,u,beta,numVars, true, csDataType,  "EGR.SGlike"), myOutputOpts, myWriteFunction, myREfunction)
 		
 		
 	relError = norm(xFromEGR-xFromSG)/norm(xFromSG)

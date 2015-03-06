@@ -27,10 +27,15 @@ function ML_restore_gradient(featuresTP::Matrix{Float64}, labels::Vector{Int64},
 end
 
 function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Int64}, W::Vector{Float64})
+	# println(features)
+	# println(labels)
+	# println(W)
 	numFeatures = size(features)[2]
 	numClasses = div(length(W),numFeatures)
+	# println("numFeatures $numFeatures")
+	# println("numClasses $numClasses")
 	W=reshape(W,(numFeatures,numClasses))
-	g=zeros(size(W));
+	g=zeros(size(W))
 	f=0
 	 @inbounds @simd for k=1:length(labels)
 		class=labels[k]
@@ -42,6 +47,7 @@ function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Int64}, W::Vector{
 				g[i,j] =g[i,j]+ x[i]*aDb[j]
 			end
 		end
+		# println(g)
 		g[:,class]=g[:,class]-x'
 		f+=log(aDb[class])
 	end
@@ -53,7 +59,7 @@ function ML_for_output(features::Matrix{Float64}, labels::Vector{Int64}, W::Vect
 	numFeatures = size(features)[2]
 	numClasses = div(length(W),numFeatures)
 	W=reshape(W,(numFeatures,numClasses))
-	g=zeros(size(W));
+	g=zeros(size(W))
 	f=0
 	pcc=0
 	 @inbounds @simd for k=1:length(labels)

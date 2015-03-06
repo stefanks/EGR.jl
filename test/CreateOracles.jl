@@ -26,9 +26,9 @@ function CreateOracles(Oracles)
 			
 			push!(Oracles, (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, (t)-> Problem(L2reg, thisDataName, LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t)))
 			
-			(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName) = createMLOracles(trf, trl2, numTrainingPoints, numClasses, tef, tel2, L2reg, 0, ThisData["name"]) 
+			(gradientOracle2, numVars2, numTrainingPoints2, restoreGradient2, csDataType2, LossFunctionString2, myOutputter2, L2reg2, thisDataName2) = createMLOracles(trf, trl2, numTrainingPoints, numClasses, tef, tel2, L2reg, 0, ThisData["name"]) 
 			
-			push!(Oracles,(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName,  (t)-> Problem(L2reg, thisDataName, LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t)))
+			push!(Oracles,(gradientOracle2, numVars2, numTrainingPoints2, restoreGradient2, csDataType2, LossFunctionString2, myOutputter2, L2reg2, thisDataName2,  (t)-> Problem(L2reg2, thisDataName2, LossFunctionString2, (w)->gradientOracle2(w), numTrainingPoints2, t)))
 			
 			
 			

@@ -22,9 +22,10 @@ sds = [
 ]
 
 
-myREfunction(problem, opts, sd, wantOutputs) = returnIfExists(client, problem, opts, sd, wantOutputs,0)
-myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction) = writeFunction(client, problem,  opts, sd,k, gnum, fromOutputsFunction)
-
+# myREfunction(problem, opts, sd, wantOutputs) = returnIfExists(client, problem, opts, sd, wantOutputs,0)
+# myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction) = writeFunction(client, problem,  opts, sd,k, gnum, fromOutputsFunction)
+myREfunction(problem, opts, sd, wantOutputs) = false
+myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction) = false
 
 for thisOracle in Oracles
 			
