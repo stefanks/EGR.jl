@@ -45,9 +45,9 @@ immutable type Problem
 	L2reg::Bool
 	name::String
 	lossFunctionString::String
-	getFullGradient::Function # Optional!
-	numTrainingPoints::Int64 # Optional!
-	getNextSampleFunction::Task # Optional!
+	getFullGradient::Function
+	numTrainingPoints::Int64
+	getNextSampleFunction::Task
 	function Problem(a,b,c,d,e,f)
 		# println("In the Problem constructor!")
 		new(a,b,c,d,e,f)

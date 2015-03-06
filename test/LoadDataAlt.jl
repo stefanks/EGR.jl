@@ -1,4 +1,4 @@
-function CreateTheData()
+function LoadDataAlt()
 	features = 
 	[-1.0  1.0
 	-1.0  -1.0
@@ -21,10 +21,12 @@ function CreateTheData()
 
 	normalizeFeatures(features, size(features)[2])
 
-	(trf, trl, trl2, numTrainingPoints, tef, tel, tel2) = trainTestRandomSeparate(features, MinusPlusOneVector(labels, Set([1.0])), createClassLabels(labels))
+	(classLabels, numClasses) = createClassLabels(labels)
+	
+	(trf, trl, trl2, numTrainingPoints, tef, tel, tel2) = trainTestRandomSeparate(features, MinusPlusOneVector(labels, Set([1.0])), classLabels)
 
-	dict = {"trf"=> trf, "trl"=> trl, "trl2"=> trl2, "numTrainingPoints" => numTrainingPoints, "tef" => tef, "tel" => tel, "tel2" => tel2, "name" => "TestToy"}
+	dict = {"trf"=> trf, "trl"=> trl, "trl2"=> trl2, "numTrainingPoints" => numTrainingPoints, "tef" => tef, "tel" => tel, "tel2" => tel2, "name" => "TestToy", "numClasses" => numClasses}
 
 end
 
-FullDict["TestToy"] = CreateTheData()
+FullDict["TestToy"] = LoadDataAlt()

@@ -26,11 +26,9 @@ myREfunction(problem, opts, sd, wantOutputs) = returnIfExists(client, problem, o
 myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction) = writeFunction(client, problem,  opts, sd,k, gnum, fromOutputsFunction)
 
 
-for thisProblem in Problems
+for thisOracle in Oracles
 			
-	(gradientOracle, numTrainingPoints, numVars, outputsFunction, restoreGradient, csDataType, outputStringHeader,  LossFunctionString,numOutputsFromOutputsFunction ) = createOracleFunctions(features, labels, L2reg, createOracleOutputLevel)
-			
-	myOutputter = Outputter(outputsFunction, outputStringHeader,numOutputsFromOutputsFunction)
+	(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) = thisOracle
 			
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
@@ -38,8 +36,22 @@ for thisProblem in Problems
 			
 	myOpts(stepSizePower) = Opts(zeros(numVars); stepSizeFunction=constStepSize, stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel)
 			
-	VerifyGradient(numVars,gradientOracle,numTrainingPoints; outputLevel=2)
-	VerifyRestoration(numVars,gradientOracle,restoreGradient; outputLevel=2)
+	#By now the oracles are created. 
+	# From now on only concerned with the algorithm
+			
+			
+	for sd in sds
+			
+				
+		algForSearch(stepSizePower) =alg(thisProblem(Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower), sd(numVars,numTrainingPoints,csDataType), myOutputOpts, myWriteFunction, myREfunction)
+
+		findBests = [((res)->getF(res,maxG),0.0),((res)->getPCC(res,maxG),-1.0), ((res)->getMCC(res,maxG),-1.0)]
+				
+		for findBest in findBests
+			findBestStepsizeFactor(algForSearch,findBest...; outputLevel=1)
+		end
+				
+	end
 end
 
 
