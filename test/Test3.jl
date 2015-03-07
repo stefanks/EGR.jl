@@ -1,6 +1,6 @@
 using Base.Test
 using EGR
 
-for ThisKey in keys(FullDict)
+for ThisKey in Base.keys(FullDict)
 	println(ThisKey)
 end

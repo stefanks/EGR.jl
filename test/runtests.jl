@@ -16,12 +16,9 @@ println("Loading data, separating into testing and training")
 
 FullDict = Dict()
 
-# testProblems = ["TestToy","TestAgaricus"]
-# testProblems = ["TestToy"]
-# testProblems = ["TestAgaricus"]
-# include("LoadData.jl")
-
 include("LoadDataAlt.jl")
+
+include("LoadData.jl")
 
 println("Data dependent tests")
 
@@ -31,7 +28,7 @@ println("Create oracles")
 
 Oracles = (Function,Int64,Int64,Function,DataType,ASCIIString,Outputter,Bool,ASCIIString,Function)[]
 
-include("CreateOracles.jl")
+include("CO.jl")
 
 println("Oracle dependent tests")
 

@@ -1,5 +1,5 @@
 
-function CreateOracles(Oracles)
+function CO(Oracles)
 
 	println("Starting to create oracles")
 	L2regs=[
@@ -8,7 +8,7 @@ function CreateOracles(Oracles)
 	]
 
 
-	for ThisKey in keys(FullDict)
+	for ThisKey in Base.keys(FullDict)
 		ThisData=FullDict[ThisKey]
 		trf = ThisData["trf"]
 		trl = ThisData["trl"]
@@ -31,11 +31,8 @@ function CreateOracles(Oracles)
 			push!(Oracles,(gradientOracle2, numVars2, numTrainingPoints2, restoreGradient2, csDataType2, LossFunctionString2, myOutputter2, L2reg2, thisDataName2,  (t)-> Problem(L2reg2, thisDataName2, LossFunctionString2, (w)->gradientOracle2(w), numTrainingPoints2, t)))
 			
 			
-			
-			
 		end
 	end
-
 end
 
-CreateOracles(Oracles)
+CO(Oracles)

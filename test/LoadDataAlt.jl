@@ -1,4 +1,8 @@
 function LoadDataAlt()
+	
+
+	println("In LoadDataAlt")
+	
 	features = 
 	[-1.0  1.0
 	-1.0  -1.0
