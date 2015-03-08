@@ -1,4 +1,4 @@
-try 
+try
 	cd(Pkg.dir("EGR"))
 catch
 	cd("/Users/stepa/Google Drive/Research/EGRproject/EGR.jl")
@@ -39,3 +39,4 @@ println("Problem dependent tests")
 include("Test5.jl")
 include("Test6.jl")
 include("Test7.jl")
+include("TestRedis.jl")

@@ -1,19 +1,4 @@
-#
 using Redis
-#
-#
-# sLikeGd(k,numTrainingPoints) = k==0 ? 0 : numTrainingPoints
-# uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
-#
-# println("Starting Redis connection")
-#
-# run(`redis-cli keys "TestToy:*"` |> `xargs redis-cli del`);
-# run(`redis-cli keys "TestAgaricus:*"` |> `xargs redis-cli del`);
-#
-# testProblems = ["TestToy"]
-#
-# testProblems = ["TestAgaricus"]
-#
 
 function LoadAgaricusData()
 	

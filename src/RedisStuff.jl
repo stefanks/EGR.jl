@@ -64,6 +64,8 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 			kk=hcat(kk, arrayss)
 		end
 			
+		outputLevel>0 && println("Ready to return!")
+			
 		return (
 		"Already exists!"
 		, 

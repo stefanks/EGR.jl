@@ -10,7 +10,7 @@ type EGRsd <: StepData
 	getStep::Function
 	newS::Bool
 	stepString::String
-		
+
 	function EGRsd(s::Function, u::Function, beta::Function, numVars::Int64, newS::Bool,dt::DataType, stepString::String)
 		new(zeros(numVars),(Function,Function)[], dt[],0, s, u, beta, naturalEGRS, newS, stepString)
 	end
@@ -37,17 +37,17 @@ type GDsd <: StepData
 end
 
 function naturalEGRS(x, k, gnum, sd::EGRsd, problem::Problem);
-	
+
 	# println("sd.I = $(sd.I)")
 	# println("k = $k")
 	# println("sd.u(k,sd.I) = $(sd.u(k,sd.I))")
 	# println("sd.s(k,sd.I) = $(sd.s(k,sd.I))")
-	
-	
-	
+
+
+
 	U = (sd.I+1):(sd.I+sd.u(k,sd.I))
 	# println(U)
-		
+
 	for i in U
 		# println(i)
 		# println(typeof(sd.getNextSampleFunction))
@@ -69,17 +69,17 @@ function naturalEGRS(x, k, gnum, sd::EGRsd, problem::Problem);
 	# println("These should be different!!!")
 	# println(sd.functions[1][1]([0.0,0])[2])
 	# println(sd.functions[end][1]([0.0,0])[2])
-	
+
 	S = StatsBase.sample(1:sd.I,sd.s(k,sd.I);replace=false)
 	# println(S)
-		
+
 	B=zeros(size(x))
-		
+
 	for i in S
 		B +=sd.functions[i][2](sd.y[i])
 	end
 	# println("B/sd.s(k,sd.I) = $(B/sd.s(k,sd.I))")
-		
+
 	sumy=zeros(size(x))
 
 	for i in [U]
@@ -98,49 +98,49 @@ function naturalEGRS(x, k, gnum, sd::EGRsd, problem::Problem);
 		sd.y[i]=cs
 		sumy += sampleG
 	end
-		
-	gnum += sd.s(k,sd.I)+sd.u(k,sd.I)	
-	
+
+	gnum += sd.s(k,sd.I)+sd.u(k,sd.I)
+
 	# println("sumy = $sumy")
 	# println("sumy/sd.u(k,sd.I) = $(sumy/sd.u(k,sd.I))")
 	# println("sumy/sd.s(k,sd.I) = $(sumy/sd.s(k,sd.I))")
 	# println("sd.A = $(sd.A)")
 	# println("$((sd.s(k,sd.I) > 0  ? sd.s(k,sd.I)*((sd.beta(k)/sd.I)*sd.A): 0)- sd.beta(k)*B ) ")
-		
+
 	if sd.newS == true
 		g = ((sd.s(k,sd.I) > 0  ? sd.s(k,sd.I)*((sd.beta(k)/sd.I)*sd.A): 0) - sd.beta(k)*B + sumy )/(sd.s(k,sd.I)+sd.u(k,sd.I))
 	else
 		g = (sd.A- B + sumy )/(sd.I+sd.u(k,sd.I))
 	end
 	sd.I = sd.I + sd.u(k,sd.I)
-		
+
 	# println(size(sd.A))
 	# println(size(B))
 	# println(size(sumy))
 	sd.A=sd.A-B+sumy
-		
+
 	(g, gnum)
 end
 
 function computeGDStep(x, k, gnum, sd::GDsd,problem::Problem)
 
 	(f,g)= problem.getFullGradient(x)
-	
+
 	gnum += problem.numTrainingPoints
-	
+
 	(g, gnum)
-	
+
 end
 
 function computeSGStep(x, k, gnum, sd::SGsd, problem::Problem)
 
 	# println(typeof(sp.getNextSampleFunction))
 	(func,cs) = consume(problem.getNextSampleFunction)
-	
+
 	(f, g, cs) = func(x)
-	
+
 	gnum += 1
-	
+
 	(g, gnum)
-	
+
 end

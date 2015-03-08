@@ -75,6 +75,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		if typeof(existingResult) != (ASCIIString,Vector{Int64},Vector{Int64},Array{Float64,2})
 			error("existingResult type is wrong: $(typeof(existingResult))")
 		end
+		opts.outputLevel>0 && println("Returning existing! Remember it doesn't have x")
 		return existingResult
 	end
 	

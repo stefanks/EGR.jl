@@ -10,3 +10,6 @@ println(a[1])
 println(b[2:3])
 println(c[[1,3]])
 println(length(a))
+
+@test_throws ArgumentError MinusPlusOneVector([1,1,-2])
+@test_throws ArgumentError MinusPlusOneVector([1.0,1,-2])

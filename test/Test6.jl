@@ -7,9 +7,6 @@ algOutputLevel = 0
 maxOutputNum=20
 constStepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
 
-sLikeGd(k,numTrainingPoints) = k==0 ? 0 : numTrainingPoints
-uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
-
 # myREfunction(problem, opts, sd, wantOutputs) = returnIfExists(client, problem, opts, sd, wantOutputs,0)
 # myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction) = writeFunction(client, problem,  opts, sd,k, gnum, fromOutputsFunction)
 myREfunction(problem, opts, sd, wantOutputs) = false

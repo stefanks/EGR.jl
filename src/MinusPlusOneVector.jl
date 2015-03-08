@@ -12,7 +12,7 @@ immutable MinusPlusOneVector
 			elseif inputfield[i]==-one(T)
 				floatfield[i] = -1
 			else
-				error("Not 1 or -1")
+				throw(ArgumentError("Not 1 or -1"))
 			end
 		end
 		new(floatfield,numPlus)
@@ -24,7 +24,7 @@ immutable MinusPlusOneVector
 				numPlus+=1
 			elseif i == -one(Float64)
 			else
-				error("Not 1 or -1")
+				throw(ArgumentError("Not 1 or -1"))
 			end
 		end
 		new(floatfield,numPlus)

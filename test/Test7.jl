@@ -2,11 +2,7 @@ using Base.Test
 using EGR
 
 
-
-findBests = [
-"f", 
-"pcc"
-]
+client = RedisConnection();
 
 
 createOracleOutputLevel = 1
@@ -40,19 +36,6 @@ for thisOracle in Oracles
 	#By now the oracles are created. 
 	# From now on only concerned with the algorithm
 			
-			
-	for sd in sds
-			
-				
-		algForSearch(stepSizePower) =alg(thisProblem(Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower), sd(numVars,numTrainingPoints,csDataType), myOutputOpts, myWriteFunction, myREfunction)
-
-		findBests = [((res)->getF(res,maxG),0.0),((res)->getPCC(res,maxG),-1.0), ((res)->getMCC(res,maxG),-1.0)]
-				
-		for findBest in findBests
-			findBestStepsizeFactor(algForSearch,findBest...; outputLevel=1)
-		end
-				
-	end
 end
 
 
