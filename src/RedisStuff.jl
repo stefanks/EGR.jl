@@ -63,7 +63,7 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 			# println(size(arrayss))
 			kk=hcat(kk, arrayss)
 		end
-			
+
 		outputLevel>0 && println("Ready to return!")
 			
 		return (
@@ -80,16 +80,16 @@ end
 
 function writeFunction(client::RedisConnection, problem::Problem, opts::Opts, sd::StepData,  k, gnum, fromOutputsFunction)
 
-	writeLoc = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*"const"*":"*string(opts.stepSizePower)
+	longKey = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*"const"*":"*string(opts.stepSizePower)
 	
-	if ~exists(client, writeLoc*":k")
-		rpush(client, writeLoc*":k",k)
-		rpush(client, writeLoc*":gnum",gnum)
+	if ~exists(client, longKey*":k")
+		rpush(client, longKey*":k",k)
+		rpush(client, longKey*":gnum",gnum)
 		for j in 1:length(fromOutputsFunction.resultLine)
-			rpush(client, writeLoc*":$j",fromOutputsFunction.resultLine[j])
+			rpush(client, longKey*":$j",fromOutputsFunction.resultLine[j])
 		end
 	else
-		arrayOfStrings  = lrange(client, writeLoc*":gnum", 0, -1)
+		arrayOfStrings  = lrange(client, longKey*":gnum", 0, -1)
 		existingListOfgunum=Int64[]
 		currentIndex=0
 		for i in 1:length(arrayOfStrings)
@@ -98,22 +98,23 @@ function writeFunction(client::RedisConnection, problem::Problem, opts::Opts, sd
 			end
 			push!(existingListOfgunum, int(arrayOfStrings[i]))
 			if int(arrayOfStrings[i])>gnum
-				currentIndex=i
+				currentIndex=i-1
 				break
 			end
 		end
 		if currentIndex ==0
-			rpush(client, writeLoc*":k",k)
-			rpush(client, writeLoc*":gnum",gnum)
+			rpush(client, longKey*":k",k)
+			rpush(client, longKey*":gnum",gnum)
 			for j in 1:length(fromOutputsFunction.resultLine)
-				rpush(client, writeLoc*":$j",fromOutputsFunction.resultLine[j])
+				rpush(client, longKey*":$j",fromOutputsFunction.resultLine[j])
 			end
 		else
-			linsert(client, writeLoc*":k" ,"before", lindex(client,writeLoc*":k",currentIndex  )   ,k)
-			linsert(client, writeLoc*":gnum" ,"before", lindex(client,writeLoc*":gnum",currentIndex  )   ,gnum)
+			linsert(client, longKey*":k" ,"before", lindex(client,longKey*":k",currentIndex  )   ,k)
+			linsert(client, longKey*":gnum" ,"before", lindex(client,longKey*":gnum",currentIndex  )   ,gnum)
 			for j in 1:length(fromOutputsFunction.resultLine)
-				linsert(client, writeLoc*":$j" ,"before", lindex(client,writeLoc*":$j",currentIndex  )   ,fromOutputsFunction.resultLine[j])
+				linsert(client, longKey*":$j" ,"before", lindex(client,longKey*":$j",currentIndex  )   ,fromOutputsFunction.resultLine[j])
 			end
 		end
 	end
+	# println(int(lrange(client, longKey*":gnum",0, -1)))
 end
