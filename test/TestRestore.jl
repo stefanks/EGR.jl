@@ -3,7 +3,7 @@ using EGR
 
 println("TestRestore")
 
-for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName)  in Oracles
+for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem)  in Oracles
 			
 	srand(1)
 
@@ -13,7 +13,7 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 	xs = {zeros(numVars),2*rand(numVars)-1, randn(numVars)}
 	xtexts = ["zeros(numVars)","2*rand(numVars)-1", "randn(numVars)"]
 	for i in 1:3
-		println("  For x = $(xtexts[i])")
+		print("  For x = $(xtexts[i])")
 		x=xs[i]
 		(f,g,cs) = gradientOracle(x,1)
 		relError = norm(restoreGradient(cs,1)-g)/norm(g)

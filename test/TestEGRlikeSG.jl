@@ -9,15 +9,14 @@ algOutputLevel = 0
 maxOutputNum=20
 constStepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
 
-# myREfunction(problem, opts, sd, wantOutputs) = returnIfExists(client, problem, opts, sd, wantOutputs,0)
-# myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction) = writeFunction(client, problem,  opts, sd,k, gnum, fromOutputsFunction)
-myREfunction(problem, opts, sd, wantOutputs) = false
-myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction) = false
+
+myREfunction(problem, opts, sd, expIndices) = false
+myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = false
 
 
 for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
 	
-	println(" $thisDataName $LossFunctionString L2reg = $L2reg")
+	print(" $thisDataName $LossFunctionString L2reg = $L2reg")
 		
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			

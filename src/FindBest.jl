@@ -32,20 +32,14 @@ function getMCC(res, glim)
 end
 
 # FIND THE LOWEST VALUE!!! Therefore, valueComputer must return the negative of pcc and mcc
-function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPossible::Float64; outputLevel::Int64=0)
+function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPossible::Float64, thisString; outputLevel::Int64=0)
 	
 	mid = 50
 	
-	outputLevel>0 && println("Starting findBestStepsizeFactor, with $(2*mid-1) possible stepsizes")
+	outputLevel>0 && println("Starting findBestStepsizeFactor, with $(2*mid-1) possible stepsizes, looking for $thisString")
 	
 	function checkValues(values, checkDown, checkUp,lowestImprov)
 		
-		if ~isnan(values[1]) 
-			checkDown = false
-		end
-		if ~isnan(values[end]) 
-			checkUp = false
-		end
 		
 		for i in values
 			if i==bestPossible
@@ -100,6 +94,14 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 			end
 		end
 		
+		if ~isnan(values[1]) 
+			checkDown = false
+		end
+		if ~isnan(values[end]) 
+			checkUp = false
+		end
+		
+		
 		return (checkDown, checkUp)
 	end
 	
@@ -148,4 +150,5 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 	(bestVal, bestI) = findmin(values)
 	outputLevel>0 && println("Best stepsize power found: $(bestI-mid)")
 	outputLevel>0 && println("Best value found: $bestVal")
+	((bestI-mid), bestVal) 
 end

@@ -3,7 +3,7 @@ using EGR
 
 println("TestVerify")
 
-for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName)  in Oracles
+for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem)  in Oracles
 			
 	srand(1)
 

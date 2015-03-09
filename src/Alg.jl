@@ -64,18 +64,15 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		expIndices=unique(int(round(linspace(0,opts.maxG,oo.maxOutputNum))))
 	end
 	
-	trueOutputNum = length(expIndices)
-	
 	# println("trueOutputNum = $trueOutputNum")
 	# println("expIndices = $expIndices")
 	
-	existingResult = returnResultIfExists(problem, opts, sd, trueOutputNum)
+	existingResult = returnResultIfExists(problem, opts, sd, expIndices)
 
 	if existingResult != false
 		if typeof(existingResult) != (ASCIIString,Vector{Int64},Vector{Int64},Array{Float64,2})
 			error("existingResult type is wrong: $(typeof(existingResult))")
 		end
-		opts.outputLevel>0 && println("Returning existing! Remember it doesn't have x")
 		return existingResult
 	end
 	
@@ -118,7 +115,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 				@printf("%2.i %7.i %7.i ", kOutputs, k, gnum)
 				println(fromOutputsFunction.resultString)
 			end
-			writeFunction(problem, sd, opts, k, gnum, fromOutputsFunction)
+			writeFunction(problem, sd, opts, k, gnum, expIndices[kOutputs], fromOutputsFunction)
 			if isnan(fromOutputsFunction.resultLine[end])
 				 return ("NaN found", results_k, results_gnum,results_fromOutputsFunction,xToTest)
 			 end
@@ -155,11 +152,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		
 	end
 	
-	if opts.outputLevel>0
-		opts.outputLevel == 1 && println(opts.outputStringHeader)
-		opts.outputLevel == 1 && println(results_fromOutputsFunction[end].resultString)
-		println("Finished alg: $(sd.stepString)")
-	end
+	opts.outputLevel>0 && println("Finished alg: $(sd.stepString)")
 	 
 	## Write answer!
 	("Finished nicely", results_k, results_gnum, results_fromOutputsFunction, xToTest)
