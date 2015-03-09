@@ -18,7 +18,6 @@ function createClassLabels(labels; outputLevel = 0)
 			classLabels[i] = currentClass
 		end
 	end
-	println(classesDict)
 	outputLevel > 1  && println(classesDict)
 	outputLevel > 0  && println("Number of classes is $(length(classesDict))")
 	
@@ -34,12 +33,12 @@ function normalizeFeatures(features, numFeatures)
 	end
 end
 
-function trainTestRandomSeparate(features,labels::MinusPlusOneVector, labels2::Vector{Int64})
+function trainTestRandomSeparate(features,labels::MinusPlusOneVector, labels2::Vector{Int64}; outputLevel = 0)
 	srand(1)
 	shuffledIndices = shuffle([1 : length(labels)])
 	numTrainingPoints = div(length(labels)*3,4)
-	println("numTrainingPoints = $numTrainingPoints")
-	println("numTestingPoints = $(length(labels)-numTrainingPoints)")
+	outputLevel > 0  && println("numTrainingPoints = $numTrainingPoints")
+	outputLevel > 0  && println("numTestingPoints = $(length(labels)-numTrainingPoints)")
 	(copy(features[shuffledIndices[1:numTrainingPoints      ],:]),
 	 MinusPlusOneVector(labels  [shuffledIndices[1:numTrainingPoints      ]  ]),
 	copy(labels2  [shuffledIndices[1:numTrainingPoints      ]  ]),

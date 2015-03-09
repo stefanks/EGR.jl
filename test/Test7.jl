@@ -1,5 +1,6 @@
 using Base.Test
 using EGR
+using Redis
 
 
 client = RedisConnection();
@@ -27,9 +28,9 @@ findBests = [
 myREfunction(problem, opts, sd, wantOutputs) = false
 myWriteFunction(problem, sd, opts, k, gnum, fromOutputsFunction) = false
 
-for thisOracle in Oracles
-			
-	(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) = thisOracle
+for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
+	
+	println(" $thisDataName $LossFunctionString L2reg = $L2reg")
 			
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
@@ -55,4 +56,5 @@ for thisOracle in Oracles
 end
 
 
-
+println("TestVerifyAndRestore successful!")
+println()
