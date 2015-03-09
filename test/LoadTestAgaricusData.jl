@@ -1,7 +1,7 @@
 function LoadTestAgaricusData(Oracles)
 
-	(features,labels) = readBin("data/TestAgaricus/TestAgaricus.bin", 8124, 126)
-
+	(features, labels) = readData("data/TestAgaricus/TestAgaricus", (8124,126), 0)
+	
 	(classLabels, numClasses) = createClassLabels(labels)
 
 	(trf, trl, trl2, numTrainingPoints, tef, tel, tel2) = trainTestRandomSeparate(features, MinusPlusOneVector(labels, Set([1.0])), classLabels)
