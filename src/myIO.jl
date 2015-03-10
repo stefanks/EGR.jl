@@ -5,9 +5,6 @@ function readData(fname::String, shape, minFeatureInd::Integer)
 	cnt = 1
 	for line in eachline(fi)
 		line = split(line, " ")
-		# println(line)
-		# println(line[1])
-		# println(float64(line[1]))
 		push!(labels, float64(line[1]))
 		line = line[2:end]
 		for itm in line
@@ -51,10 +48,10 @@ function getStats(fname::String)
 		line = line[2:end]
 		for itm in line
 			itm = split(itm, ":")
-			minfeatureInd = min(minfeatureInd,int(itm[1]))
-			maxfeatureInd = max(maxfeatureInd,int(itm[1]))
-			minfeature = min(minfeature,float(chomp(itm[2])))
-			maxfeature = max(maxfeature,float(chomp(itm[2])))
+			minfeatureInd = min(minfeatureInd,int64(itm[1]))
+			maxfeatureInd = max(maxfeatureInd,int64(itm[1]))
+			minfeature = min(minfeature,float64(chomp(itm[2])))
+			maxfeature = max(maxfeature,float64(chomp(itm[2])))
 			numTotal+=1
 		end
 	end
@@ -66,6 +63,88 @@ function getStats(fname::String)
 	
 	close(fi)
 	
-	return (n,minfeatureInd,maxfeatureInd-minfeatureInd+1,numTotal,minfeature,maxfeature, length(mySetOfClasses))
+	(n,minfeatureInd,maxfeatureInd-minfeatureInd+1,numTotal,minfeature,maxfeature, length(mySetOfClasses))
 end
 
+
+function getStatsHIGGSSUSY(fname::String)
+	fi = open(fname, "r")
+	n = 0
+	numTotal=0
+	minfeature=typemax(Int)
+	maxfeature=typemin(Int)
+	mySetOfClasses = Set()
+	for line in eachline(fi)
+		n += 1
+		line = split(line, ",")
+		push!(mySetOfClasses, line[1])
+		line = line[2:end]
+		for itm in line
+			minfeature = min(minfeature,float64(chomp(itm)))
+			maxfeature = max(maxfeature,float64(chomp(itm)))
+			numTotal+=1
+		end
+	end
+	close(fi)
+	(n,numTotal,minfeature,maxfeature, length(mySetOfClasses))
+end
+
+
+function readDataHIGGSSUSY(fname::String, shape)
+	features = zeros(shape)
+	labels = Float64[]
+	fi = open(fname, "r")
+	cnt = 1
+	for line in eachline(fi)
+		line = split(line, ",")
+		push!(labels, float64(line[1]))
+		line = line[2:end]
+		for i in 1:length(line)
+			features[cnt, i] = float64(chomp(line[i]))
+		end
+		cnt += 1
+	end
+	close(fi)
+	(features, labels)
+end
+
+function getStatsIRIS(fname::String)
+	fi = open(fname, "r")
+	n = 0
+	numTotal=0
+	minfeature=typemax(Int)
+	maxfeature=typemin(Int)
+	mySetOfClasses = Set()
+	for line in eachline(fi)
+		n += 1
+		line = split(line, ",")
+		push!(mySetOfClasses, chomp(line[end]))
+		line = line[1:end-1]
+		for itm in line
+			minfeature = min(minfeature,float64(chomp(itm)))
+			maxfeature = max(maxfeature,float64(chomp(itm)))
+			numTotal+=1
+		end
+	end
+	close(fi)
+	println(mySetOfClasses)
+	(n,numTotal,minfeature,maxfeature, length(mySetOfClasses))
+end
+
+function readDataIRIS(fname::String, shape)
+	features = zeros(shape)
+	labels = String[]
+	fi = open(fname, "r")
+	cnt = 1
+	for line in eachline(fi)
+		line = split(line, ",")
+		push!(labels, chomp(line[end]))
+		line = line[1:end-1]
+		for i in 1:length(line)
+			features[cnt, i] = float64(chomp(line[i]))
+		end
+		cnt += 1
+	end
+	close(fi)
+	(features, labels)
+end

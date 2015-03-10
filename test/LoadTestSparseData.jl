@@ -36,9 +36,9 @@ function LoadTestSparseData(Oracles)
 	for L2reg in L2regs
 		
 		
-		(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName) = createSBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg, 0, "TestSparse")
+		(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg) = createSBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg, 0)
 		
-		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, (t)-> Problem(L2reg, thisDataName, LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t), (numVars, 1)))
+		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, "TestSparse", (t)-> Problem(L2reg, "TestSparse", LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t), (numVars, 1)))
 		
 		
 	end

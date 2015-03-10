@@ -4,6 +4,8 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 	
 	longKey = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*"const"*":"*string(opts.stepSizePower)
 	
+	outputLevel>1 && println("longKey = $longKey")
+	
 	if ~exists(client, longKey*":gnum")
 		outputLevel>0 && println("RUN: key does not exist")
 		return false

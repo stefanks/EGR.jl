@@ -4,10 +4,10 @@ function createClassLabels(labels; outputLevel = 0)
 
 	outputLevel > 0  && println("Creating class labels")
 
-	classesDict=(Float64 => (Int64, Int64))[]
+	classesDict=(Any => (Int64, Int64))[]
 
 	currentClass =0
-	classLabels = zeros(Int64,numDatapoints )
+	classLabels = zeros(Float64,numDatapoints )
 	for i in 1:numDatapoints
 		if haskey(classesDict, labels[i])
 			classesDict[labels[i]]=(classesDict[labels[i]][1],classesDict[labels[i]][2]+ 1)
@@ -33,7 +33,7 @@ function normalizeFeatures(features, numFeatures)
 	end
 end
 
-function trainTestRandomSeparate(features,labels::MinusPlusOneVector, labels2::Vector{Int64}; outputLevel = 0)
+function trainTestRandomSeparate(features,labels::MinusPlusOneVector, labels2::Vector{Float64}; outputLevel = 0)
 	srand(1)
 	shuffledIndices = shuffle([1 : length(labels)])
 	numTrainingPoints = div(length(labels)*3,4)

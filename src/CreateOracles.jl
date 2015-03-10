@@ -10,7 +10,7 @@ function bs(val::Float64)
 end
 
 
-function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool, outputLevel,thisDataName)
+function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool, outputLevel)
 	
 	outputLevel > 0  && println("Fraction of ones in training set: $(trl.numPlus/length(trl))")
 	outputLevel > 0  && println("Fraction of ones in testing  set: $(tel.numPlus/length(tel))")
@@ -39,11 +39,11 @@ function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool, outpu
 		csDataType = Float64
 	end
 
-	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "BL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg, thisDataName)
+	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "BL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg)
 end
 
 
-function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::Bool, outputLevel, thisDataName)
+function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::Bool, outputLevel)
 	
 	trft=trf'
 	gradientOracle(W,index) = ML_get_f_g(trft, trl,W,index)
@@ -68,11 +68,11 @@ function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::
 		csDataType=Matrix{Float64}
 	end
 	
-	(mygradientOracle, size(trf)[2]*numClasses,  numTrainingPoints, myrestoreGradient, csDataType, "ML", Outputter(outputsFunction,  "     f-train       f         pcc    ",3), L2reg, thisDataName)
+	(mygradientOracle, size(trf)[2]*numClasses,  numTrainingPoints, myrestoreGradient, csDataType, "ML", Outputter(outputsFunction,  "     f-train       f         pcc    ",3), L2reg)
 end
 
 
-function createSBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool, outputLevel,thisDataName)
+function createSBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool, outputLevel)
 	
 	outputLevel > 0  && println("Fraction of ones in training set: $(trl.numPlus/length(trl))")
 	outputLevel > 0  && println("Fraction of ones in testing  set: $(tel.numPlus/length(tel))")
@@ -101,5 +101,5 @@ function createSBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool, outp
 		csDataType = Float64
 	end
 
-	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "BL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg, thisDataName)
+	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "BL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg)
 end

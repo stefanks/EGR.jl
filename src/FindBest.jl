@@ -42,7 +42,7 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 		
 		
 		for i in values
-			if i==bestPossible
+			if i<=bestPossible
 				return (false, false)
 			end
 		end
