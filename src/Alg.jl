@@ -129,6 +129,8 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		
 	    (g, gnum) = sd.getStep(x, k, gnum, sd, problem);
 		
+		# println(typeof(g))
+		
 		opts.outputLevel>2 && println("norm(g) = $(norm(g))")
 		
 		opts.outputLevel>2 && println("norm(x) before step = $(norm(x))")
@@ -139,7 +141,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		# println("typeof(g) = $(typeof(g))")
 		#  PUT IN ADAGRAD !!!
 		x-=(2.0^opts.stepSizePower)*opts.stepSizeFunction(k)*g
-
+		
 		# println("x = $x")
 		# println("typeof(x) = $(typeof(x))")
 		

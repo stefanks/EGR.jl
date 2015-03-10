@@ -44,7 +44,6 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 				end
 				if j>length(existingListOfgunum)
 					outputLevel>0 && println("RE-RUN: could not find element >= $val in existingListOfgunum")
-					error()
 					return false
 				end
 			end
@@ -60,36 +59,6 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 				return false
 			end
 		end
-
-		# Are there other cases that need to be re-run?
-		
-		
-		
-		
-		
-		
-		# atWhichIndexHaveEnough= findfirst((i)->i>=expIndices[end],existingListOfgunum)
-		#
-		# # println("existingListOfOrigWant = $existingListOfOrigWant")
-		# # println("expIndices[end] = $(expIndices[end])")
-		# # println("atWhichIndexHaveEnough = $atWhichIndexHaveEnough")
-		# # println("atWhichIndexHaveExact = $atWhichIndexHaveExact")
-		#
-		#
-		# if (atWhichIndexHaveEnough >= length(expIndices)) && (existingListOfOrigWant[atWhichIndexHaveEnough] <= expIndices[end])
-		# 	outputLevel>0 && println(" atWhichIndexHaveEnough>0 && existingListOfOrigWant(atWhichIndexHaveEnough) <= expIndices[end] && atWhichIndexHaveEnough >= length(expIndices)")
-		# 	outputLevel>0 && println("Already exists, using existing! atWhichIndexHaveEnough=$atWhichIndexHaveEnough wantOutputs=$(length(expIndices))")
-		# 	# elseif  existingListOfk[end] +1 == length(existingListOfk)
-		# 	# 	warn("existingListOfk[end] +1 == length(existingListOfk)")
-		# 	# 	warn("Already exists, using existing! atWhichIndexHaveEnough=$atWhichIndexHaveEnough wantGnum = $wantGnum wantOutputs=$wantOutputs")
-		# elseif isnan(existingListRes1[end]) && expIndices[end]>=existingListOfgunum[end]
-		# 	outputLevel>0 && println("isnan(existingListRes1[end]) && wantGnum>=existingListOfgunum[end]")
-		# 	outputLevel>0 && println("Already exists, using existing! atWhichIndexHaveEnough=$atWhichIndexHaveEnough expIndices[end] = $(expIndices[end]) wantOutputs=$(length(expIndices))")
-		# else
-		# 	outputLevel>0 && println("Already exists, but re-running! atWhichIndexHaveEnough=$atWhichIndexHaveEnough expIndices[end] = $(expIndices[end]) wantOutputs=$(length(expIndices))")
-		# 	return false
-		# end
-			
 		
 		i=1
 		while Redis.exists(client, longKey*":$i")
@@ -104,10 +73,6 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 			for i in fullRange
 				push!(arrayss, float(i))
 			end
-			# println(typeof(kk))
-			# println(typeof(arrayss))
-			# println(size(kk))
-			# println(size(arrayss))
 			kk=hcat(kk, arrayss)
 		end
 
