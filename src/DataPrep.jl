@@ -14,7 +14,7 @@ function createClassLabels(labels; outputLevel = 0)
 			classLabels[i] = classesDict[labels[i]][1]
 		else
 			currentClass +=1
-			classesDict[labels[i]] = (currentClass,1)
+			classesDict[labels[i]] = (currentClass,1.0)
 			classLabels[i] = currentClass
 		end
 	end
