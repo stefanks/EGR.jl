@@ -37,8 +37,8 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 		while i<=length(expIndices)
 			val = expIndices[i]
 			while existingListOfgunum[j]<val
-				j+=1
 				outputLevel>1 && println("existingListOfgunum[j] = $(existingListOfgunum[j])")
+				j+=1
 				if j<=length(existingListOfgunum) && isnan(existingListRes1[j])
 					outputLevel>0 && println("Found NaN at $j, when existingListOfgunum[$j] = $(existingListOfgunum[j]) and val = $val")
 					i = -1

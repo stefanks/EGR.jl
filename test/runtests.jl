@@ -11,7 +11,7 @@ include("TestRedisReadWrite.jl")
 
 Oracles = (Function,Int64,Int64,Function,DataType,ASCIIString,Outputter,Bool,ASCIIString,Function,Any)[]
 include("LoadTestToyData.jl")
-include("LoadTestAgaricusData.jl")
+# include("LoadTestAgaricusData.jl")
 # include("LoadTestSparseData.jl")
 
 include("TestVerify.jl")
