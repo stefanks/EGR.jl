@@ -12,12 +12,12 @@ function LoadTestAgaricusData(Oracles)
 	]
 	
 	for L2reg in L2regs
-		(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg) = createBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg, 0)
+		(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg) = createBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg; outputLevel = 0) 
 		
 		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg,  "TestAgaricus", (t)-> Problem(L2reg, "TestAgaricus", LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t),numVars))
 		
 		
-		(gradientOracle2, numVars2, numTrainingPoints2, restoreGradient2, csDataType2, LossFunctionString2, myOutputter2, L2reg2) = createMLOracles(trf, trl2, numTrainingPoints, numClasses, tef, tel2, L2reg, 0) 
+		(gradientOracle2, numVars2, numTrainingPoints2, restoreGradient2, csDataType2, LossFunctionString2, myOutputter2, L2reg2) = createMLOracles(trf, trl2, numTrainingPoints, numClasses, tef, tel2, L2reg; outputLevel = 0) 
 		
 		push!(Oracles,(gradientOracle2, numVars2, numTrainingPoints2, restoreGradient2, csDataType2, LossFunctionString2, myOutputter2, L2reg2, "TestAgaricus", (t)-> Problem(L2reg2, "TestAgaricus", LossFunctionString2, (w)->gradientOracle2(w), numTrainingPoints2, t),numVars2))
 	end

@@ -12,7 +12,7 @@ run(`redis-cli keys "Test*"` |> `xargs redis-cli del`);
 
 createOracleOutputLevel = 1
 numEquivalentPasses = 5
-algOutputLevel = 0
+algOutputLevel = 2
 maxOutputNum=5
 constStepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
 

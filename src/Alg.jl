@@ -66,6 +66,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	
 	# println("trueOutputNum = $trueOutputNum")
 	# println("expIndices = $expIndices")
+	# println("length = $(length(expIndices))")
 	
 	existingResult = returnResultIfExists(problem, opts, sd, expIndices)
 

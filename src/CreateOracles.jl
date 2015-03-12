@@ -10,7 +10,7 @@ function bs(val::Float64)
 end
 
 
-function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool, outputLevel)
+function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outputLevel::Int64=0)
 	
 	outputLevel > 0  && println("Fraction of ones in training set: $(trl.numPlus/length(trl))")
 	outputLevel > 0  && println("Fraction of ones in testing  set: $(tel.numPlus/length(tel))")
@@ -43,7 +43,7 @@ function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool, outpu
 end
 
 
-function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::Bool, outputLevel)
+function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::Bool; outputLevel::Int64=0)
 	
 	trft=trf'
 	gradientOracle(W,index) = ML_get_f_g(trft, trl,W,index)
@@ -72,7 +72,7 @@ function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::
 end
 
 
-function createSBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool, outputLevel)
+function createSBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outputLevel::Int64=0)
 	
 	outputLevel > 0  && println("Fraction of ones in training set: $(trl.numPlus/length(trl))")
 	outputLevel > 0  && println("Fraction of ones in testing  set: $(tel.numPlus/length(tel))")

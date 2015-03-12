@@ -17,6 +17,33 @@ function readData(fname::String, shape, minFeatureInd::Integer)
 	(features, labels)
 end
 
+function readDataSparse(fname::String, shape, minFeatureInd::Integer)
+	A = Int64[]
+	B = Int64[]
+	C = Float64[]
+	labels = Float64[]
+	fi = open(fname, "r")
+	cnt = 1
+	
+	for line in eachline(fi)
+		line = split(line, " ")
+		push!(labels, float64(line[1]))
+		line = line[2:end]
+		for itm in line
+			itm = split(itm, ":")
+			push!(A, cnt)
+			push!(B, int(itm[1]) + 1-minFeatureInd)
+			push!(C, float64(chomp(itm[2])))
+		end
+		cnt += 1
+	end
+	close(fi)
+	
+	features = sparse(A,B,C)
+	
+	(features, labels)
+end
+
 function writeBin(fname::String, features, labels)
 	fi = open(fname, "w")
 	write(fi, features)
