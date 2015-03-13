@@ -32,7 +32,7 @@ function LoadTestToyData(Oracles)
 	]
 	for L2reg in L2regs
 		
-		(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg) = createBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg; outputLevel = 0) )
+		(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg) = createBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg; outputLevel = 0)
 		
 		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg,  "TestToy", (t)-> Problem(L2reg, "TestToy", LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t),numVars))
 		
