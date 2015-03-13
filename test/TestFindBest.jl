@@ -18,7 +18,7 @@ sds = [
 (n,ntp,dt)->SGsd( "SG")
 ]
 
-myREfunction(problem, opts, sd, expIndices) = returnIfExists(client, problem, opts, sd, expIndices; outputLevel = 0)
+myREfunction(problem, opts, sd, expIndices,n) = returnIfExists(client, problem, opts, sd, expIndices,n; outputLevel = 0)
 myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = writeFunction(client, problem,  opts, sd,k, gnum, origWant, fromOutputsFunction; outputLevel = 0)
 
 for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem,dims) in Oracles

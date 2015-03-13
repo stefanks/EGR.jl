@@ -22,10 +22,15 @@ function readDataSparse(fname::String, shape, minFeatureInd::Integer)
 	B = Int64[]
 	C = Float64[]
 	labels = Float64[]
+	# featuresVec =  SparseMatrixCSC{Float64,Int64}[]
+	# featuresVec2 =  SparseMatrixCSC{Float64,Int64}[]
 	fi = open(fname, "r")
 	cnt = 1
 	
 	for line in eachline(fi)
+		# A1 = Int64[]
+		# B1= Int64[]
+		# C1 = Float64[]
 		line = split(line, " ")
 		push!(labels, float64(line[1]))
 		line = line[2:end]
@@ -34,13 +39,23 @@ function readDataSparse(fname::String, shape, minFeatureInd::Integer)
 			push!(A, cnt)
 			push!(B, int(itm[1]) + 1-minFeatureInd)
 			push!(C, float64(chomp(itm[2])))
+			
+			# push!(A1, int(itm[1]) + 1-minFeatureInd)
+			# push!(B1, 1)
+			# push!(C1, float64(chomp(itm[2])))
+			
+		
 		end
+		
+		# push!(featuresVec, sparse(A1, B1, C1,shape[2],1))
+		# push!(featuresVec2, sparse( B1,A1, C1,1,shape[2]))
 		cnt += 1
 	end
 	close(fi)
 	
 	features = sparse(A,B,C)
 	
+	# (features, featuresVec, featuresVec2,  labels)
 	(features, labels)
 end
 

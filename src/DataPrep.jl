@@ -49,7 +49,6 @@ function trainTestRandomSeparate(features,labels::MinusPlusOneVector, labels2::V
 end
 
 
-
 # function StrainTestRandomSeparate(features,labels)
 # 	srand(1)
 # 	shuffledIndices = shuffle([1 : size(labels)[1];])

@@ -101,5 +101,5 @@ function createSBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outp
 		csDataType = Float64
 	end
 
-	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "BL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg)
+	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "SBL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg)
 end

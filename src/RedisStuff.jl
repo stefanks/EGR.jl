@@ -1,6 +1,6 @@
 using Redis 
 
-function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, sd::StepData, expIndices::Vector{Int64}; outputLevel::Int64=0)
+function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, sd::StepData, expIndices::Vector{Int64},numOutputsFromOutputsFunction; outputLevel::Int64=0)
 	
 	longKey = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*"const"*":"*string(opts.stepSizePower)
 	
@@ -12,6 +12,7 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 	else
 		existingListOfgunum=Int64[]
 		existingListRes1=Float64[]
+		existingListResEnd=Float64[]
 		existingListOfk=Int64[]
 		existingListOfOrigWant=Int64[]
 		
@@ -23,6 +24,12 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 		for i in arrayOfStrings
 			push!(existingListRes1, float64(i))
 		end
+
+		arrayOfStrings  = lrange(client, longKey*":$numOutputsFromOutputsFunction", 0, -1)
+		for i in arrayOfStrings
+			push!(existingListResEnd, float64(i))
+		end
+		
 		arrayOfStrings  = lrange(client, longKey*":k", 0, -1)
 		for i in arrayOfStrings
 			push!(existingListOfk, int(i))
@@ -39,7 +46,7 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 			while existingListOfgunum[j]<val
 				outputLevel>1 && println("existingListOfgunum[j] = $(existingListOfgunum[j])")
 				j+=1
-				if j<=length(existingListOfgunum) && isnan(existingListRes1[j])
+				if j<=length(existingListOfgunum) && (isnan(existingListRes1[j]) || isnan(existingListResEnd[j]))
 					outputLevel>0 && println("Found NaN at $j, when existingListOfgunum[$j] = $(existingListOfgunum[j]) and val = $val")
 					i = -1
 					break	

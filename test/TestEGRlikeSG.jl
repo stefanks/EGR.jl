@@ -10,7 +10,7 @@ maxOutputNum=20
 constStepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
 
 
-myREfunction(problem, opts, sd, expIndices) = false
+myREfunction(problem, opts, sd, expIndices,n) = false
 myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = false
 
 

@@ -56,19 +56,20 @@ end
 
 function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFunction::Function, returnResultIfExists::Function)
 	
-	opts.outputLevel>0 && println("Starting alg")
+	opts.outputLevel>0 && println("Function to minimize: $(problem.name) with loss function $(problem.lossFunctionString), L2reg = $(problem.L2reg)")
+	opts.outputLevel>0 && println("Step: $(sd.stepString) with stepSizePower = $(opts.stepSizePower)")
 	
 	if oo.logarithmic == true
-		expIndices=unique(int(round(logspace(0,log10(opts.maxG+1),oo.maxOutputNum))))-1
+		expIndices=unique(round(Int, logspace(0,log10(opts.maxG+1),oo.maxOutputNum)))-1
 	else
-		expIndices=unique(int(round(linspace(0,opts.maxG,oo.maxOutputNum))))
+		expIndices=unique(round(Int, linspace(0,opts.maxG,oo.maxOutputNum)))
 	end
 	
 	# println("trueOutputNum = $trueOutputNum")
 	# println("expIndices = $expIndices")
 	# println("length = $(length(expIndices))")
 	
-	existingResult = returnResultIfExists(problem, opts, sd, expIndices)
+	existingResult = returnResultIfExists(problem, opts, sd, expIndices, oo.outputter.numOutputsFromOutputsFunction)
 
 	if existingResult != false
 		if typeof(existingResult) != (ASCIIString,Vector{Int64},Vector{Int64},Array{Float64,2})
@@ -109,11 +110,9 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 			else
 				xToTest =x
 			end
-			# println("xToTest = $xToTest")
-			# println("typeof(xToTest) = $(typeof(xToTest))")
 			fromOutputsFunction::ResultFromOO = oo.outputter.outputsFunction(xToTest)
 			if opts.outputLevel>1 
-				@printf("%2.i %7.i %7.i ", kOutputs, k, gnum)
+				@printf("%2.i %8.i %8.i ", kOutputs, k, gnum)
 				println(fromOutputsFunction.resultString)
 			end
 			writeFunction(problem, sd, opts, k, gnum, expIndices[kOutputs], fromOutputsFunction)
@@ -132,20 +131,15 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		
 		# println(typeof(g))
 		
-		opts.outputLevel>2 && println("norm(g) = $(norm(g))")
-		
+		opts.outputLevel>2 && println("norm(g) before step = $(norm(g))")
 		opts.outputLevel>2 && println("norm(x) before step = $(norm(x))")
-
-		# println("x = $x")
-		# println("typeof(x) = $(typeof(x))")
-		# println("g = $g")
-		# println("typeof(g) = $(typeof(g))")
+		opts.outputLevel>2 && println("typeof(x) before step = $(typeof(x))")
+		opts.outputLevel>2 && println("typeof(g) = $(typeof(g))")
+		
 		#  PUT IN ADAGRAD !!!
 		x-=(2.0^opts.stepSizePower)*opts.stepSizeFunction(k)*g
 		
-		# println("x = $x")
-		# println("typeof(x) = $(typeof(x))")
-		
+		opts.outputLevel>2 && println("typeof(x) after step = $(typeof(x))")
 		opts.outputLevel>2 && println("norm(x) after step = $(norm(x))")
 		
 		

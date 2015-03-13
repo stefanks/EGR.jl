@@ -13,7 +13,7 @@ sLikeGd(k,numTrainingPoints) = k==0 ? 0 : numTrainingPoints
 uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
 
 
-myREfunction(problem, opts, sd, expIndices) = false
+myREfunction(problem, opts, sd, expIndices,n) = false
 myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = false
 
 
