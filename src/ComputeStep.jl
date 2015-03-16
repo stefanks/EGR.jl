@@ -29,6 +29,10 @@ type DSSsd <: StepData
 	end
 end
 
+function DSSexp(c::Float64,r::Float64,ntp::Int64,stepString::String)
+	DSSsd( (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1))),  (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))), stepString)
+end
+
 function EGRexp(c::Float64,r::Float64,numVars::Int64,ntp::Int64, beta::Function, newS::Bool, dt::DataType, stepString::String)
 	EGRsd( (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1))),  (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) , beta,  numVars, newS, dt,	stepString)
 end
