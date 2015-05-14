@@ -34,7 +34,7 @@ s(k,I) = 0
 u(k,I) = 2
 beta(k) = 1
 
-thisSD = EGRsd(s,u,beta,numVars, true, csDataType,  "EGR.SGlike")
+thisSD = EGRsd(s,u,beta,numVars, true, csDataType,  "EGR.SGlike",  "EGR.SGlike")
 
 longKey = thisDataName*":"*LossFunctionString*":"*string(L2reg)*":"thisSD.stepString*":"*"const"*":0"
 println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))

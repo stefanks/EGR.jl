@@ -8,14 +8,14 @@ run(`redis-cli keys "Test*"` |> `xargs redis-cli del`);
 
 createOracleOutputLevel = 1
 numEquivalentPasses = 5
-algOutputLevel = 2
+algOutputLevel = 0
 maxOutputNum=20
 constStepSize(k)=1
 
 sds = [
-(n,ntp,dt)->EGRexp(1.0,100.0,n,ntp, (k)->1, false, dt,"alg2.s_k=u_k=(101/100)^(k-1).b_k=1"),
-(n,ntp,dt)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, true, dt, "alg4.s_k=k.u_k=k+1.b_k=1"),
-(n,ntp,dt)->SGsd( "SG")
+(n,ntp,dt)->EGRexp(1.0,100.0,n,ntp, (k)->1, false, dt,"alg2.s_k=u_k=(101/100)^(k-1).b_k=1", "alg2 .01, a=2^"),
+(n,ntp,dt)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, true, dt, "alg4.s_k=k.u_k=k+1.b_k=1",  "alg4 lin, a=2^"),
+(n,ntp,dt)->SGsd( "SG", "SG")
 ]
 
 myREfunction(problem, opts, sd, expIndices,n) = returnIfExists(client, problem, opts, sd, expIndices,n; outputLevel = 0)

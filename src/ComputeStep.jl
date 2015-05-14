@@ -10,11 +10,13 @@ type EGRsd <: StepData
 	getStep::Function
 	newS::Bool
 	stepString::String
+	shortString::String
 
-	function EGRsd(s::Function, u::Function, beta::Function, numVars::Int64, newS::Bool,dt::DataType, stepString::String)
-		new(zeros(numVars),(Function,Function)[], dt[],0, s, u, beta, naturalEGRS, newS, stepString)
+	function EGRsd(s::Function, u::Function, beta::Function, numVars::Int64, newS::Bool,dt::DataType, stepString::String, shortString::String)
+		new(zeros(numVars),(Function,Function)[], dt[],0, s, u, beta, naturalEGRS, newS, stepString, shortString)
 	end
 end
+
 
 type DSSsd <: StepData
 
@@ -23,33 +25,36 @@ type DSSsd <: StepData
 	u::Function
 	getStep::Function
 	stepString::String
+	shortString::String
 
-	function DSSsd(s::Function, u::Function, stepString::String)
-		new(0,s, u, DSS, stepString)
+	function DSSsd(s::Function, u::Function, stepString::String, shortString::String)
+		new(0,s, u, DSS, stepString, shortString)
 	end
 end
 
-function DSSexp(c::Float64,r::Float64,ntp::Int64,stepString::String)
-	DSSsd( (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1))),  (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))), stepString)
+function DSSexp(c::Float64,r::Float64,ntp::Int64,stepString::String, shortString::String)
+	DSSsd( (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1))),  (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))), stepString, shortString)
 end
 
-function EGRexp(c::Float64,r::Float64,numVars::Int64,ntp::Int64, beta::Function, newS::Bool, dt::DataType, stepString::String)
-	EGRsd( (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1))),  (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) , beta,  numVars, newS, dt,	stepString)
+function EGRexp(c::Float64,r::Float64,numVars::Int64,ntp::Int64, beta::Function, newS::Bool, dt::DataType, stepString::String, shortString::String)
+	EGRsd( (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1))),  (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) , beta,  numVars, newS, dt,	stepString, shortString)
 end
 
 type SGsd <: StepData
 	getStep::Function
 	stepString::String
-	function SGsd(stepString)
-		new(computeSGStep,stepString)
+	shortString::String
+	function SGsd(stepString::String, shortString::String)
+		new(computeSGStep,stepString, shortString)
 	end
 end
 
 type GDsd <: StepData
 	getStep::Function
 	stepString::String
-	function GDsd(stepString)
-		new(computeGDStep,stepString)
+	shortString::String
+	function GDsd(stepString::String, shortString::String)
+		new(computeGDStep,stepString, shortString)
 	end
 end
 
