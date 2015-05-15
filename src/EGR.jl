@@ -1,6 +1,6 @@
 module EGR
 
-export MinusPlusOneVector, OutputOpts, alg, getStats, readBin, createBLOracles, L2regGradient, readData, writeBin, EGRsd, GDsd, SGsd, Opts, VerifyGradient, VerifyRestoration, findBestStepsizeFactor, getSequential, createMLOracles, StepData, writeFunction, Outputter, ResultFromOO, Problem, returnIfExists, EGRexp, createSBLOracles, writeFinal, getF, getPCC, getMCC, normalizeFeatures, trainTestRandomSeparate, createClassLabels, getStatsHIGGSSUSY, readDataHIGGSSUSY, getStatsIRIS, readDataIRIS, readDataSparse, StrainTestRandomSeparate,DSSsd,DSSexp
+export MinusPlusOneVector, OutputOpts, alg, getStats, readBin, createBLOracles, L2regGradient, readData, writeBin, EGRsd, GDsd, SGsd, Opts, VerifyGradient, VerifyRestoration, findBestStepsizeFactor, getSequential, createMLOracles, StepData, writeFunction, Outputter, ResultFromOO, Problem, returnIfExists, EGRexp, createSBLOracles, writeFinal, getF, getPCC, getMCC, normalizeFeatures, trainTestRandomSeparate, createClassLabels, getStatsHIGGSSUSY, readDataHIGGSSUSY, getStatsIRIS, readDataIRIS, readDataSparse, StrainTestRandomSeparate,DSSsd,DSSexp, getSequentialFinite
 
 include("MinusPlusOneVector.jl")
 include("DataPrep.jl")

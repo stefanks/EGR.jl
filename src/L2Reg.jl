@@ -10,6 +10,5 @@ function L2regGradient(gradientOracle::Function, L2param::Float64, W::Union(Vect
 end
 
 function L2RestoreGradient(restoreGradient::Function, L2param::Float64, cs::Union(Vector{Float64},Matrix{Float64}), index::Int64)
-	# Base.info("restoring L2")
 	cs
 end
