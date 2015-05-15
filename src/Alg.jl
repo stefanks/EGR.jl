@@ -16,28 +16,25 @@ end
 immutable type OutputOpts
 	logarithmic::Bool
 	maxOutputNum::Int64
-	average::Bool
 	ooString::String
 	outputter::Outputter
 	function OutputOpts(outputter::Outputter; logarithmic::Bool = true, maxOutputNum::Int64 = 10, average::Bool=false, ooString::String="logarithmic = $logarithmic, maxOutputNum = $maxOutputNum, average = $average")
 		maxOutputNum>99 && error("maxOutputNum too big")
 		maxOutputNum<1 && error("maxOutputNum too small")
-		new(logarithmic, maxOutputNum, average, ooString, outputter)
+		new(logarithmic, maxOutputNum, ooString, outputter)
 	end
 end
 
 immutable type Opts
-	init::Union(Vector{Float64},Matrix{Float64})
-	stepSizeFunction::Function
+	init::Vector{Float64}
 	stepSizePower::Int64
 	maxG::Int64
 	outputLevel::Int64
 	optsString::String
-	function Opts(init::Union(Vector{Float64},Matrix{Float64}); stepSizeFunction::Function=(k)->1/(k+1), stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::String="stepSizePower = $stepSizePower, maxG = $maxG")
+	function Opts(init::Vector{Float64}; stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::String="stepSizePower = $stepSizePower, maxG = $maxG")
 		outputLevel>2 && println("outputLevel is $outputLevel") 
 		(maxG>typemax(Int64)-35329 || maxG<0) && error("maxG is $maxG, and is out of range")
-		stepSizeFunction(0) != 1 && error("stepSizeFunction(0) is $(stepSizeFunction(0)) instead of 1")
-		new(init, stepSizeFunction, stepSizePower, maxG, outputLevel, optsString)
+		new(init, stepSizePower, maxG, outputLevel, optsString)
 	end
 end
 
@@ -105,11 +102,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	while true
 		
 		if gnum >= expIndices[kOutputs]
-			if oo.average == 1
-				xToTest = xSum/(k+1)
-			else
 				xToTest =x
-			end
 			fromOutputsFunction::ResultFromOO = oo.outputter.outputsFunction(xToTest)
 			if opts.outputLevel>1 
 				@printf("%2.i %8.i %8.i ", kOutputs, k, gnum)
@@ -135,11 +128,10 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		opts.outputLevel>2 && println("norm(x) before step = $(norm(x))")
 		
 		#  PUT IN ADAGRAD !!!
-		x-=(2.0^opts.stepSizePower)*opts.stepSizeFunction(k)*g
+		x-=(2.0^opts.stepSizePower)*g
 		
 		opts.outputLevel>2 && println("norm(x) after step = $(norm(x))")
-		
-		
+	
 		xSum = xSum+x;
 		
 		k+=1
