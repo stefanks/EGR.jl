@@ -39,12 +39,11 @@ function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outpu
 		csDataType = Float64
 	end
 
-	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "BL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg)
+	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "BL", Outputter(outputsFunction,  "     f-train       f         pcc        mcc",8), L2reg)
 end
 
 
 function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::Bool; outputLevel::Int64=0)
-	
 	trft=trf'
 	gradientOracle(W,index) = ML_get_f_g(trft, trl,W,index)
 	gradientOracle(W) = ML_get_f_g(trf, trl,W)

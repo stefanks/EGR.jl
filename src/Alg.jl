@@ -45,9 +45,9 @@ immutable type Problem
 	getFullGradient::Function
 	numTrainingPoints::Int64
 	getNextSampleFunction::Task
-	function Problem(a,b,c,d,e,f)
-		# println("In the Problem constructor!")
-		new(a,b,c,d,e,f)
+	getSampleFunctionAt::Function
+	function Problem(a,b,c,d,e,f,g)
+		new(a,b,c,d,e,f,g)
 	end
 end
 
@@ -97,7 +97,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	
 	# opts.outputLevel>0 && println("opts.outputLevel = $(opts.outputLevel)")
 	
-	opts.outputLevel>1 && println("        k    gnum"*oo.outputter.outputStringHeader)
+	opts.outputLevel>1 && println("        k     gnum"*oo.outputter.outputStringHeader)
 	
 	while true
 		
