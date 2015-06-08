@@ -2,18 +2,18 @@ using StatsBase
 
 abstract StepData
 
-immutable type Outputter
+immutable Outputter
 	outputsFunction::Function
 	outputStringHeader::String
 	numOutputsFromOutputsFunction::Int64	
 end
 
-immutable type ResultFromOO
+immutable ResultFromOO
 	resultString::String
 	resultLine::Vector{Float64}
 end
 
-immutable type OutputOpts
+immutable OutputOpts
 	logarithmic::Bool
 	maxOutputNum::Int64
 	ooString::String
@@ -25,7 +25,7 @@ immutable type OutputOpts
 	end
 end
 
-immutable type Opts
+immutable Opts
 	init::Vector{Float64}
 	stepSizePower::Int64
 	maxG::Int64
@@ -39,7 +39,7 @@ immutable type Opts
 	end
 end
 
-immutable type Problem
+immutable Problem
 	L2reg::Bool
 	name::String
 	lossFunctionString::String
