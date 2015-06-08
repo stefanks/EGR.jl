@@ -32,7 +32,7 @@ function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outpu
 		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTrainingPoints, a)
 		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTrainingPoints, a, b)
 		myrestoreGradient(a, b) = L2RestoreGradient(restoreGradient, 1/numTrainingPoints, a, b)
-		csDataType = Vector{Float64}
+		csDataType = Matrix{Float64}
 	else
 		mygradientOracle=gradientOracle
 		myrestoreGradient=restoreGradient
@@ -60,7 +60,7 @@ function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::
 		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTrainingPoints, a)
 		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTrainingPoints, a, b)
 		myrestoreGradient(a, b) = L2RestoreGradient(restoreGradient, 1/numTrainingPoints, a, b)
-		csDataType=Vector{Float64}
+		csDataType=Matrix{Float64}
 	else
 		mygradientOracle=gradientOracle
 		myrestoreGradient=restoreGradient

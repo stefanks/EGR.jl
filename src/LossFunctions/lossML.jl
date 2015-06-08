@@ -1,4 +1,4 @@
-function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Float64}, W::Vector{Float64}, index::Int64)
+function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Float64}, W::Matrix{Float64}, index::Int64)
 	numFeatures = size(featuresTP)[1]
 	numClasses = div(length(W),numFeatures)
 	W=reshape(W,(numFeatures,numClasses))
@@ -26,7 +26,7 @@ function ML_restore_gradient(featuresTP::Matrix{Float64}, labels::Vector{Float64
 	vec(g)
 end
 
-function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Float64}, W::Vector{Float64})
+function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Float64}, W::Matrix{Float64})
 	# println(features)
 	# println(labels)
 	# println(W)
@@ -55,7 +55,7 @@ function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Float64}, W::Vecto
 end
 
 # Returns f, percent correctly classified
-function ML_for_output(features::Matrix{Float64}, labels::Vector{Float64}, W::Vector{Float64})
+function ML_for_output(features::Matrix{Float64}, labels::Vector{Float64}, W::Matrix{Float64})
 	numFeatures = size(features)[2]
 	numClasses = div(length(W),numFeatures)
 	W=reshape(W,(numFeatures,numClasses))

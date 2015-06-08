@@ -41,6 +41,7 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 	s(k,I) = sLikeGd(k,numTrainingPoints)
 	u(k,I) =  uLikeGd(k,numTrainingPoints)
 	beta(k) =1 
+	println("csDataType = $csDataType")
 	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGRgd) = alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(0), EGRsd(s,u,beta, numVars, csDataType, "EGR.GDlike", "EGR.GDlike a=1"), myOutputOpts, myWriteFunction, myREfunction)
 		
 		

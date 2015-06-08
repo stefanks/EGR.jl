@@ -3,25 +3,25 @@ using EGR
 
 println("TestVerify")
 
-for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem,dims)  in Oracles
+for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem)  in Oracles
 			
 	srand(1)
 
 	println(" $thisDataName $LossFunctionString L2reg = $L2reg")
 	tol = 1e-6
 	
-	xs = {zeros(dims),2*rand(dims)-1, randn(dims)}
-	xtexts = ["zeros(numVars)","2*rand(numVars)-1", "randn(numVars)"]
+	xs = {zeros(numVars,1),2*rand(numVars,1)-1, randn(numVars,1)}
+	xtexts = ["zeros(numVars,1)","2*rand(numVars,1)-1", "randn(numVars,1)"]
 	for i in 1:3
 		println("  For x = $(xtexts[i])")
 		x=xs[i]
 		(f,g)= gradientOracle(x)
-		gDiff = zeros(dims)
+		gDiff = zeros(numVars)
 		passedDiff = false
 		for displacementAccuracy in 1:15
 			for j in 1:numVars
-				a=zeros(dims)
-				b=zeros(dims)
+				a=zeros(numVars)
+				b=zeros(numVars)
 				a[j] = 10.0^(-displacementAccuracy)
 				b[j] = -10.0^(-displacementAccuracy)
 				a+=x
