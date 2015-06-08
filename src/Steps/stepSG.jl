@@ -10,9 +10,8 @@ type SGsd <: StepData
 	end
 end
 
-function computeSGStep(x, k, gnum, sd::SGsd, problem::Problem)
+function computeSGStep(x, k, gnum, sd::SGsd, problem::Problem; outputLevel =0)
 
-	# println(typeof(sp.getNextSampleFunction))
 	(func,cs) = consume(problem.getNextSampleFunction)
 
 	(f, g, cs) = func(x)

@@ -16,7 +16,7 @@ function SAGAinit(numVars::Int64, dt::DataType, numDP::Int64)
 end
 
 
-function SAGAinitComputation(x, k, gnum, sd::SAGAinitsd, problem::Problem)
+function SAGAinitComputation(x, k, gnum, sd::SAGAinitsd, problem::Problem; outputLevel =0)
 
 	i = rand(1:problem.numTrainingPoints)
 

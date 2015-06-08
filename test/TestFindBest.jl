@@ -2,19 +2,21 @@ using Base.Test
 using EGR
 using Redis
 
+println("TestFindBest")
+
 client = RedisConnection()
 
 run(`redis-cli keys "Test*"` |> `xargs redis-cli del`);
 
 createOracleOutputLevel = 1
-numEquivalentPasses = 5
+numEquivalentPasses = 1
 algOutputLevel = 0
 maxOutputNum=20
 constStepSize(k)=1
 
 sds = [
-(n,ntp,dt)->EGRexp(1.0,100.0,n,ntp, (k)->1, false, dt,"alg2.s_k=u_k=(101/100)^(k-1).b_k=1", "alg2 .01, a=2^"),
-(n,ntp,dt)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, true, dt, "alg4.s_k=k.u_k=k+1.b_k=1",  "alg4 lin, a=2^"),
+(n,ntp,dt)->EGRexpBeta1(1.0,2.0,n,ntp, dt),
+(n,ntp,dt)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, dt, "alg4.s_k=k.u_k=k+1.b_k=1",  "alg4 lin, a=2^"),
 (n,ntp,dt)->SGsd( "SG", "SG")
 ]
 
@@ -25,14 +27,14 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 	println(" $thisDataName $LossFunctionString L2reg = $L2reg")
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 	maxG  = int(round(numEquivalentPasses*numTrainingPoints))
-	myOpts(stepSizePower) = Opts(zeros(dims); stepSizeFunction=constStepSize, stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel)
+	myOpts(stepSizePower) = Opts(zeros(dims);  stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel)
 	for sd in sds
 	
 		thisSD = sd(numVars,numTrainingPoints,csDataType)
 	
 		println("  stepString = $(thisSD.stepString)")
 				
-		algForSearch(stepSizePower) =alg(thisProblem(Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower),thisSD, myOutputOpts, myWriteFunction, myREfunction)
+		algForSearch(stepSizePower) =alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower),thisSD, myOutputOpts, myWriteFunction, myREfunction)
 
 		findBests = [((res)->getF(res,maxG),0.0,"getF"),((res)->getPCC(res,maxG),-1.0,"getPCC"), ((res)->getMCC(res,maxG),-1.0,"getMCC")]
 				
@@ -45,5 +47,5 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 end
 
 
-println("TestVerifyAndRestore successful!")
+println("TestFindBest successful!")
 println()

@@ -7,7 +7,7 @@ type GDsd <: StepData
 	end
 end
 
-function computeGDStep(x, k, gnum, sd::GDsd,problem::Problem)
+function computeGDStep(x, k, gnum, sd::GDsd,problem::Problem; outputLevel =0)
 
 	(f,g)= problem.getFullGradient(x)
 

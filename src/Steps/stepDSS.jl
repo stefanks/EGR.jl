@@ -12,7 +12,7 @@ type DSSsd <: StepData
 	end
 end
 
-function DSSexp(c::Float64,r::Float64,ntp::Int64,stepString::String, shortString::String)
+function DSSexp(c::Float64,r::Float64,ntp::Int64,stepString::String, shortString::String; outputLevel =0)
 	DSSsd( (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1))),  (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))), stepString, shortString)
 end
 

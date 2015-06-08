@@ -30,11 +30,12 @@ immutable type Opts
 	stepSizePower::Int64
 	maxG::Int64
 	outputLevel::Int64
+	stepOutputLevel::Int64
 	optsString::String
-	function Opts(init::Vector{Float64}; stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::String="stepSizePower = $stepSizePower, maxG = $maxG")
+	function Opts(init::Vector{Float64}; stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::String="stepSizePower = $stepSizePower, maxG = $maxG", stepOutputLevel::Int64=0)
 		outputLevel>2 && println("outputLevel is $outputLevel") 
 		(maxG>typemax(Int64)-35329 || maxG<0) && error("maxG is $maxG, and is out of range")
-		new(init, stepSizePower, maxG, outputLevel, optsString)
+		new(init, stepSizePower, maxG, outputLevel, stepOutputLevel, optsString)
 	end
 end
 
@@ -43,9 +44,9 @@ immutable type Problem
 	name::String
 	lossFunctionString::String
 	getFullGradient::Function
-	numTrainingPoints::Int64
+	numTrainingPoints::Int64 # Don't need for EGR
 	getNextSampleFunction::Task
-	getSampleFunctionAt::Function
+	getSampleFunctionAt::Function # Don't need for EGR
 	function Problem(a,b,c,d,e,f,g)
 		new(a,b,c,d,e,f,g)
 	end
@@ -120,7 +121,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		
 		gnum >= maxG && break
 		
-	    (g, gnum) = sd.getStep(x, k, gnum, sd, problem);
+	    (g, gnum) = sd.getStep(x, k, gnum, sd, problem; outputLevel = opts.stepOutputLevel)
 		
 		# println(typeof(g))
 		

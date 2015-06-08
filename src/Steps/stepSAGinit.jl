@@ -16,7 +16,7 @@ function SAGinit(numVars::Int64, dt::DataType, numDP::Int64)
 end
 
 
-function SAGinitComputation(x, k, gnum, sd::SAGinitsd, problem::Problem)
+function SAGinitComputation(x, k, gnum, sd::SAGinitsd, problem::Problem; outputLevel =0)
 
 	i = rand(1:problem.numTrainingPoints)
 	

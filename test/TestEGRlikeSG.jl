@@ -4,7 +4,7 @@ using EGR
 println("TestEGRlikeSG")
 
 createOracleOutputLevel = 1
-numEquivalentPasses = 5
+numEquivalentPasses = 1
 algOutputLevel = 0
 maxOutputNum=20
 constStepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
@@ -22,19 +22,20 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 			
 	maxG  = int(round(numEquivalentPasses*numTrainingPoints))
 			
-	myOpts(stepSizePower) = Opts(zeros(dims); stepSizeFunction=constStepSize, stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel)
-			
-			
-	stepSize(k)=1.0
-			
-	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromSG) = alg(thisProblem(Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient)))	, myOpts(0),SGsd( "SG", "SG a=1") , myOutputOpts, myWriteFunction, myREfunction)
-		
+	myOpts(stepSizePower) = Opts(zeros(dims); stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel)
 		
 	s(k,I) = 0
 	u(k,I) = 1
 	beta(k) = 1
 			
-	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(Task(() -> getSequential(numTrainingPoints, gradientOracle, restoreGradient)))	, myOpts(0), EGRsd(s,u,beta,numVars, true, csDataType,  "EGR.SGlike", "EGR.SGlike a=1"), myOutputOpts, myWriteFunction, myREfunction)
+	a = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle, restoreGradient))
+	b = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle, restoreGradient))
+	
+	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(a)	, myOpts(0), EGRsd(s,u,beta,numVars, csDataType,  "EGR.SGlike", "EGR.SGlike a=1"), myOutputOpts, myWriteFunction, myREfunction)
+	
+	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromSG)  = alg(thisProblem(b)	, myOpts(0), SGsd( "SG", "SG a=1")                                               , myOutputOpts, myWriteFunction, myREfunction)
+		
+		
 		
 		
 	relError = norm(xFromEGR-xFromSG)/norm(xFromSG)

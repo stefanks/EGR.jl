@@ -34,11 +34,11 @@ function LoadTestToyData(Oracles)
 		
 		(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg) = createBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg; outputLevel = 0)
 		
-		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg,  "TestToy", (t)-> Problem(L2reg, "TestToy", LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t),numVars))
+		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg,  "TestToy", (t)-> Problem(L2reg, "TestToy", LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t,(j)->getSampleFunctionAt(j,gradientOracle,restoreGradient)),numVars))
 		
 		(gradientOracle2, numVars2, numTrainingPoints2, restoreGradient2, csDataType2, LossFunctionString2, myOutputter2, L2reg2) = createMLOracles(trf, trl2, numTrainingPoints, numClasses, tef, tel2, L2reg; outputLevel = 0) 
 		
-		push!(Oracles,(gradientOracle2, numVars2, numTrainingPoints2, restoreGradient2, csDataType2, LossFunctionString2, myOutputter2, L2reg2,  "TestToy",  (t)-> Problem(L2reg2, "TestToy", LossFunctionString2, (w)->gradientOracle2(w), numTrainingPoints2, t),numVars2))
+		push!(Oracles,(gradientOracle2, numVars2, numTrainingPoints2, restoreGradient2, csDataType2, LossFunctionString2, myOutputter2, L2reg2,  "TestToy",  (t)-> Problem(L2reg2, "TestToy", LossFunctionString2, (w)->gradientOracle2(w), numTrainingPoints2, t ,(j)->getSampleFunctionAt(j,gradientOracle2,restoreGradient2)),numVars2))
 		
 	end
 end

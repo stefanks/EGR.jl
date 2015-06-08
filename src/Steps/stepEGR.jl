@@ -34,8 +34,8 @@ end
 function EGRexpBeta1(c::Float64, r::Float64, numVars::Int64, ntp::Int64, dt::DataType)
 	
 	
-	s =  (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))
-	u = (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) 
+	s =  (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))
+	u = (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) 
 	beta = (k)->0
 	
 	stepString  = "EGRexp"*".c="*string(c)*".r="*string(r)
@@ -45,12 +45,54 @@ function EGRexpBeta1(c::Float64, r::Float64, numVars::Int64, ntp::Int64, dt::Dat
 	EGRsd(s, u , beta,  numVars,  dt,	stepString, shortString)
 end
 
-function EGRcomputation(x, k, gnum, sd::EGRsd, problem::Problem);
+
+function EGRexpBeta2(numVars::Int64, ntp::Int64, dt::DataType) # LEGACY!
+	
+	c=1
+	r=ntp/400
+	s =  (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))
+	u = (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) 
+	beta = (k)->0
+		#
+	# stepString  = "EGRexpNatural"
+	#
+	# shortString = "EGRexpNatural"
+	stepString  = "EGRexp"*".c="*string(c)*".r="*string(r)
+	
+	shortString = "EGRexp"*" c="*string(c)*" r="*string(r)
+	
+	EGRsd(s, u , beta,  numVars,  dt,	stepString, shortString)
+end
+
+
+# K is the total number of planned iterations
+function EGRexpNatural(numVars::Int64, K::Int64, dt::DataType) # LEGACY!
+	
+	c=1
+	r=K/400
+	s =  (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))
+	u = (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) 
+	beta = (k)->0
+	
+	stepString  = "EGRexpNatural"
+
+	shortString = "EGRexpNatural"
+	
+	EGRsd(s, u , beta,  numVars,  dt,	stepString, shortString)
+end
+
+function EGRcomputation(x, k, gnum, sd::EGRsd, problem::Problem; outputLevel = 0)
 
 	U = (sd.I+1):(sd.I+sd.u(k,sd.I))
 
+	outputLevel > 0  && println("$(sd.I) $(sd.u(k,sd.I)) $(sd.s(k,sd.I))")
+	
 	for i in U
-		push!(sd.functions,consume(problem.getNextSampleFunction))
+		try
+			push!(sd.functions,consume(problem.getNextSampleFunction))
+		catch
+			error("Not producing anymore!")
+		end
 	end
 
 	S = StatsBase.sample(1:sd.I,sd.s(k,sd.I);replace=false)
