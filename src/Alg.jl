@@ -26,13 +26,13 @@ immutable OutputOpts
 end
 
 immutable Opts
-	init::Vector{Float64}
+	init::Matrix{Float64}
 	stepSizePower::Int64
 	maxG::Int64
 	outputLevel::Int64
 	stepOutputLevel::Int64
 	optsString::String
-	function Opts(init::Vector{Float64}; stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::String="stepSizePower = $stepSizePower, maxG = $maxG", stepOutputLevel::Int64=0)
+	function Opts(init::Matrix{Float64}; stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::String="stepSizePower = $stepSizePower, maxG = $maxG", stepOutputLevel::Int64=0)
 		outputLevel>2 && println("outputLevel is $outputLevel") 
 		(maxG>typemax(Int64)-35329 || maxG<0) && error("maxG is $maxG, and is out of range")
 		new(init, stepSizePower, maxG, outputLevel, stepOutputLevel, optsString)
@@ -103,7 +103,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	while true
 		
 		if gnum >= expIndices[kOutputs]
-				xToTest =x
+			xToTest =x
 			fromOutputsFunction::ResultFromOO = oo.outputter.outputsFunction(xToTest)
 			if opts.outputLevel>1 
 				@printf("%2.i %8.i %8.i ", kOutputs, k, gnum)
@@ -111,8 +111,8 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 			end
 			writeFunction(problem, sd, opts, k, gnum, expIndices[kOutputs], fromOutputsFunction)
 			if isnan(fromOutputsFunction.resultLine[end])
-				 return ("NaN found", results_k, results_gnum,results_fromOutputsFunction,xToTest)
-			 end
+				return ("NaN found", results_k, results_gnum,results_fromOutputsFunction,xToTest)
+			end
 			push!(results_k,k)
 			push!(results_gnum,gnum)
 			results_fromOutputsFunction = [results_fromOutputsFunction ; fromOutputsFunction.resultLine']
@@ -121,7 +121,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		
 		gnum >= maxG && break
 		
-	    (g, gnum) = sd.getStep(x, k, gnum, sd, problem; outputLevel = opts.stepOutputLevel)
+		(g, gnum) = sd.getStep(x, k, gnum, sd, problem; outputLevel = opts.stepOutputLevel)
 		
 		# println(typeof(g))
 		

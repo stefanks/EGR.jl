@@ -14,7 +14,7 @@ myREfunction(problem, opts, sd, expIndices,n) = false
 myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = false
 
 
-for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem,dims) in Oracles
+for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
 	
 	print(" $thisDataName $LossFunctionString L2reg = $L2reg")
 		
@@ -22,7 +22,7 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 			
 	maxG  = int(round(numEquivalentPasses*numTrainingPoints))
 			
-	myOpts(stepSizePower) = Opts(zeros(dims); stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel)
+	myOpts(stepSizePower) = Opts(zeros(numVars,1); stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel)
 		
 	s(k,I) = 0
 	u(k,I) = 1

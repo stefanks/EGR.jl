@@ -9,10 +9,10 @@ using EGR
 include("TestM1P1.jl")
 include("TestRedisReadWrite.jl")
 
-Oracles = (Function,Int64,Int64,Function,DataType,ASCIIString,Outputter,Bool,ASCIIString,Function,Any)[]
-# include("LoadTestToyData.jl")
+Oracles = (Function,Int64,Int64,Function,DataType,ASCIIString,Outputter,Bool,ASCIIString,Function)[]
+include("LoadTestToyData.jl")
 include("LoadTestAgaricusData.jl")
-# include("LoadTestSparseData.jl")
+include("LoadTestSparseData.jl")
 # include("LoadTestFarmData.jl")
 
 include("TestVerify.jl")
