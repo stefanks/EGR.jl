@@ -66,7 +66,7 @@ end
 
 
 # K is the total number of planned iterations
-function EGRexpNatural(numVars::Int64, K::Int64, dt::DataType) # LEGACY!
+function EGRexpNatural(numVars::Int64, K::Int64, dt::DataType) 
 	
 	c=1
 	r=K/400
