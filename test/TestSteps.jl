@@ -24,10 +24,10 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
 	maxG  = int(round(numEquivalentPasses*numTrainingPoints))
-	myOpts(stepSizePower) = Opts(zeros(numVars,1); stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel, stepOutputLevel=1)
+	myOptss(stepSizePower) = Opts(zeros(numVars,1); stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel, stepOutputLevel=1)
 	k(k)=k+1
 	m=10
-	alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle, restoreGradient))),  myOpts(0), SSVRGsd(k,m,numVars, "ssvrg","ssvrg"), myOutputOpts, myWriteFunction, myREfunction)
+	alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle, restoreGradient))),  myOptss(0), SSVRGsd(k,m,numVars, "ssvrg","ssvrg"), myOutputOpts, myWriteFunction, myREfunction)
 end
 
 
