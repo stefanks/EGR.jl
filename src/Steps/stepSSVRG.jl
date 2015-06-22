@@ -21,6 +21,17 @@ function SSVRG(k::Function, m::Int64,  numVars::Int64)
 	SSVRGsd(k, m,numVars, stepString, shortString)
 end
 
+
+function SSVRGfromEGR(myEGRsd::EGRsd,  numVars::Int64)
+	
+	
+	# k = 
+	# m = 
+	stepString = "ssvrgFromEGR $(EGRsd.stepString)"
+	shortString = "ssvrgFromEGR $(EGRsd.shortString)"
+	SSVRGsd(k, m,numVars, stepString, shortString)
+end
+
 function SSVRGComputation(x, k, gnum, sd::SSVRGsd, problem::Problem; outputLevel = 0)
 	outputLevel>0 && println("starting step computation")
 	if sd.t ==  sd.mtilde
