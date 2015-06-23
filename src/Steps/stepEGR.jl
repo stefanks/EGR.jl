@@ -85,7 +85,7 @@ function EGRcomputation(x, k, gnum, sd::EGRsd, problem::Problem; outputLevel = 0
 
 	U = (sd.I+1):(sd.I+sd.u(k,sd.I))
 
-	outputLevel > 0  && println("$(sd.I) $(sd.u(k,sd.I)) $(sd.s(k,sd.I))")
+	outputLevel > 0  && println("sd.I=$(sd.I) sd.u(k,sd.I)=$(sd.u(k,sd.I)) sd.s(k,sd.I)=$(sd.s(k,sd.I))")
 	
 	for i in U
 		try

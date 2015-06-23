@@ -13,9 +13,9 @@ function LoadTestFarmData(Oracles)
 	for L2reg in L2regs
 		
 		
-		(gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg) = createSBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg; outputLevel = 0) 
+		(gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg) = createSBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg; outputLevel = 0) 
 		
-		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, "TestSparse", (t)-> Problem(L2reg, "TestSparse", LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t,(j)->getSampleFunctionAt(j,gradientOracle,restoreGradient))))
+		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg, "TestSparse", (t)-> Problem(L2reg, "TestSparse", LossFunctionString, (w)->gradientOracle(w), numTrainingPoints, t,(j)->getSampleFunctionAt(j,gradientOracle))))
 		
 	end
 end

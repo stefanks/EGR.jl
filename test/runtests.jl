@@ -9,7 +9,7 @@ using EGR
 include("TestM1P1.jl")
 include("TestRedisReadWrite.jl")
 
-Oracles = (Function,Int64,Int64,Function,DataType,ASCIIString,Outputter,Bool,ASCIIString,Function)[]
+Oracles = (Function,Int64,Int64,DataType,ASCIIString,Outputter,Bool,ASCIIString,Function)[]
 include("LoadTestToyData.jl")
 include("LoadTestAgaricusData.jl")
 include("LoadTestSparseData.jl")
@@ -20,4 +20,5 @@ include("TestEGRlikeGD.jl")
 include("TestEGRlikeSG.jl")
 include("TestFindBest.jl")
 include("TestRedisRuns.jl")
-include("TestSteps.jl")
+include("TestSSVRG.jl")
+include("TestSAG.jl")

@@ -7,14 +7,13 @@ createOracleOutputLevel = 1
 numEquivalentPasses = 1
 algOutputLevel = 0
 maxOutputNum=20
-constStepSize(k)=1 # ALL THIS MEANS IS A CONSTANT, SINCE WE ARE SEARCHING FOR THE BEST MULTIPLE HERE
 
 
 myREfunction(problem, opts, sd, expIndices,n) = false
 myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = false
 
 
-for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
+for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
 	
 	print(" $thisDataName $LossFunctionString L2reg = $L2reg")
 		
@@ -28,8 +27,8 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 	u(k,I) = 1
 	beta(k) = 1
 			
-	a = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle, restoreGradient))
-	b = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle, restoreGradient))
+	a = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))
+	b = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))
 	
 	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(a)	, myOpts(0), EGRsd(s,u,beta,numVars, csDataType,  "EGR.SGlike", "EGR.SGlike a=1"), myOutputOpts, myWriteFunction, myREfunction)
 	

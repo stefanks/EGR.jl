@@ -23,7 +23,7 @@ sds = [
 myREfunction(problem, opts, sd, expIndices,n) = returnIfExists(client, problem, opts, sd, expIndices,n; outputLevel = 0)
 myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = writeFunction(client, problem,  opts, sd,k, gnum, origWant, fromOutputsFunction; outputLevel = 0)
 
-for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
+for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
 	println(" $thisDataName $LossFunctionString L2reg = $L2reg")
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 	maxG  = int(round(numEquivalentPasses*numTrainingPoints))
@@ -34,7 +34,7 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 	
 		println("  stepString = $(thisSD.stepString)")
 				
-		algForSearch(stepSizePower) =alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle, restoreGradient))), myOpts(stepSizePower),thisSD, myOutputOpts, myWriteFunction, myREfunction)
+		algForSearch(stepSizePower) =alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))), myOpts(stepSizePower),thisSD, myOutputOpts, myWriteFunction, myREfunction)
 
 		findBests = [((res)->getF(res,maxG),0.0,"getF"),((res)->getPCC(res,maxG),-1.0,"getPCC"), ((res)->getMCC(res,maxG),-1.0,"getMCC")]
 				
