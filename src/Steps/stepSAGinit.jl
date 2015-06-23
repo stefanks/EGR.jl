@@ -7,7 +7,7 @@ type SAGinitsd <: StepData
 	stepString::String
 	shortString::String
 	function SAGinitsd(numVars::Int64,dt::DataType, stepString::String, shortString::String,numDp::Int64)
-		new(zeros(numVars),Array((Function,Function), numDp), Array(dt, numDp),0,  SAGinitComputation, stepString, shortString)
+		new(zeros(numVars),Array(Function, numDp), Array(dt, numDp),0,  SAGinitComputation, stepString, shortString)
 	end
 end
 
@@ -22,7 +22,7 @@ function SAGinitComputation(x, k, gnum, sd::SAGinitsd, problem::Problem; outputL
 	
 	# step 1
 	try
-		sd.d -= sd.functions[i][2](sd.y[i])
+		sd.d -= sd.y[i]
 	catch
 		sd.functions[i] = problem.getSampleFunctionAt(i)
 		sd.I+=1
@@ -30,8 +30,8 @@ function SAGinitComputation(x, k, gnum, sd::SAGinitsd, problem::Problem; outputL
 			   
 		
 	# step 2
-	(f,sampleG,cs) = (sd.functions[i][1])(x)
-	sd.y[i] = cs
+	(f,sampleG) = (sd.functions[i])(x)
+	sd.y[i] = sampleG
 	gnum += 1
 	
 	#step 3

@@ -16,12 +16,29 @@ function SAGA(numVars::Int64, y, numDP::Int64,numChunks::Int64)
 end
 
 
-function SAGAComputation(x, k, gnum, sd::SAGsd, problem::Problem; outputLevel =0)
+function SAGAComputation(x, k, gnum, sd::SAGAsd, problem::Problem; outputLevel =0)
+
+
+	
+	#
+	# oldG = sd.functions[i][2](sd.y[i])
+	# step=sd.d/sd.I - oldG
+	# sd.d -= oldG
+	#
+	# (f,sampleG,cs) = (sd.functions[i][1])(x)
+	# sd.y[i] = cs
+	# gnum += 1
+	# sd.d += sampleG
+	#
+	# step = step + sampleG
+
 
 	i = rand(1:sd.numChunks)
 	
 	# step 1
-	sd.d -= sd.y[i]
+	oldG = sd.y[i]
+	step =sd.d/sd.m -oldG*(sd.m/sd.numChunks)
+	sd.d -= oldG
 	sd.y[i] = zeros(sd.y[i] )
 			   
 	# step 2
@@ -33,7 +50,6 @@ function SAGAComputation(x, k, gnum, sd::SAGsd, problem::Problem; outputLevel =0
 	
 	#step 3
 	sd.d += sd.y[i]
-
 	
-	(sd.d/sd.m, gnum)
+	(step + sd.y[i]*(sd.m/sd.numChunks), gnum)
 end

@@ -7,7 +7,7 @@ type SAGAinitsd <: StepData
 	stepString::String
 	shortString::String
 	function SAGAinitsd(numVars::Int64,dt::DataType, stepString::String, shortString::String,numDp::Int64)
-		new(zeros(numVars),Array((Function,Function), numDp), Array(dt, numDp),0,  SAGAinitComputation, stepString, shortString)
+		new(zeros(numVars),Array(Function, numDp), Array(dt, numDp),0,  SAGAinitComputation, stepString, shortString)
 	end
 end
 
@@ -18,27 +18,34 @@ end
 
 function SAGAinitComputation(x, k, gnum, sd::SAGAinitsd, problem::Problem; outputLevel =0)
 
+	outputLevel >0 && println("In SAGAinitComputation")
 	i = rand(1:problem.numTrainingPoints)
 
 	step = sd.d
 	
 	# step 1
 	try
-		oldG = sd.functions[i][2](sd.y[i])
+		outputLevel >0 && println("Trying to do full SAGA update")
+		oldG = sd.y[i]
+		step=sd.d/sd.I - oldG
 		sd.d -= oldG
 
-		(f,sampleG,cs) = (sd.functions[i][1])(x)
-		sd.y[i] = cs
+		(f,sampleG) = (sd.functions[i])(x)
+		sd.y[i] = sampleG
 		gnum += 1
 		sd.d += sampleG
+		step = step + sampleG
 		
-		step = sampleG - oldG + origSum/sd.I 
 	catch
+		outputLevel >0 && println("Falling back on SG")
 		sd.functions[i] = problem.getSampleFunctionAt(i)
+		outputLevel >0 && println("Added a function")
 		sd.I+=1
 
-		(f,sampleG,cs) = (sd.functions[i][1])(x)
-		sd.y[i] = cs
+		(f,sampleG) = (sd.functions[i])(x)
+		outputLevel >0 && println("Computed new gradient")
+		sd.y[i] = sampleG
+		outputLevel >0 && println("Stored in y")
 		gnum += 1
 		sd.d += sampleG
 		
@@ -46,6 +53,7 @@ function SAGAinitComputation(x, k, gnum, sd::SAGAinitsd, problem::Problem; outpu
 	end
 			 
 
+	outputLevel >0 && println("Finishing SAGAinitComputation")
 	
 	(step, gnum)
 end
