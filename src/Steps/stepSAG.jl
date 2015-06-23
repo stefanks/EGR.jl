@@ -7,12 +7,13 @@ type SAGsd <: StepData
 	stepString::String
 	shortString::String
 	function SAGsd(numVars::Int64,y, stepString::String, shortString::String,numDp::Int64,numChunks::Int64)
-		new(zeros(numVars), y, numDp, numChunks, SAGComputation, stepString, shortString)
+		d= sum(y)
+		new(d, y, numDp, numChunks, SAGComputation, stepString, shortString)
 	end
 end
 
 function SAG(numVars::Int64, y, numDP::Int64,numChunks::Int64)
-	SAGsd(numVars,y, "SAG", "SAG", numDP,numChunks)
+	SAGsd(numVars,y, "SAG.$numChunks", "SAG.$numChunks", numDP,numChunks)
 end
 
 
