@@ -19,7 +19,7 @@ function LoadTestAgaricusData(Oracles)
 		
 		(gradientOracle2, numVars2, numTrainingPoints2, csDataType2, LossFunctionString2, myOutputter2, L2reg2) = createMLOracles(trf, trl2, numTrainingPoints, numClasses, tef, tel2, L2reg; outputLevel = 0) 
 		
-		push!(Oracles,(gradientOracle2, numVars2, numTrainingPoints22, csDataType2, LossFunctionString2, myOutputter2, L2reg2, "TestAgaricus", (t)-> Problem(L2reg2, "TestAgaricus", LossFunctionString2, (w)->gradientOracle2(w), numTrainingPoints2, t,(j)->getSampleFunctionAt(j,gradientOracle2))))
+		push!(Oracles,(gradientOracle2, numVars2, numTrainingPoints2, csDataType2, LossFunctionString2, myOutputter2, L2reg2, "TestAgaricus", (t)-> Problem(L2reg2, "TestAgaricus", LossFunctionString2, (w)->gradientOracle2(w), numTrainingPoints2, t,(j)->getSampleFunctionAt(j,gradientOracle2))))
 	end
 end
 
