@@ -30,7 +30,7 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 	y=csDataType[]
 	for i in 1:numChunks
 		println("Working on chunk $i")
-		for j in (i-1)*int(numTrainingPoints/numChunks)+1:i*int(numTrainingPoints/numChunks)
+		for j in (i-1)*int(floor(numTrainingPoints/numChunks))+1:i*int(floor(numTrainingPoints/numChunks))
 			(f,sampleG) = (problem.getSampleFunctionAt(j))(myOptss.init)
 			push!(y,sampleG)
 		end
