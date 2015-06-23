@@ -8,7 +8,7 @@ function SBL_get_f_g(featuresTP::SparseMatrixCSC{Float64,Int64}, labels::MinusPl
 	X = featuresTP[:,index]
 	Y = labels[index]
 	ym=Y*(W'*X)[1]
-	(log(1 + exp(-ym)), X*(-Y / (1 + exp(ym))), ym)
+	(log(1 + exp(-ym)), X*(-Y / (1 + exp(ym))))
 end
 
 function SBL_for_output(features::SparseMatrixCSC{Float64,Int64}, labels::MinusPlusOneVector, W::Matrix{Float64})
@@ -28,11 +28,4 @@ function SBL_for_output(features::SparseMatrixCSC{Float64,Int64}, labels::MinusP
 	pcc = (tp+tn)/(tp+tn+fp+fn)
 	mcc = (tp*tn - fp*fn)/(sqrt(tp+fp)*sqrt(tp+fn)*sqrt(tn+fp)*sqrt(tn+fn))
 	(mean(log(1 + exp(-ym))), pcc, mcc, tp, tn, fp, fn)
-end
-
-
-function SBL_restore_gradient(featuresTP::SparseMatrixCSC{Float64,Int64}, labels::MinusPlusOneVector, ym::Float64, index::Int64)
-	X = featuresTP[:,index]
-	Y = labels[index]
-	X*(-Y / (1 + exp(ym)))
 end

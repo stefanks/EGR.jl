@@ -38,7 +38,7 @@ function SSVRGComputation(x, k, gnum, sd::SSVRGsd, problem::Problem; outputLevel
 		outputLevel>0 && println("in outer cycle, recomputing mtilde, wtilde, phat")
 		phatsum=zeros(x)
 		for i = 1:sd.k(k)
-			(f,sampleG,cs) = ((consume(problem.getNextSampleFunction))[1])(x)
+			(f,sampleG) = ((consume(problem.getNextSampleFunction)))(x)
 			outputLevel>0 && println("sampleG = $(sampleG)")
 			phatsum += sampleG
 		end
@@ -51,9 +51,9 @@ function SSVRGComputation(x, k, gnum, sd::SSVRGsd, problem::Problem; outputLevel
 		outputLevel>0 && println("sd.wtilde = $(sd.wtilde)")
 		sd.t=0
 	end
-	kay = (consume(problem.getNextSampleFunction))[1]
-	(f,sampleG,cs) = kay(x)
-	(ft,sampleGt,cst) = kay(sd.wtilde)
+	kay = (consume(problem.getNextSampleFunction))
+	(f,sampleG) = kay(x)
+	(ft,sampleGt) = kay(sd.wtilde)
 	gnum+=2
 	g=sampleG-sampleGt+sd.phat
 	sd.t+=1

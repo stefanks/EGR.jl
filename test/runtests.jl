@@ -16,7 +16,6 @@ include("LoadTestSparseData.jl")
 # include("LoadTestFarmData.jl")
 
 include("TestVerify.jl")
-include("TestRestore.jl")
 include("TestEGRlikeGD.jl")
 include("TestEGRlikeSG.jl")
 include("TestFindBest.jl")

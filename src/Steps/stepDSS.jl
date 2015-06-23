@@ -23,7 +23,7 @@ function DSS(x, k, gnum, sd::DSSsd, problem::Problem);
 	sumy=zeros(size(x))
 	batchSize = sd.u(k,sd.I)+sd.s(k,sd.I)
 	for i in 1:batchSize
-		(f,sampleG,cs) = ((consume(problem.getNextSampleFunction))[1])(x)
+		(f,sampleG,cs) = (consume(problem.getNextSampleFunction))(x)
 		sumy+=sampleG
 	end
 

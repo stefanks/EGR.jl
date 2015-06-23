@@ -10,21 +10,9 @@ function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Float64}, W::Mat
 	g[:,class]-=x
 	# println("aDb = ")
 	# println(aDb)
-	(-log(aDb[class]),vec(g),aDb)
+	(-log(aDb[class]),reshape(g, (numFeatures*numClasses,1)))
 end
 
-function ML_restore_gradient(featuresTP::Matrix{Float64}, labels::Vector{Float64}, aDb::Matrix{Float64}, index::Int64)
-	# println("IN restoration")
-	# println("aDb = ")
-	# println(aDb)
-	numFeatures = size(featuresTP)[1]
-	numClasses = size(aDb)[2]
-	class=labels[index]
-	x = featuresTP[:,index]
-	g=x*aDb
-	g[:,class]-=x
-	vec(g)
-end
 
 function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Float64}, W::Matrix{Float64})
 	# println(features)
@@ -51,7 +39,7 @@ function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Float64}, W::Matri
 		g[:,class]=g[:,class]-x'
 		f+=log(aDb[class])
 	end
-	(-f/length(labels), vec(g)/length(labels))
+	(-f/length(labels), reshape(g, (numFeatures*numClasses,1))/length(labels))
 end
 
 # Returns f, percent correctly classified

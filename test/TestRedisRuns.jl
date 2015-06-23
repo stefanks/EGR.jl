@@ -34,8 +34,6 @@ longKey = thisDataName*":"*LossFunctionString*":"*string(L2reg)*":"thisSD.stepSt
 println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
 println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
 
-
-
 myOpts= Opts(zeros(numVars,1); stepSizePower=0, maxG=20, outputLevel=algOutputLevel)
 alg(thisProblem(Task(() -> getRandom(numTrainingPoints, gradientOracle, restoreGradient)))	, myOpts, thisSD, myOutputOpts, myWriteFunction, myREfunction)
 println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))

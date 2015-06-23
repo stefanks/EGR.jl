@@ -36,7 +36,7 @@ function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outpu
 	else
 		mygradientOracle=gradientOracle
 		myrestoreGradient=restoreGradient
-		csDataType = Float64
+		csDataType = Matrix{Float64}
 	end
 
 	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "BL", Outputter(outputsFunction,  "     f-train       f         pcc        mcc",8), L2reg)
@@ -97,7 +97,7 @@ function createSBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outp
 	else
 		mygradientOracle=gradientOracle
 		myrestoreGradient=restoreGradient
-		csDataType = Float64
+		csDataType = SparseMatrixCSC{Float64,Int64}
 	end
 
 	(mygradientOracle, size(trf)[2], numTrainingPoints, myrestoreGradient, csDataType, "SBL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg)

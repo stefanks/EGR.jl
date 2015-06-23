@@ -14,8 +14,7 @@ function getSequential(numTrainingPoints::Int64,gradientOracle,restoreGradient)
 			let j=i
 				# println(i)
 				gg=(x)-> gradientOracle(x,j)
-				ccs=(cs)-> restoreGradient(cs,j)
-				produce((gg,ccs))
+				produce(gg)
 			end
 		end
 		# println("Shuffling!")
@@ -30,8 +29,7 @@ function getSequentialFinite(numTrainingPoints::Int64,gradientOracle,restoreGrad
 	for i in indices
 		let j=i
 			gg=(x)-> gradientOracle(x,j)
-			ccs=(cs)-> restoreGradient(cs,j)
-			produce((gg,ccs))
+			produce(gg)
 		end
 	end
 end
@@ -41,14 +39,12 @@ function getRandom(numTrainingPoints::Int64,gradientOracle,restoreGradient)
 		i = rand(1:numTrainingPoints)
 		let j=i
 			gg=(x)-> gradientOracle(x,j)
-			ccs=(cs)-> restoreGradient(cs,j)
-			produce((gg,ccs,j))
+			produce(gg)
 		end
 	end
 end
 
 function getSampleFunctionAt(j::Int64,gradientOracle,restoreGradient)
 		gg=(x)-> gradientOracle(x,j)
-		ccs=(cs)-> restoreGradient(cs,j)
-		(gg,ccs)
+		gg
 end

@@ -10,7 +10,7 @@ type EGRsd <: StepData
 	stepString::String
 	shortString::String
 	function EGRsd(s::Function, u::Function, beta::Function, numVars::Int64,dt::DataType, stepString::String, shortString::String)
-		new(zeros(numVars),(Function,Function)[], dt[],0, s, u, beta, EGRcomputation, stepString, shortString)
+		new(zeros(numVars),Function[], dt[],0, s, u, beta, EGRcomputation, stepString, shortString)
 	end
 end
 
@@ -100,20 +100,20 @@ function EGRcomputation(x, k, gnum, sd::EGRsd, problem::Problem; outputLevel = 0
 	B=zeros(size(x))
 
 	for i in S
-		B +=sd.functions[i][2](sd.y[i])
+		B +=sd.y[i]
 	end
 
 	sumy=zeros(size(x))
 
 	for i in [U]
-		(f,sampleG,cs) = (sd.functions[i][1])(x)
-		push!(sd.y,cs)
+		(f,sampleG) = (sd.functions[i])(x)
+		push!(sd.y,sampleG)
 		sumy += sampleG
 	end
 
 	for i in [S]
-		(f,sampleG,cs) = (sd.functions[i][1])(x)
-		sd.y[i]=cs
+		(f,sampleG) = (sd.functions[i])(x)
+		sd.y[i]=sampleG
 		sumy += sampleG
 	end
 

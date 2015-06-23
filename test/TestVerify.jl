@@ -43,7 +43,7 @@ for (gradientOracle, numVars, numTrainingPoints, restoreGradient, csDataType, Lo
 		
 		est=zeros(numVars)
 		for i=1:numTrainingPoints
-			(f,g1, margins)= gradientOracle(x,i)
+			(f,g1)= gradientOracle(x,i)
 			est+=g1
 		end
 		est=est/numTrainingPoints

@@ -12,9 +12,9 @@ end
 
 function computeSGStep(x, k, gnum, sd::SGsd, problem::Problem; outputLevel =0)
 
-	(func,cs) = consume(problem.getNextSampleFunction)
+	func = consume(problem.getNextSampleFunction)
 
-	(f, g, cs) = func(x)
+	(f, g) = func(x)
 
 	gnum += 1
 
