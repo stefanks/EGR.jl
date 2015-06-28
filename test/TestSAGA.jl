@@ -40,7 +40,7 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 			end
 		end
 	
-		alg(problem,  myOptss, SAGA(numVars, y, numTrainingPoints,numChunks), myOutputOpts, myWriteFunction, myREfunction)
+		alg(problem,  myOptss, SAGA(numVars, y, numTrainingPoints,numChunks,1), myOutputOpts, myWriteFunction, myREfunction)
 	
 	end
 end

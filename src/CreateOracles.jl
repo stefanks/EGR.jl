@@ -48,9 +48,9 @@ function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::
 	testFunction(W) = ML_for_output(tef, tel,W)
 	
 	function outputsFunction(W)
-		ye = testFunction(W)
+		(f,pcc) = testFunction(W)
 		yo = gradientOracle(W)
-		ResultFromOO(bs(yo[1])*" "*bs(ye[1]) *" "*bs(ye[2]), [ye[1], ye[2], yo[1]])
+		ResultFromOO(bs(yo[1])*" "*bs(f) *" "*bs(pcc), [f, pcc, yo[1]])
 	end
 	
 	restoreGradient(cs,indices) = ML_restore_gradient(trft, trl,cs,indices)

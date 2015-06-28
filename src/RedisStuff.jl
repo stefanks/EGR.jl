@@ -2,7 +2,7 @@ using Redis
 
 function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, sd::StepData, expIndices::Vector{Int64},numOutputsFromOutputsFunction; outputLevel::Int64=0)
 	
-	longKey = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*"const"*":"*string(opts.stepSizePower)
+	longKey = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*string(opts.stepSizePower)
 	
 	outputLevel>1 && println("longKey = $longKey")
 	
@@ -101,7 +101,7 @@ end
 
 function writeFunction(client::RedisConnection, problem::Problem, opts::Opts, sd::StepData,  k::Int64, gnum::Int64, origWant::Int64, fromOutputsFunction; outputLevel::Int64=0)
 
-	longKey = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*"const"*":"*string(opts.stepSizePower)
+	longKey = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*string(opts.stepSizePower)
 	
 	if ~exists(client, longKey*":k")
 		outputLevel>0 && println("Key doesn't exist, so pushing new")
@@ -166,5 +166,4 @@ function writeFunction(client::RedisConnection, problem::Problem, opts::Opts, sd
 			end
 		end
 	end
-	# println(int(lrange(client, longKey*":gnum",0, -1)))
 end

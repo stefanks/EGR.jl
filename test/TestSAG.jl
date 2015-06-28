@@ -21,6 +21,12 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 	
 	println(" $thisDataName $LossFunctionString L2reg = $L2reg")
 	
+    # println("When numChunks = 1, same as GD")
+    #
+    #
+    #
+    # println("When numChunks = 1, same as GD")
+	
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
 	maxG  = int(round(numEquivalentPasses*numTrainingPoints))
@@ -29,14 +35,14 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 	problem = thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle)))
 	y=csDataType[]
 	for i in 1:numChunks
-		println("Working on chunk $i")
+		println("Creating chunk $i")
 		for j in (i-1)*int(floor(numTrainingPoints/numChunks))+1:i*int(floor(numTrainingPoints/numChunks))
 			(f,sampleG) = (problem.getSampleFunctionAt(j))(myOptss.init)
 			push!(y,sampleG)
 		end
 	end
 	
-	alg(problem,  myOptss, SAG(numVars, y, numTrainingPoints,numChunks), myOutputOpts, myWriteFunction, myREfunction)
+	alg(problem,  myOptss, SAG(numVars, y, numTrainingPoints,numChunks,1), myOutputOpts, myWriteFunction, myREfunction)
 end
 
 
