@@ -4,10 +4,10 @@ using EGR
 println("TestSAG")
 
 createOracleOutputLevel = 1
-numEquivalentPasses = 1
+numEquivalentPasses = 5
 algOutputLevel = 0
 maxOutputNum=20
-numChunks=5
+numChunks=3
 
 sLikeGd(k,numTrainingPoints) = k==0 ? 0 : numTrainingPoints
 uLikeGd(k,numTrainingPoints) = k==0 ? numTrainingPoints : 0
@@ -21,11 +21,7 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 	
 	println(" $thisDataName $LossFunctionString L2reg = $L2reg")
 	
-    # println("When numChunks = 1, same as GD")
-    #
-    #
-    #
-    # println("When numChunks = 1, same as GD")
+	println(" numTrainingPoints = $numTrainingPoints")
 	
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
@@ -35,14 +31,17 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 	problem = thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle)))
 	y=csDataType[]
 	for i in 1:numChunks
-		println("Creating chunk $i")
+		println("  Creating chunk $i")
 		for j in (i-1)*int(floor(numTrainingPoints/numChunks))+1:i*int(floor(numTrainingPoints/numChunks))
 			(f,sampleG) = (problem.getSampleFunctionAt(j))(myOptss.init)
 			push!(y,sampleG)
 		end
 	end
 	
-	alg(problem,  myOptss, SAG(numVars, y, numTrainingPoints,numChunks,1), myOutputOpts, myWriteFunction, myREfunction)
+	alg(problem,  myOptss, SAG(numVars, copy(y), numTrainingPoints,numChunks,1), myOutputOpts, myWriteFunction, myREfunction)
+	
+	alg(problem,  myOptss, SAG(numVars, copy(y), numTrainingPoints,numChunks,2), myOutputOpts, myWriteFunction, myREfunction)
+	
 end
 
 
