@@ -119,8 +119,11 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 	# The middle one corresponds to 1 (or to 2^0) !!
 	values=ones(2*mid-1)*NaN
 	
-	# Always start with -10,0,10
+	# Always start with -20,-10,0,10
 
+	theValueS = getThisRunValue(alg(-20))
+	values[mid-20] = theValueS
+	outputLevel>1 && println(" For stepsizePower -20 the value is $theValueS")
 	theValueA = getThisRunValue(alg(-10))
 	values[mid-10] = theValueA
 	outputLevel>1 && println(" For stepsizePower -10 the value is $theValueA")
@@ -130,15 +133,18 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 	theValueC = getThisRunValue(alg(10))
 	values[mid+10] = theValueC
 	outputLevel>1 && println(" For stepsizePower 10 the value is $theValueC")
-	if theValueA<=theValueB && theValueA<=theValueC
+	if theValueA<=theValueB && theValueA<=theValueC && theValueA<=theValueS
 		currentIup = mid+1-10
 		currentIdown = mid-1-10
-	elseif theValueB<=theValueA && theValueB<=theValueC
+	elseif theValueB<=theValueA && theValueB<=theValueC && theValueB<=theValueS
 		currentIup = mid+1
 		currentIdown = mid-1
-	elseif theValueC<=theValueB && theValueC<=theValueA
+	elseif theValueC<=theValueB && theValueC<=theValueA && theValueC<=theValueS
 		currentIup = mid+1+10
 		currentIdown = mid-1+10
+	elseif theValueS<=theValueB && theValueS<=theValueA && theValueS<=theValueC
+		currentIup = mid+1-20
+		currentIdown = mid-1-20
 	end
 	
 	checkDown, checkUp = true, true
@@ -157,7 +163,7 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 				lowestImprov = true
 			end
 			(checkDown, checkUp) = checkValues(values, checkDown, checkUp,lowestImprov)
-			outputLevel>1 && println(" $(checkDown, checkUp)")
+			outputLevel>1 && println(" $((checkDown, checkUp))")
 		end
 		if  checkUp==true
 			outputLevel>1 && println(" Looking at next up!")
@@ -167,7 +173,7 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 			values[currentIup] = theValue
 			currentIup += 1
 			(checkDown, checkUp) = checkValues(values, checkDown, checkUp, lowestImprov)
-			outputLevel>1 && println(" $(checkDown, checkUp)")
+			outputLevel>1 && println(" $((checkDown, checkUp))")
 		end
 	end
 
