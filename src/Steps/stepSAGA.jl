@@ -46,11 +46,7 @@ function SAGAComputation(x, k, gnum, sd::SAGAsd, problem::Problem; outputLevel =
 		#step 3
 	end
 	outputLevel >0 && println("Acutal step determination")
-	# println(typeof(sd.m))
-	# println(typeof(sd.A))
-	# println(typeof(sd.numChunks))
-	# println(typeof(B))
-	# println(typeof(sd.y[i]))
+	
 	step =((1/sd.m)*sd.A) - (1/nummm)*(B - sumy )
 	
 

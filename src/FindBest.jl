@@ -9,6 +9,17 @@ function getF(res, glim)
 	currentBest
 end
 
+function getFfinal(res, glim)
+	currentBest = Inf
+	for i in 1:size(res[4], 1)
+		thisRunValue = res[4][i,1]
+		if res[3][i]<=glim
+			currentBest=thisRunValue
+		end
+	end
+	currentBest
+end
+
 function getPCC(res, glim)
 	currentBest = Inf
 	for i in 1:size(res[4], 1)
@@ -56,7 +67,7 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 					break
 				end
 				if values[i]>=values[i+1]>values[i+2]
-					outputLevel>1 && println("$(values[i]) $(values[i+1]) $(values[i+2])")
+					outputLevel>1 && println(" $(values[i]) $(values[i+1]) $(values[i+2])")
 					checkDown = false
 					break
 				end
@@ -67,7 +78,7 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 		if checkUp ==true
 			for j in bestI:length(values)-2
 				if values[j]<values[j+1]<=values[j+2]
-					outputLevel>1 && println("$(values[j]) $(values[j+1]) $(values[j+2])")
+					outputLevel>1 && println(" $(values[j]) $(values[j+1]) $(values[j+2])")
 					checkUp = false
 					break
 				end
@@ -107,43 +118,56 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 	
 	# The middle one corresponds to 1 (or to 2^0) !!
 	values=ones(2*mid-1)*NaN
-	startValue = NaN
 	
-	# Always start with zero power
+	# Always start with -10,0,10
 
-	theValue = getThisRunValue(alg(0))
-	outputLevel>1 && println("For stepsizePower 0 the value is $theValue")
-	values[mid] = theValue
+	theValueA = getThisRunValue(alg(-10))
+	values[mid-10] = theValueA
+	outputLevel>1 && println(" For stepsizePower -10 the value is $theValueA")
+	theValueB = getThisRunValue(alg(0))
+	values[mid-10] = theValueB
+	outputLevel>1 && println(" For stepsizePower 0 the value is $theValueB")
+	theValueC = getThisRunValue(alg(10))
+	values[mid+10] = theValueC
+	outputLevel>1 && println(" For stepsizePower 10 the value is $theValueC")
+	if theValueA<=theValueB && theValueA<=theValueC
+		currentIup = mid+1-10
+		currentIdown = mid-1-10
+	elseif theValueB<=theValueA && theValueB<=theValueC
+		currentIup = mid+1
+		currentIdown = mid-1
+	elseif theValueC<=theValueB && theValueC<=theValueA
+		currentIup = mid+1+10
+		currentIdown = mid-1+10
+	end
 	
-	currentIup = mid+1
-	currentIdown = mid-1
 	checkDown, checkUp = true, true
 	lowestImprov=false
 	(checkDown, checkUp) = checkValues(values, checkDown, checkUp,lowestImprov)
 	while (checkDown, checkUp) != (false, false)
 		if  checkDown==true
-			outputLevel>1 && println("Exploring down!")
+			outputLevel>1 && println(" Looking at next down!")
 			stepsizePower = currentIdown-mid
 			res=alg(stepsizePower)
 			theValue = getThisRunValue(res)
-			outputLevel>1 && println("For stepsizePower $stepsizePower the value is $theValue")
+			outputLevel>1 && println(" For stepsizePower $stepsizePower the value is $theValue")
 			values[currentIdown] = theValue
 			currentIdown -= 1
 			if res[4][end,end]<res[4][1,end]
 				lowestImprov = true
 			end
 			(checkDown, checkUp) = checkValues(values, checkDown, checkUp,lowestImprov)
-			outputLevel>1 && println((checkDown, checkUp))
+			outputLevel>1 && println(" $(checkDown, checkUp)")
 		end
 		if  checkUp==true
-			outputLevel>1 && println("Exploring up!")
+			outputLevel>1 && println(" Looking at next up!")
 			stepsizePower = currentIup-mid
 			theValue = getThisRunValue(alg(stepsizePower))
-			outputLevel>1 && println("For stepsizePower $stepsizePower the value is $theValue")
+			outputLevel>1 && println(" For stepsizePower $stepsizePower the value is $theValue")
 			values[currentIup] = theValue
 			currentIup += 1
 			(checkDown, checkUp) = checkValues(values, checkDown, checkUp, lowestImprov)
-			outputLevel>1 && println((checkDown, checkUp))
+			outputLevel>1 && println(" $(checkDown, checkUp)")
 		end
 	end
 
