@@ -16,8 +16,8 @@ type SSVRGsd <: StepData
 end
 
 function SSVRG(k::Function, m::Int64,  numVars::Int64)
-	stepString = "ssvrg m = $m"
-	shortString = "ssvrg m = $m"
+	stepString = "ssvrg.m=$m"
+	shortString = "ssvrg.m=$m"
 	SSVRGsd(k, m,numVars, stepString, shortString)
 end
 
