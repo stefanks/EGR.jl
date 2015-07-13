@@ -13,7 +13,7 @@ function getFfinal(res, glim)
 	currentBest = Inf
 	for i in 1:size(res[4], 1)
 		thisRunValue = res[4][i,1]
-		if res[3][i]<=glim
+		if res[3][i]<=glim && ~isnan(thisRunValue)
 			currentBest=thisRunValue
 		end
 	end

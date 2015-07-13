@@ -8,7 +8,7 @@ type DSSsd <: StepData
 	shortString::String
 
 	function DSSsd(s::Function, u::Function, stepString::String, shortString::String)
-		new(0,s, u, DSS, stepString, shortString)
+		new(0,s, u, DSScomputation, stepString, shortString)
 	end
 end
 
@@ -16,14 +16,19 @@ function DSSexp(c::Float64,r::Float64,ntp::Int64,stepString::String, shortString
 	DSSsd( (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))  >I ? I : int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1))),  (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) > ntp - I ? ntp-I : int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))), stepString, shortString)
 end
 
-function DSS(x, k, gnum, sd::DSSsd, problem::Problem);
+
+function DSS(thisEGRsd::EGRsd)
+	DSSsd(thisEGRsd.u,thisEGRsd.s, "DSS"*thisEGRsd.stepString, "DSS"*thisEGRsd.shortString)
+end
+
+function DSScomputation(x, k, gnum, sd::DSSsd, problem::Problem; outputLevel = 0)
 	U = (sd.I+1):(sd.I+sd.u(k,sd.I))
 	# println(U)
 
 	sumy=zeros(size(x))
 	batchSize = sd.u(k,sd.I)+sd.s(k,sd.I)
 	for i in 1:batchSize
-		(f,sampleG,cs) = (consume(problem.getNextSampleFunction))(x)
+		(f,sampleG) = (consume(problem.getNextSampleFunction))(x)
 		sumy+=sampleG
 	end
 

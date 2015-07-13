@@ -21,6 +21,13 @@ function SSVRG(k::Function, m::Int64,  numVars::Int64)
 	SSVRGsd(k, m,numVars, stepString, shortString)
 end
 
+function SSVRG(thisEGRsd::EGRsd)
+	k=
+	m=
+	numVars = size(thisEGRsd.A)[1]
+	SSVRGsd(k,m,numVars, "SSVRG"*thisEGRsd.stepString, "SSVRG"*thisEGRsd.shortString)
+end
+
 
 function SSVRGfromEGR(myEGRsd::EGRsd,  numVars::Int64)
 	
