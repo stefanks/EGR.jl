@@ -21,22 +21,34 @@ function SSVRG(k::Function, m::Int64,  numVars::Int64)
 	SSVRGsd(k, m,numVars, stepString, shortString)
 end
 
-function SSVRG(thisEGRsd::EGRsd)
-	k=
-	m=
-	numVars = size(thisEGRsd.A)[1]
-	SSVRGsd(k,m,numVars, "SSVRG"*thisEGRsd.stepString, "SSVRG"*thisEGRsd.shortString)
+
+function productionOfSandU(s,u)
+	k=0
+    while true
+		produce(s(k,0)+u(k,0))
+		k=k+1
+	end
+end
+
+function kComputation(t::Task,gnum,mtilde)
+	thisSum =0 
+	for i=1:mtilde
+		thisSum += consume(t)
+	end
+	max(thisSum-gnum,1)
+end
+
+function mytaskP(myarg)
+	produce(myarg)
 end
 
 
-function SSVRGfromEGR(myEGRsd::EGRsd,  numVars::Int64)
-	
-	
-	# k = 
-	# m = 
-	stepString = "ssvrgFromEGR $(EGRsd.stepString)"
-	shortString = "ssvrgFromEGR $(EGRsd.shortString)"
-	SSVRGsd(k, m,numVars, stepString, shortString)
+function SSVRG(thisEGRsd::EGRsd)
+	thisProducer = @task  productionOfSandU(thisEGRsd.s,thisEGRsd.u)
+	m = 100
+ 	stepString = "ssvrgFromEGRm=100 $(thisEGRsd.stepString)"
+	shortString = "ssvrgFromEGRm=100 $(thisEGRsd.shortString)"
+	SSVRGsd((gnum,mtilde)->kComputation(thisProducer,gnum,mtilde), m,size(thisEGRsd.A)[1], stepString, shortString)
 end
 
 function SSVRGComputation(x, k, gnum, sd::SSVRGsd, problem::Problem; outputLevel = 0)
@@ -44,13 +56,14 @@ function SSVRGComputation(x, k, gnum, sd::SSVRGsd, problem::Problem; outputLevel
 	if sd.t ==  sd.mtilde
 		outputLevel>0 && println("in outer cycle, recomputing mtilde, wtilde, phat")
 		phatsum=zeros(x)
-		for i = 1:sd.k(k)
+		thisK = sd.k(gnum,sd.mtilde)
+		for i = 1:thisK
 			(f,sampleG) = ((consume(problem.getNextSampleFunction)))(x)
 			outputLevel>0 && println("sampleG = $(sampleG)")
 			phatsum += sampleG
 		end
-		gnum+=sd.k(k)
-		sd.phat = phatsum/sd.k(k)
+		gnum+=thisK
+		sd.phat = phatsum/thisK
 		sd.mtilde = rand(1:sd.m)
 		sd.wtilde = copy(x)
 		outputLevel>0 && println("sd.phat = $(sd.phat)")

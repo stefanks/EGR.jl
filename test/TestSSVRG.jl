@@ -24,7 +24,7 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 			
 	maxG  = int(round(numEquivalentPasses*numTrainingPoints))
 	myOptss(stepSizePower) = Opts(zeros(numVars,1); stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel, stepOutputLevel=0)
-	k(k)=k+1
+	k(k,mtilde)=k+1
 	m=10
 	alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))),  myOptss(0), SSVRG(k,m,numVars), myOutputOpts, myWriteFunction, myREfunction)
 end
