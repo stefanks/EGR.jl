@@ -4,7 +4,7 @@ using EGR
 println("TestSSVRG")
 
 createOracleOutputLevel = 1
-numEquivalentPasses = 1
+numEquivalentPasses = 0.5
 algOutputLevel = 0
 maxOutputNum=20
 
@@ -18,7 +18,7 @@ myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = fal
 
 for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
 	
-	print(" $thisDataName $LossFunctionString L2reg = $L2reg")
+	println(" $thisDataName $LossFunctionString L2reg = $L2reg")
 	
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			

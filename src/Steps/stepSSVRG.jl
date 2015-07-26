@@ -58,7 +58,7 @@ function SSVRGComputation(x, k, gnum, sd::SSVRGsd, problem::Problem; outputLevel
 		phatsum=zeros(x)
 		thisK = sd.k(gnum,sd.mtilde)
 		for i = 1:thisK
-			(f,sampleG) = ((consume(problem.getNextSampleFunction)))(x)
+			(f,sampleG) = (consume(problem.getNextSampleFunction))(x)
 			outputLevel>0 && println("sampleG = $(sampleG)")
 			phatsum += sampleG
 		end
