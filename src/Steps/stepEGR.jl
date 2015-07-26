@@ -8,25 +8,24 @@ type EGRsd <: StepData
 	beta::Function
 	getStep::Function
 	stepString::String
-	shortString::String
-	function EGRsd(s::Function, u::Function, beta::Function, numVars::Int64,dt::DataType, stepString::String, shortString::String)
-		new(zeros(numVars),Function[], dt[],0, s, u, beta, EGRcomputation, stepString, shortString)
+	function EGRsd(s::Function, u::Function, beta::Function, numVars::Int64,dt::DataType, stepString::String)
+		new(zeros(numVars),Function[], dt[],0, s, u, beta, EGRcomputation, stepString)
 	end
 end
 
-function onlyAdd(u::Function, numVars::Int64,dt::DataType, stepString::String, shortString::String)
-	EGRsd(()->0, u, ()->0, numVars,dt, stepString, shortString)
-end
+# function onlyAdd(u::Function, numVars::Int64,dt::DataType, stepString::String, stepString::String)
+# 	EGRsd(()->0, u, ()->0, numVars,dt, stepString, stepString)
+# end
+#
+# function onlyUpdate(s::Function, beta::Function, numVars::Int64,dt::DataType, stepString::String, stepString::String)
+# 	EGRsd(s,()->0, beta, numVars,dt, stepString, stepString)
+# end
 
-function onlyUpdate(s::Function, beta::Function, numVars::Int64,dt::DataType, stepString::String, shortString::String)
-	EGRsd(s,()->0, beta, numVars,dt, stepString, shortString)
-end
-
-function EGRlinBeta1(c::Float64,numVars::Int64,ntp::Int64,  dt::DataType, stepString::String, shortString::String)
+function EGRlinBeta1(c::Float64,numVars::Int64,ntp::Int64,  dt::DataType, stepString::String)
 	EGRsd()
 end
 
-function EGRquadBeta1(c::Float64,numVars::Int64,ntp::Int64,  dt::DataType, stepString::String, shortString::String)
+function EGRquadBeta1(c::Float64,numVars::Int64,ntp::Int64,  dt::DataType, stepString::String)
 	EGRsd()
 end
 
@@ -40,9 +39,7 @@ function EGRexpBeta1(c::Float64, r::Float64, numVars::Int64, ntp::Int64, dt::Dat
 	
 	stepString  = "EGRexp"*".c="*string(c)*".r="*string(r)
 	
-	shortString = "EGRexp"*" c="*string(c)*" r="*string(r)
-	
-	EGRsd(s, u , beta,  numVars,  dt,	stepString, shortString)
+	EGRsd(s, u , beta,  numVars,  dt,	stepString)
 end
 
 
@@ -53,15 +50,10 @@ function EGRexpBeta2(numVars::Int64, ntp::Int64, dt::DataType) # LEGACY!
 	s =  (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))
 	u = (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) 
 	beta = (k)->0
-		#
-	# stepString  = "EGRexpNatural"
-	#
-	# shortString = "EGRexpNatural"
+	
 	stepString  = "EGRexp"*".c="*string(c)*".r="*string(r)
 	
-	shortString = "EGRexp"*" c="*string(c)*" r="*string(r)
-	
-	EGRsd(s, u , beta,  numVars,  dt,	stepString, shortString)
+	EGRsd(s, u , beta,  numVars,  dt,	stepString)
 end
 
 
@@ -76,9 +68,9 @@ function EGRexpNatural(numVars::Int64, K::Int64, dt::DataType)
 	
 	stepString  = "EGRexpNatural"
 
-	shortString = "EGRexpNatural"
+	stepString = "EGRexpNatural"
 	
-	EGRsd(s, u , beta,  numVars,  dt,	stepString, shortString)
+	EGRsd(s, u , beta,  numVars,  dt,	stepString)
 end
 
 function EGRcomputation(x, k, gnum, sd::EGRsd, problem::Problem; outputLevel = 0)

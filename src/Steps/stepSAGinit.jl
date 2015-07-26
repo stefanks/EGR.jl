@@ -5,14 +5,13 @@ type SAGinitsd <: StepData
 	I
 	getStep::Function
 	stepString::String
-	shortString::String
-	function SAGinitsd(numVars::Int64,dt::DataType, stepString::String, shortString::String,numDp::Int64)
-		new(zeros(numVars),Array(Function, numDp), Array(dt, numDp),0,  SAGinitComputation, stepString, shortString)
+	function SAGinitsd(numVars::Int64,dt::DataType, stepString::String,numDp::Int64)
+		new(zeros(numVars),Array(Function, numDp), Array(dt, numDp),0,  SAGinitComputation, stepString)
 	end
 end
 
 function SAGinit(numVars::Int64, dt::DataType, numDP::Int64)
-	SAGinitsd(numVars,dt, "SAGinit", "SAGinit", numDP)
+	SAGinitsd(numVars,dt, "SAGinit",  numDP)
 end
 
 

@@ -30,14 +30,12 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 	
 	getFullGradient(W) = gradientOracle(W)
 			
-	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromGD) = alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))), myOpts(0),GDsd( "GD","GD a=1") , myOutputOpts, myWriteFunction, myREfunction)
+	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromGD) = alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))), myOpts(0),GDsd( "GD.a=1") , myOutputOpts, myWriteFunction, myREfunction)
 
-	
-		
 	s(k,I) = sLikeGd(k,numTrainingPoints)
 	u(k,I) =  uLikeGd(k,numTrainingPoints)
 	beta(k) =1 
-	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGRgd) = alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))), myOpts(0), EGRsd(s,u,beta, numVars, csDataType, "EGR.GDlike", "EGR.GDlike a=1"), myOutputOpts, myWriteFunction, myREfunction)
+	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGRgd) = alg(thisProblem(Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))), myOpts(0), EGRsd(s,u,beta, numVars, csDataType, "EGR.GDlike.a=1"), myOutputOpts, myWriteFunction, myREfunction)
 		
 		
 	relError = norm(xFromEGRgd-xFromGD)/norm(xFromGD)

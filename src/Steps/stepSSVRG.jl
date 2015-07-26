@@ -9,16 +9,14 @@ type SSVRGsd <: StepData
 	m::Int64
 	getStep::Function
 	stepString::String
-	shortString::String
-	function SSVRGsd(k::Function, m::Int64,  numVars::Int64, stepString::String, shortString::String)
-		new(0,0,zeros(numVars), zeros(numVars),k,m, SSVRGComputation, stepString, shortString)
+	function SSVRGsd(k::Function, m::Int64,  numVars::Int64, stepString::String)
+		new(0,0,zeros(numVars), zeros(numVars),k,m, SSVRGComputation, stepString)
 	end
 end
 
 function SSVRG(k::Function, m::Int64,  numVars::Int64)
 	stepString = "ssvrg.m=$m"
-	shortString = "ssvrg.m=$m"
-	SSVRGsd(k, m,numVars, stepString, shortString)
+	SSVRGsd(k, m,numVars, stepString)
 end
 
 
@@ -47,8 +45,7 @@ function SSVRG(thisEGRsd::EGRsd)
 	thisProducer = @task  productionOfSandU(thisEGRsd.s,thisEGRsd.u)
 	m = 100
  	stepString = "ssvrgFromEGRm=100 $(thisEGRsd.stepString)"
-	shortString = "ssvrgFromEGRm=100 $(thisEGRsd.shortString)"
-	SSVRGsd((gnum,mtilde)->kComputation(thisProducer,gnum,mtilde), m,size(thisEGRsd.A)[1], stepString, shortString)
+	SSVRGsd((gnum,mtilde)->kComputation(thisProducer,gnum,mtilde), m,size(thisEGRsd.A)[1], stepString)
 end
 
 function SSVRGComputation(x, k, gnum, sd::SSVRGsd, problem::Problem; outputLevel = 0)

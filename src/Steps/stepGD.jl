@@ -1,9 +1,8 @@
 type GDsd <: StepData
 	getStep::Function
 	stepString::String
-	shortString::String
-	function GDsd(stepString::String, shortString::String)
-		new(computeGDStep,stepString, shortString)
+	function GDsd(stepString::String)
+		new(computeGDStep,stepString)
 	end
 end
 

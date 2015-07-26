@@ -27,7 +27,7 @@ myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
 maxG  = int(round(numEquivalentPasses*numTrainingPoints))
 		
-thisSD = SGsd( "SG", "SG a=1")  
+thisSD = SGsd( "SG.a=1")  
 
 longKey = thisDataName*":"*LossFunctionString*":"*string(L2reg)*":"thisSD.stepString*":"*"const"*":0"
 println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))

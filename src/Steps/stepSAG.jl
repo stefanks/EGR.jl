@@ -6,15 +6,14 @@ type SAGsd <: StepData
 	batchSize::Int64
 	getStep::Function
 	stepString::String
-	shortString::String
-	function SAGsd(numVars::Int64,y, stepString::String, shortString::String,numDp::Int64,numChunks::Int64, batchSize::Int64)
+	function SAGsd(numVars::Int64,y, stepString::String,numDp::Int64,numChunks::Int64, batchSize::Int64)
 		d= sum(y)
-		new(d, y, numDp, numChunks, batchSize, SAGComputation, stepString, shortString)
+		new(d, y, numDp, numChunks, batchSize, SAGComputation, stepString)
 	end
 end
 
 function SAG(numVars::Int64, y, numDP::Int64,numChunks::Int64,batchSize::Int64)
-	SAGsd(numVars,y, "SAG.$numChunks.$batchSize", "SAG.$numChunks.$batchSize", numDP,numChunks,batchSize)
+	SAGsd(numVars,y, "SAG.$numChunks.$batchSize", numDP,numChunks,batchSize)
 end
 
 

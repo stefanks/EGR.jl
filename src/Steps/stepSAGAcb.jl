@@ -7,15 +7,14 @@ type SAGAcbsd <: StepData
 	batchSize::Int64
 	getStep::Function
 	stepString::String
-	shortString::String
-	function SAGAcbsd(numVars::Int64,y, stepString::String, shortString::String,numDp::Int64, batchSize::Int64,c)
+	function SAGAcbsd(numVars::Int64,y, stepString::String,numDp::Int64, batchSize::Int64,c)
 		A = sum(y)
-		new(A, y, numDp, size(y)[1],c,batchSize, SAGAcbComputation, stepString, shortString)
+		new(A, y, numDp, size(y)[1],c,batchSize, SAGAcbComputation, stepString)
 	end
 end
 
 function SAGAcb(numVars::Int64, y,batchSize::Int64, c, numDP::Int64)
-	SAGAcbsd(numVars,y, "SAGAcb.$batchSize", "SAGAcb.$batchSize", numDP,batchSize,c)
+	SAGAcbsd(numVars,y, "SAGAcb.$batchSize", numDP,batchSize,c)
 end
 
 function SAGAcbComputation(x, k, gnum, sd::SAGAcbsd, problem::Problem; outputLevel =0 )

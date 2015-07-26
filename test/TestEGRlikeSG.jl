@@ -30,9 +30,9 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 	a = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))
 	b = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))
 	
-	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(a)	, myOpts(0), EGRsd(s,u,beta,numVars, csDataType,  "EGR.SGlike", "EGR.SGlike a=1"), myOutputOpts, myWriteFunction, myREfunction)
+	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(a)	, myOpts(0), EGRsd(s,u,beta,numVars, csDataType,  "EGR.SGlike.a=1"), myOutputOpts, myWriteFunction, myREfunction)
 	
-	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromSG)  = alg(thisProblem(b)	, myOpts(0), SGsd( "SG", "SG a=1")                                               , myOutputOpts, myWriteFunction, myREfunction)
+	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromSG)  = alg(thisProblem(b)	, myOpts(0), SGsd( "SG.a=1")                                               , myOutputOpts, myWriteFunction, myREfunction)
 		
 		
 		
