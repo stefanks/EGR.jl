@@ -40,13 +40,13 @@ function mytaskP(myarg)
 	produce(myarg)
 end
 
-
-function SSVRG(thisEGRsd::EGRsd)
-	thisProducer = @task  productionOfSandU(thisEGRsd.s,thisEGRsd.u)
-	m = 100
- 	stepString = "ssvrgFromEGRm=100 $(thisEGRsd.stepString)"
-	SSVRGsd((gnum,mtilde)->kComputation(thisProducer,gnum,mtilde), m,size(thisEGRsd.A)[1], stepString)
-end
+#
+# function SSVRG(thisUsd::USD)
+# 	thisProducer = @task  productionOfSandU(thisUsd.s,thisUsd.u)
+# 	m = 100
+#  	stepString = "ssvrgFromUm=100 $(thisEGRsd.stepString)"
+# 	SSVRGsd((gnum,mtilde)->kComputation(thisProducer,gnum,mtilde), m,size(thisUsd.A)[1], stepString)
+# end
 
 function SSVRGComputation(x, k, gnum, sd::SSVRGsd, problem::Problem; outputLevel = 0)
 	outputLevel>0 && println("starting step computation")

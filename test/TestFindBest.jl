@@ -15,10 +15,14 @@ maxOutputNum=20
 constStepSize(k)=1
 
 sds = [
-(n,ntp,dt)->EGRexpBeta1(1.0,2.0,n,ntp, dt),
-(n,ntp,dt)->EGRsd((k,I)-> k >I ? I : k, (k,I)->k+1 > ntp - I ? ntp-I : k+1, (k)->1, n, dt, "alg4.s_k=k.u_k=k+1.b_k=1"),
+(n,ntp,dt)->uQuadBeta1(1.0,n,1,false),
+(n,ntp,dt)->uExpBeta1(1.0,2.0,n,1,false),
 (n,ntp,dt)->SGsd( "SG")
 ]
+
+
+
+
 
 myREfunction(problem, opts, sd, expIndices,n) = returnIfExists(client, problem, opts, sd, expIndices,n; outputLevel = 0)
 myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = writeFunction(client, problem,  opts, sd,k, gnum, origWant, fromOutputsFunction; outputLevel = 0)
