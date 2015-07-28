@@ -92,7 +92,7 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 		end
 
 		# But maybe still need to go lower?
-		if lowestImprov==false
+		if lowestImprov==true
 			checkDown=true
 		end
 		for i in 2:length(values)-2
@@ -159,7 +159,9 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 			outputLevel>1 && println(" For stepsizePower $stepsizePower the value is $theValue")
 			values[currentIdown] = theValue
 			currentIdown -= 1
-			if res[4][end,end]<res[4][1,end]
+			lowestImprov=false
+			if res[4][end,end]>=res[4][1,end]
+				outputLevel>1 && println(" Still looking down, because res[4][end,end]<res[4][1,end] $(res[4][end,end])<$(res[4][1,end])")
 				lowestImprov = true
 			end
 			(checkDown, checkUp) = checkValues(values, checkDown, checkUp,lowestImprov)
