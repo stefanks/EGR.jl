@@ -1,6 +1,6 @@
 type DSSsd <: StepData
 
-	I
+	I # total points sampled
 	s::Function
 	u::Function
 	getStep::Function
@@ -16,9 +16,8 @@ function DSS(thisUsd::USD)
 end
 
 function DSScomputation(x, k, gnum, sd::DSSsd, problem::Problem; outputLevel = 0)
-	U = (sd.I+1):(sd.I+sd.u(k,sd.I))
-	# println(U)
 
+	error("Fix if sampling more than have!")
 	sumy=zeros(size(x))
 	batchSize = sd.u(k,sd.I)+sd.s(k,sd.I)
 	for i in 1:batchSize

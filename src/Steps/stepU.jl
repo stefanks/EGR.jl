@@ -44,6 +44,9 @@ end
 
 function uLinBeta1(c::Float64,numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
+	if c<1
+		error("C must be >=1")
+	end
 	s = (k,I)-> int(floor(k==0 ? 0 : c))
 	u = (k,I)-> int(c) 
 	beta = (k)->1
@@ -56,7 +59,7 @@ end
 function uQuadBeta1(c::Float64,numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
 	s = (k,I)-> int(floor(k==0 ? 0 : c*k))
-	u = (k,I)-> int(floor(c*(k+1)))
+	u = (k,I)-> int(ceil(c*(k+1)))
 	beta = (k)->1
 	
 	stepString  = "uQb1"*".c="*string(c)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
