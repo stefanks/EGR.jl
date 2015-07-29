@@ -43,77 +43,90 @@ function getMCC(res, glim)
 end
 
 # FIND THE LOWEST VALUE!!! Therefore, valueComputer must return the negative of pcc and mcc
-function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPossible::Float64, thisString; outputLevel::Int64=0)
+function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPossible::Float64, thisString, returnResultIfExists::Function; outputLevel::Int64=0)
 	
 	mid = 50
 	
 	outputLevel>0 && println("Starting findBestStepsizeFactor, with $(2*mid-1) possible stepsizes, looking for $thisString")
 	
-	function checkValues(values, checkDown, checkUp,lowestImprov)
+	function getNextI(values)
 		
+		outputLevel>2 && println(values)
 		
+		# Weird cases
 		for i in values
 			if i<=bestPossible
-				return (false, false)
+				return false
 			end
 		end
 		
 		
 		# Find minimizer
 		(bestVal, bestI) = findmin(values)
-		if checkDown ==true
-			for i in 1:length(values)-2
-				if i+2>bestI
-					break
-				end
-				if values[i]>=values[i+1]>values[i+2]
-					outputLevel>1 && println(" $(values[i]) $(values[i+1]) $(values[i+2])")
-					checkDown = false
-					break
-				end
-			end
-		end
 		
-		# Search for UP sequence
-		if checkUp ==true
-			for j in bestI:length(values)-2
-				if values[j]<values[j+1]<=values[j+2]
-					outputLevel>1 && println(" $(values[j]) $(values[j+1]) $(values[j+2])")
-					checkUp = false
-					break
-				end
-			end
-		end
-		
-		for i in 1:length(values)-2
-			if values[i]==values[i+1]==values[i+2]
+		possibleUp=0
+		possibleDown=0
+		prevUpValue=0
+		prevDownValue=0
+		checkUp=true
+		for i in bestI:99
+			outputLevel>2 && println("  Looking at i = $i values[i]=$(values[i])") 
+			if isnan(values[i])
+				outputLevel>1 && println(" Might look up! Prev = $(values[i-1]) ") 
+				possibleUp=i
+				prevUpValue= values[i-1]
+				break
+			elseif i<=97 && values[i]<=values[i+1]<=values[i+2]
+				outputLevel>1 && println(" $(values[i]) $(values[i+1]) $(values[i+2])")
 				checkUp = false
-			end
-		end
-
-		# But maybe still need to go lower?
-		if lowestImprov==true
-			checkDown=true
-		end
-		for i in 2:length(values)-2
-			if i+2>bestI
 				break
-			end
-			if (values[i]<values[i+1] && isnan(values[i-1])) ||  (values[i+1]<values[i+2] && isnan(values[i-1]))
-				checkDown = true
+			elseif i==98 && values[i]<values[i+1]
+				outputLevel>1 && println(" $(values[i]) $(values[i+1])")
+				checkUp = false
 				break
+			elseif i==99
+				outputLevel>1 && println(" $(values[i])")
+				checkUp = false
+				break	
 			end
 		end
 		
-		if ~isnan(values[1]) 
-			checkDown = false
-		end
-		if ~isnan(values[end]) 
-			checkUp = false
+		checkDown=true
+		for i in bestI:-1:1
+			outputLevel>2 && println("  Looking at i = $i values[i]=$(values[i])") 
+			if isnan(values[i])
+				outputLevel>1 && println(" Might look down! Prev = $(values[i+1]) ") 
+				possibleDown=i
+				prevDownValue= values[i+1]
+				break
+			elseif i>=3 && values[i-2]>=values[i-1]>values[i]
+				outputLevel>1 && println(" $(values[i-2]) $(values[i-1]) $(values[i])")
+				checkDown = false
+				break
+			elseif i==2 && values[i-1]>values[i]
+				outputLevel>1 && println(" $(values[i-1]) $(values[i])")
+				checkDown = false
+				break
+			elseif i==1
+				outputLevel>1 && println(" $(values[i])")
+				checkDown = false
+				break	
+			end
 		end
 		
-		
-		return (checkDown, checkUp)
+		if checkUp==false && checkDown==false
+			return false
+		elseif checkUp==false
+			return possibleDown
+		elseif checkDown==false
+			return possibleUp
+		else
+			if prevDownValue<prevUpValue
+				return possibleDown
+			else
+				return possibleUp
+			end
+		end
 	end
 	
 	# The middle one corresponds to 1 (or to 2^0) !!
@@ -122,61 +135,41 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 	# Always start with -20,-10,0,10
 
 	theValueS = getThisRunValue(alg(-20))
+	gc()
 	values[mid-20] = theValueS
 	outputLevel>1 && println(" For stepsizePower -20 the value is $theValueS")
 	theValueA = getThisRunValue(alg(-10))
+	gc()
 	values[mid-10] = theValueA
 	outputLevel>1 && println(" For stepsizePower -10 the value is $theValueA")
 	theValueB = getThisRunValue(alg(0))
+	gc()
 	values[mid] = theValueB
 	outputLevel>1 && println(" For stepsizePower 0 the value is $theValueB")
 	theValueC = getThisRunValue(alg(10))
+	gc()
 	values[mid+10] = theValueC
 	outputLevel>1 && println(" For stepsizePower 10 the value is $theValueC")
-	if theValueA<=theValueB && theValueA<=theValueC && theValueA<=theValueS
-		currentIup = mid+1-10
-		currentIdown = mid-1-10
-	elseif theValueB<=theValueA && theValueB<=theValueC && theValueB<=theValueS
-		currentIup = mid+1
-		currentIdown = mid-1
-	elseif theValueC<=theValueB && theValueC<=theValueA && theValueC<=theValueS
-		currentIup = mid+1+10
-		currentIdown = mid-1+10
-	elseif theValueS<=theValueB && theValueS<=theValueA && theValueS<=theValueC
-		currentIup = mid+1-20
-		currentIdown = mid-1-20
+	
+	bestI=0
+	currentBest=Inf
+	for i in 1:99
+		existingResult = returnResultIfExists(i-mid)
+		if existingResult != false
+			values[i] = getThisRunValue(existingResult)
+		end
+		if values[i]<currentBest
+			bestI = i
+			currentBest = values[i]
+		end
 	end
 	
-	checkDown, checkUp = true, true
-	lowestImprov=false
-	(checkDown, checkUp) = checkValues(values, checkDown, checkUp,lowestImprov)
-	while (checkDown, checkUp) != (false, false)
-		if  checkDown==true
-			outputLevel>1 && println(" Looking at next down!")
-			stepsizePower = currentIdown-mid
-			res=alg(stepsizePower)
-			theValue = getThisRunValue(res)
-			outputLevel>1 && println(" For stepsizePower $stepsizePower the value is $theValue")
-			values[currentIdown] = theValue
-			currentIdown -= 1
-			lowestImprov=false
-			if res[4][end,end]>=res[4][1,end]
-				outputLevel>1 && println(" Still looking down, because res[4][end,end]<res[4][1,end] $(res[4][end,end])<$(res[4][1,end])")
-				lowestImprov = true
-			end
-			(checkDown, checkUp) = checkValues(values, checkDown, checkUp,lowestImprov)
-			outputLevel>1 && println(" $((checkDown, checkUp))")
-		end
-		if  checkUp==true
-			outputLevel>1 && println(" Looking at next up!")
-			stepsizePower = currentIup-mid
-			theValue = getThisRunValue(alg(stepsizePower))
-			outputLevel>1 && println(" For stepsizePower $stepsizePower the value is $theValue")
-			values[currentIup] = theValue
-			currentIup += 1
-			(checkDown, checkUp) = checkValues(values, checkDown, checkUp, lowestImprov)
-			outputLevel>1 && println(" $((checkDown, checkUp))")
-		end
+	
+	# New routine
+	nextI = getNextI(values) 
+	while nextI != false
+		values[nextI] = getThisRunValue(alg(nextI-mid))
+		nextI = getNextI(values)
 	end
 
 	(bestVal, bestI) = findmin(values)
