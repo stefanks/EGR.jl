@@ -11,27 +11,19 @@ function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Float64}, W::Mat
 	(-log(aDb[class]),reshape(g, (numFeatures*numClasses,1)))
 end
 
-
-function ML_get_f_g(features::Matrix{Float64}, labels::Vector{Float64}, W::Matrix{Float64})
+function ML_get_f(features::Matrix{Float64}, labels::Vector{Float64}, W::Matrix{Float64})
 	numFeatures = size(features)[2]
 	numClasses = div(length(W),numFeatures)
 	W=reshape(W,(numFeatures,numClasses))
-	g=zeros(size(W))
 	f=0
 	@inbounds @simd for k=1:length(labels)
 		class=labels[k]
 		x=features[k,:]
 		a=exp(x*W)
 		aDb=a/sum(a)
-		for j in 1:size(g)[2]
-			for i in 1:size(g)[1]
-				g[i,j] =g[i,j]+ x[i]*aDb[j]
-			end
-		end
-		g[:,class]=g[:,class]-x'
 		f+=log(aDb[class])
 	end
-	(-f/length(labels), reshape(g, (numFeatures*numClasses,1))/length(labels))
+	(-f/length(labels))
 end
 
 # Returns f, percent correctly classified

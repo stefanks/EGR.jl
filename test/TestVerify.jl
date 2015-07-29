@@ -15,7 +15,12 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 	for i in 1:3
 		println("  For x = $(xtexts[i])")
 		x=xs[i]
-		(f,g)= gradientOracle(x)
+		est=zeros(numVars)
+		for i=1:numTrainingPoints
+			(f,g1)= gradientOracle(x,i)
+			est+=g1
+		end
+		g=est/numTrainingPoints
 		gDiff = zeros(numVars)
 		passedDiff = false
 		for displacementAccuracy in 1:15
@@ -26,8 +31,8 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 				b[j] = -10.0^(-displacementAccuracy)
 				a+=x
 				b+=x
-				(fa,g)= gradientOracle(a)
-				(fb,g)= gradientOracle(b)
+				fa= gradientOracle(a)
+				fb= gradientOracle(b)
 				gDiff[j] = (fa-fb)/(2*10.0^(-displacementAccuracy))
 			end
 			relError = norm(gDiff-g)/norm(g)
@@ -41,17 +46,6 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 			error("F values do not work with gradient!")
 		end
 		
-		est=zeros(numVars)
-		for i=1:numTrainingPoints
-			(f,g1)= gradientOracle(x,i)
-			est+=g1
-		end
-		est=est/numTrainingPoints
-		relError = norm(est-g)/norm(g)
-		if relError>tol 
-			println("relError = $relError")
-			error("Did not pass the splitting training points into individuals. Average not equal to true gradient!")
-		end
 		
 	end
 end

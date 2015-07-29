@@ -1,14 +1,13 @@
-function SBL_get_f_g(features::SparseMatrixCSC{Float64,Int64}, labels::MinusPlusOneVector, W::Matrix{Float64})
-	ym=labels.field.*(features*W)
-	(mean(log(1 + exp(-ym))) ,features'*(-labels.field ./ (1 + exp(ym)))/size(features)[1])
-end
-
-
 function SBL_get_f_g(featuresTP::SparseMatrixCSC{Float64,Int64}, labels::MinusPlusOneVector, W::Matrix{Float64}, index::Int64)
 	X = featuresTP[:,index]
 	Y = labels[index]
 	ym=Y*(W'*X)[1]
 	(log(1 + exp(-ym)), X*(-Y / (1 + exp(ym))))
+end
+
+function SBL_get_f_g(features::SparseMatrixCSC{Float64,Int64}, labels::MinusPlusOneVector, W::Matrix{Float64})
+	ym=labels.field.*(features*W)
+	mean(log(1 + exp(-ym)))
 end
 
 function SBL_for_output(features::SparseMatrixCSC{Float64,Int64}, labels::MinusPlusOneVector, W::Matrix{Float64})

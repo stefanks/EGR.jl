@@ -43,12 +43,11 @@ immutable Problem
 	L2reg::Bool
 	name::String
 	lossFunctionString::String
-	getFullGradient::Function
 	numTrainingPoints::Int64 # Don't need for EGR
 	getNextSampleFunction::Task
 	getSampleFunctionAt::Function # Don't need for EGR
-	function Problem(a,b,c,d,e,f,g)
-		new(a,b,c,d,e,f,g)
+	function Problem(a,b,c,d,e,f)
+		new(a,b,c,d,e,f)
 	end
 end
 

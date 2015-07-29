@@ -6,9 +6,9 @@ function BL_get_f_g(featuresTP::Matrix{Float64}, labels::MinusPlusOneVector, W::
 end
 
 
-function BL_get_f_g(features::Matrix{Float64}, labels::MinusPlusOneVector, W::Matrix{Float64})
+function BL_get_f(features::Matrix{Float64}, labels::MinusPlusOneVector, W::Matrix{Float64})
 	ym=labels.field.*(features*W)
-	(mean(log(1 + exp(-ym))) ,features'*(-labels.field ./ (1 + exp(ym)))/size(features)[1])
+	mean(log(1 + exp(-ym)))
 end
 
 # Returns f, pcc, mcc, tp, tn, fp, fn

@@ -15,7 +15,6 @@ include("LoadTestToySparseData.jl")
 include("LoadTestAgaricusData.jl")
 
 include("TestVerify.jl")
-include("TestEGRlikeGD.jl")
 include("TestEGRlikeSG.jl")
 include("TestFindBest.jl")
 include("TestRedisRuns.jl")
