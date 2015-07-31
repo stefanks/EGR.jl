@@ -1,10 +1,21 @@
 function getF(res, glim)
 	currentBest = Inf
+	prevRunValue = Inf
+	prevG = Inf
 	for i in 1:size(res[4], 1)
 		thisRunValue = res[4][i,1]
 		if thisRunValue<currentBest && res[3][i]<=glim
 			currentBest=thisRunValue
 		end
+		if res[3][i]>glim
+			midValue  = thisRunValue + ((res[3][i]  - glim)/(res[3][i]-prevG))* (prevRunValue-thisRunValue)
+			if midValue<currentBest
+				currentBest=midValue
+			end
+			break
+		end
+		prevRunValue=thisRunValue
+		prevG=res[3][i]
 	end
 	currentBest
 end
@@ -16,8 +27,16 @@ function getFfinal(res, glim)
 		if res[3][i]<=glim && ~isnan(thisRunValue)
 			currentBest=thisRunValue
 		end
+		if res[3][i]>glim
+			if  ~isnan(thisRunValue) && ~isinf(thisRunValue)
+				currentBest = thisRunValue + ((res[3][i]  - glim)/(res[3][i]-prevG))* (prevRunValue-thisRunValue)
+			end
+			break
+		end
+		prevRunValue=thisRunValue
+		prevG=res[3][i]
 	end
-	currentBest
+	min(currentBest,res[4][1,1])
 end
 
 function getPCC(res, glim)
@@ -134,22 +153,26 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 	
 	# Always start with -20,-10,0,10
 
-	theValueS = getThisRunValue(alg(-20))
-	gc()
-	values[mid-20] = theValueS
-	outputLevel>1 && println(" For stepsizePower -20 the value is $theValueS")
-	theValueA = getThisRunValue(alg(-10))
-	gc()
-	values[mid-10] = theValueA
-	outputLevel>1 && println(" For stepsizePower -10 the value is $theValueA")
-	theValueB = getThisRunValue(alg(0))
-	gc()
-	values[mid] = theValueB
-	outputLevel>1 && println(" For stepsizePower 0 the value is $theValueB")
-	theValueC = getThisRunValue(alg(10))
-	gc()
-	values[mid+10] = theValueC
-	outputLevel>1 && println(" For stepsizePower 10 the value is $theValueC")
+	if returnResultIfExists(-20)==false
+		theValueS = getThisRunValue(alg(-20))
+		values[mid-20] = theValueS
+		outputLevel>1 && println(" For stepsizePower -20 the value is $theValueS")
+	end
+	if returnResultIfExists(-10)==false
+		theValueA = getThisRunValue(alg(-10))
+		values[mid-10] = theValueA
+		outputLevel>1 && println(" For stepsizePower -10 the value is $theValueA")
+	end
+	if returnResultIfExists(0)==false
+		theValueB = getThisRunValue(alg(0))
+		values[mid] = theValueB
+		outputLevel>1 && println(" For stepsizePower 0 the value is $theValueB")
+	end
+	if returnResultIfExists(10)==false
+		theValueC = getThisRunValue(alg(10))
+		values[mid+10] = theValueC
+		outputLevel>1 && println(" For stepsizePower 10 the value is $theValueC")
+	end
 	
 	bestI=0
 	currentBest=Inf

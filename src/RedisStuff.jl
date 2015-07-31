@@ -1,5 +1,6 @@
 using Redis 
 
+
 function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, sd::StepData, expIndices::Vector{Int64},numOutputsFromOutputsFunction; outputLevel::Int64=0)
 	
 	longKey = problem.name*":"*problem.lossFunctionString*":"*string(problem.L2reg)*":"sd.stepString*":"*string(opts.stepSizePower)

@@ -5,7 +5,7 @@ function SBL_get_f_g(featuresTP::SparseMatrixCSC{Float64,Int64}, labels::MinusPl
 	(log(1 + exp(-ym)), X*(-Y / (1 + exp(ym))))
 end
 
-function SBL_get_f_g(features::SparseMatrixCSC{Float64,Int64}, labels::MinusPlusOneVector, W::Matrix{Float64})
+function SBL_get_f(features::SparseMatrixCSC{Float64,Int64}, labels::MinusPlusOneVector, W::Matrix{Float64})
 	ym=labels.field.*(features*W)
 	mean(log(1 + exp(-ym)))
 end
