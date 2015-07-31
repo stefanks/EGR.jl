@@ -54,8 +54,6 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	
 	opts.outputLevel>0 && println("Function to minimize: $(problem.name) with loss function $(problem.lossFunctionString), L2reg = $(problem.L2reg)")
 	opts.outputLevel>0 && println("Step: $(sd.stepString) with stepSizePower = $(opts.stepSizePower)")
-	
-	opts.outputLevel>0 && println("Start confirmed")
 	opts.outputLevel>0 && println("Opts: $(opts.optsString)")
 	opts.outputLevel>0 && println("OutputOpts: $(oo.ooString)")
 	
@@ -70,12 +68,8 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 	gnum=0
 	x=opts.init
 
-	# println("x = $x")
-	# println("typeof(x) = $(typeof(x))")
 	xSum=copy(x)
 	xToTest = zeros(size(x))
-	
-	# opts.outputLevel>0 && println("opts.outputLevel = $(opts.outputLevel)")
 	
 	opts.outputLevel>1 && println("        k     gnum"*oo.outputter.outputStringHeader)
 	

@@ -17,6 +17,6 @@ function computeSGsqrtStep(x, k, gnum, sd::SGsqrtsd, problem::Problem; outputLev
 
 	gnum += 1
 
-	(g/sqrt(k), gnum)
+	(g/sqrt(k+1), gnum)
 
 end

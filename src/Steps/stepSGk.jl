@@ -17,6 +17,6 @@ function computeSGkStep(x, k, gnum, sd::SGksd, problem::Problem; outputLevel =0)
 
 	gnum += 1
 
-	(g/k, gnum)
+	(g/(k+1), gnum)
 
 end
