@@ -24,7 +24,7 @@ function LoadTestToyData(Oracles)
 
 	(classLabels, numClasses) = createClassLabels(labels)
 	
-	(trf, trl, trl2, numTrainingPoints, tef, tel, tel2) = trainTestRandomSeparate(features, MinusPlusOneVector(labels, Set([1.0])), classLabels)
+	(trf, trl, trl2, numTP, tef, tel, tel2) = trainTestRandomSeparate(features, MinusPlusOneVector(labels, Set([1.0])), classLabels)
 
 	L2regs=[
 	false,
@@ -32,13 +32,13 @@ function LoadTestToyData(Oracles)
 	]
 	for L2reg in L2regs
 		
-		(gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg) = createBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg; outputLevel = 0)
+		(gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter, L2reg) = createBLOracles(trf, trl, numTP, tef, tel, L2reg; outputLevel = 0)
 		
-		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg,  "TestToy", (t)-> Problem(L2reg, "TestToy", LossFunctionString, numTrainingPoints, t,(j)->getSampleFunctionAt(j,gradientOracle))))
+		push!(Oracles, (gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter, L2reg,  "TestToy", (t)-> Problem(L2reg, "TestToy", LossFunctionString, numTP, t,(j)->getSampleFunctionAt(j,gradientOracle))))
 		
-		(gradientOracle2, numVars2, numTrainingPoints2, csDataType2, LossFunctionString2, myOutputter2, L2reg2) = createMLOracles(trf, trl2, numTrainingPoints, numClasses, tef, tel2, L2reg; outputLevel = 0) 
+		(gradientOracle2, numVars2, numTP2, csDataType2, LossFunctionString2, myOutputter2, L2reg2) = createMLOracles(trf, trl2, numTP, numClasses, tef, tel2, L2reg; outputLevel = 0) 
 		
-		push!(Oracles,(gradientOracle2, numVars2, numTrainingPoints2, csDataType2, LossFunctionString2, myOutputter2, L2reg2,  "TestToy",  (t)-> Problem(L2reg2, "TestToy", LossFunctionString2,  numTrainingPoints2, t ,(j)->getSampleFunctionAt(j,gradientOracle2))))
+		push!(Oracles,(gradientOracle2, numVars2, numTP2, csDataType2, LossFunctionString2, myOutputter2, L2reg2,  "TestToy",  (t)-> Problem(L2reg2, "TestToy", LossFunctionString2,  numTP2, t ,(j)->getSampleFunctionAt(j,gradientOracle2))))
 		
 	end
 end

@@ -3,7 +3,7 @@ using EGR
 
 println("TestVerify")
 
-for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem)  in Oracles
+for (gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem)  in Oracles
 			
 	srand(1)
 
@@ -16,11 +16,11 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 		println("  For x = $(xtexts[i])")
 		x=xs[i]
 		est=zeros(numVars)
-		for i=1:numTrainingPoints
+		for i=1:numTP
 			(f,g1)= gradientOracle(x,i)
 			est+=g1
 		end
-		g=est/numTrainingPoints
+		g=est/numTP
 		gDiff = zeros(numVars)
 		passedDiff = false
 		for displacementAccuracy in 1:15

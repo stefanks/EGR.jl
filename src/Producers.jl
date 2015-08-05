@@ -6,8 +6,8 @@ function shuffle!(r::AbstractRNG, a::AbstractVector)
 	return a
 end
 
-function getSequential(numTrainingPoints::Int64,gradientOracle)
-	indices = [1:numTrainingPoints;]
+function getSequential(numTP::Int64,gradientOracle)
+	indices = [1:numTP;]
 	r = MersenneTwister(1)
 	while true
 		for i in indices
@@ -21,8 +21,8 @@ function getSequential(numTrainingPoints::Int64,gradientOracle)
 end
 
 
-function getSequentialFinite(numTrainingPoints::Int64,gradientOracle)
-	indices = [1:numTrainingPoints;]
+function getSequentialFinite(numTP::Int64,gradientOracle)
+	indices = [1:numTP;]
 	for i in indices
 		let j=i
 			gg=(x)-> gradientOracle(x,j)
@@ -31,9 +31,9 @@ function getSequentialFinite(numTrainingPoints::Int64,gradientOracle)
 	end
 end
 
-function getRandom(numTrainingPoints::Int64,gradientOracle)
+function getRandom(numTP::Int64,gradientOracle)
     while true
-		i = rand(1:numTrainingPoints)
+		i = rand(1:numTP)
 		let j=i
 			gg=(x)-> gradientOracle(x,j)
 			produce(gg)

@@ -27,7 +27,7 @@ function LoadTestSparseData(Oracles)
 	
 	(classLabels, numClasses) = createClassLabels(labels)
 	
-	(trf, trl, trl2, numTrainingPoints, tef, tel, tel2) = trainTestRandomSeparate(features, MinusPlusOneVector(labels, Set([1.0])), classLabels)
+	(trf, trl, trl2, numTP, tef, tel, tel2) = trainTestRandomSeparate(features, MinusPlusOneVector(labels, Set([1.0])), classLabels)
 
 	L2regs=[
 	false,
@@ -36,9 +36,9 @@ function LoadTestSparseData(Oracles)
 	for L2reg in L2regs
 		
 		
-		(gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg) = createSBLOracles(trf, trl, numTrainingPoints, tef, tel, L2reg; outputLevel = 0) 
+		(gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter, L2reg) = createSBLOracles(trf, trl, numTP, tef, tel, L2reg; outputLevel = 0) 
 		
-		push!(Oracles, (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg, "TestSparse", (t)-> Problem(L2reg, "TestSparse", LossFunctionString,  numTrainingPoints, t,(j)->getSampleFunctionAt(j,gradientOracle))))
+		push!(Oracles, (gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter, L2reg, "TestSparse", (t)-> Problem(L2reg, "TestSparse", LossFunctionString,  numTP, t,(j)->getSampleFunctionAt(j,gradientOracle))))
 		
 		
 	end

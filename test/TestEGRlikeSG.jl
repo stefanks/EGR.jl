@@ -13,13 +13,13 @@ myREfunction(problem, opts, sd, expIndices,n) = false
 myWriteFunction(problem, sd, opts, k, gnum, origWant, fromOutputsFunction) = false
 
 
-for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
+for (gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) in Oracles
 	
 	print(" $thisDataName $LossFunctionString L2reg = $L2reg")
 		
 	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
-	maxG  = int(round(numEquivalentPasses*numTrainingPoints))
+	maxG  = int(round(numEquivalentPasses*numTP))
 			
 	myOpts(stepSizePower) = Opts(zeros(numVars,1); stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel)
 		
@@ -27,8 +27,8 @@ for (gradientOracle, numVars, numTrainingPoints, csDataType, LossFunctionString,
 	u(k,I) = 1
 	beta(k) = 1
 			
-	a = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))
-	b = Task(() -> getSequentialFinite(numTrainingPoints, gradientOracle))
+	a = Task(() -> getSequentialFinite(numTP, gradientOracle))
+	b = Task(() -> getSequentialFinite(numTP, gradientOracle))
 	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(a)	, myOpts(0), USD(s,u,beta,numVars,  "EGR.SGlike.a=1",1,true), myOutputOpts, myWriteFunction, myREfunction)
 	
 	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromSG)  = alg(thisProblem(b)	, myOpts(0), SGsd( "SG.a=1")                                               , myOutputOpts, myWriteFunction, myREfunction)

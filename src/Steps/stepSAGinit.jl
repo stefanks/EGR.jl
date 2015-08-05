@@ -17,7 +17,7 @@ end
 
 function SAGinitComputation(x, k, gnum, sd::SAGinitsd, problem::Problem; outputLevel =0)
 
-	i = rand(1:problem.numTrainingPoints)
+	i = rand(1:problem.numTP)
 	
 	# step 1
 	try

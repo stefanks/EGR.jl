@@ -34,7 +34,7 @@ end
 
 function onlyUpdateBeta1(s::Function, sString::String, numVars::Int64, ntp::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
-	u = (k,I)-> int(floor(k==0 ? ntp : 0))
+	u = (k,I)-> int(floor(k==0 ? int(floor(ntp/chunkSize)) : 0))
 	beta = (k)->1
 	
 	stepString  = "uUb1."*sString*".cs="*string(chunkSize)*"."*string(sagFsagaT)

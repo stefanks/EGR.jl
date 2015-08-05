@@ -40,7 +40,7 @@ immutable Problem
 	L2reg::Bool
 	name::String
 	lossFunctionString::String
-	numTrainingPoints::Int64 # Don't need for EGR
+	numTP::Int64 # Don't need for EGR
 	getNextSampleFunction::Task
 	getSampleFunctionAt::Function # Don't need for EGR
 	function Problem(a,b,c,d,e,f)

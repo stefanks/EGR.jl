@@ -10,7 +10,7 @@ function bs(val::Float64)
 end
 
 
-function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outputLevel::Int64=0)
+function createBLOracles(trf,trl,numTP, tef, tel, L2reg::Bool; outputLevel::Int64=0)
 	
 	outputLevel > 0  && println("Fraction of ones in training set: $(trl.numPlus/length(trl))")
 	outputLevel > 0  && println("Fraction of ones in testing  set: $(tel.numPlus/length(tel))")
@@ -29,19 +29,19 @@ function createBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outpu
 	restoreGradient(cs,indices) = BL_restore_gradient(trft, trl,cs,indices)
 	
 	if L2reg
-		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTrainingPoints, a)
-		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTrainingPoints, a, b)
+		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTP, a)
+		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTP, a, b)
 		csDataType = Matrix{Float64}
 	else
 		mygradientOracle=gradientOracle
 		csDataType = Matrix{Float64}
 	end
 
-	(mygradientOracle, size(trf)[2], numTrainingPoints, csDataType, "BL", Outputter(outputsFunction,  "     f-train       f         pcc        mcc",8), L2reg)
+	(mygradientOracle, size(trf)[2], numTP, csDataType, "BL", Outputter(outputsFunction,  "     f-train       f         pcc        mcc",8), L2reg)
 end
 
 
-function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::Bool; outputLevel::Int64=0)
+function createMLOracles(trf,trl,numTP,numClasses, tef, tel, L2reg::Bool; outputLevel::Int64=0)
 	trft=trf'
 	gradientOracle(W,index) = ML_get_f_g(trft, trl,W,index)
 	gradientOracle(W) = ML_get_f(trf, trl,W)
@@ -55,8 +55,8 @@ function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::
 	
 	restoreGradient(cs,indices) = ML_restore_gradient(trft, trl,cs,indices)
 	if L2reg
-		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTrainingPoints, a)
-		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTrainingPoints, a, b)
+		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTP, a)
+		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTP, a, b)
 		csDataType=Matrix{Float64}
 	else
 		mygradientOracle=gradientOracle
@@ -64,11 +64,11 @@ function createMLOracles(trf,trl,numTrainingPoints,numClasses, tef, tel, L2reg::
 		csDataType=Matrix{Float64}
 	end
 	
-	(mygradientOracle, size(trf)[2]*numClasses,  numTrainingPoints, csDataType, "ML", Outputter(outputsFunction,  "     f-train       f         pcc    ",3), L2reg)
+	(mygradientOracle, size(trf)[2]*numClasses,  numTP, csDataType, "ML", Outputter(outputsFunction,  "     f-train       f         pcc    ",3), L2reg)
 end
 
 
-function createSBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outputLevel::Int64=0)
+function createSBLOracles(trf,trl,numTP, tef, tel, L2reg::Bool; outputLevel::Int64=0)
 	
 	outputLevel > 0  && println("Fraction of ones in training set: $(trl.numPlus/length(trl))")
 	outputLevel > 0  && println("Fraction of ones in testing  set: $(tel.numPlus/length(tel))")
@@ -87,13 +87,13 @@ function createSBLOracles(trf,trl,numTrainingPoints, tef, tel, L2reg::Bool; outp
 	restoreGradient(cs,indices) = SBL_restore_gradient(trft, trl,cs,indices)
 	
 	if L2reg
-		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTrainingPoints, a)
-		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTrainingPoints, a, b)
+		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTP, a)
+		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTP, a, b)
 		csDataType = Matrix{Float64}
 	else
 		mygradientOracle=gradientOracle
 		csDataType = SparseMatrixCSC{Float64,Int64}
 	end
 
-	(mygradientOracle, size(trf)[2], numTrainingPoints, csDataType, "SBL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg)
+	(mygradientOracle, size(trf)[2], numTP, csDataType, "SBL", Outputter(outputsFunction,  "    f-train       f         pcc        mcc",8), L2reg)
 end

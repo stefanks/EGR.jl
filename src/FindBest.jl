@@ -20,6 +20,29 @@ function getF(res, glim)
 	currentBest
 end
 
+function getFtrain(res, glim)
+	currentBest = Inf
+	prevRunValue = Inf
+	prevG = Inf
+	for i in 1:size(res[4], 1)
+		thisRunValue = res[4][i,end]
+		if thisRunValue<currentBest && res[3][i]<=glim
+			currentBest=thisRunValue
+		end
+		if res[3][i]>glim
+			midValue  = thisRunValue + ((res[3][i]  - glim)/(res[3][i]-prevG))* (prevRunValue-thisRunValue)
+			if midValue<currentBest
+				currentBest=midValue
+			end
+			break
+		end
+		prevRunValue=thisRunValue
+		prevG=res[3][i]
+	end
+	currentBest
+end
+
+
 function getFfinal(res, glim)
 	currentBest = Inf
 	for i in 1:size(res[4], 1)
@@ -38,6 +61,26 @@ function getFfinal(res, glim)
 	end
 	min(currentBest,res[4][1,1])
 end
+
+function getFtrainfinal(res, glim)
+	currentBest = Inf
+	for i in 1:size(res[4], 1)
+		thisRunValue = res[4][i,end]
+		if res[3][i]<=glim && ~isnan(thisRunValue)
+			currentBest=thisRunValue
+		end
+		if res[3][i]>glim
+			if  ~isnan(thisRunValue) && ~isinf(thisRunValue)
+				currentBest = thisRunValue + ((res[3][i]  - glim)/(res[3][i]-prevG))* (prevRunValue-thisRunValue)
+			end
+			break
+		end
+		prevRunValue=thisRunValue
+		prevG=res[3][i]
+	end
+	min(currentBest,res[4][1,end])
+end
+
 
 function getPCC(res, glim)
 	currentBest = Inf

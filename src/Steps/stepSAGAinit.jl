@@ -18,7 +18,7 @@ end
 function SAGAinitComputation(x, k, gnum, sd::SAGAinitsd, problem::Problem; outputLevel =0)
 
 	outputLevel >0 && println("In SAGAinitComputation")
-	i = rand(1:problem.numTrainingPoints)
+	i = rand(1:problem.numTP)
 
 	step = sd.d
 	

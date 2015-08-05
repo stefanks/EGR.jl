@@ -36,30 +36,30 @@ end
 function trainTestRandomSeparate(features,labels::MinusPlusOneVector, labels2::Vector{Float64}; outputLevel = 0)
 	srand(1)
 	shuffledIndices = shuffle([1 : length(labels)])
-	numTrainingPoints = div(length(labels)*3,4)
-	outputLevel > 0  && println("numTrainingPoints = $numTrainingPoints")
-	outputLevel > 0  && println("numTestingPoints = $(length(labels)-numTrainingPoints)")
-	(copy(features[shuffledIndices[1:numTrainingPoints      ],:]),
-	 MinusPlusOneVector(labels  [shuffledIndices[1:numTrainingPoints      ]  ]),
-	copy(labels2  [shuffledIndices[1:numTrainingPoints      ]  ]),
-	 numTrainingPoints,
-	 copy(features[shuffledIndices[(numTrainingPoints+1):end],:]),
-	 MinusPlusOneVector(labels[  shuffledIndices[(numTrainingPoints+1):end]  ]),
-	copy(labels2[  shuffledIndices[(numTrainingPoints+1):end]  ]))
+	numTP = div(length(labels)*3,4)
+	outputLevel > 0  && println("numTP = $numTP")
+	outputLevel > 0  && println("numTestingPoints = $(length(labels)-numTP)")
+	(copy(features[shuffledIndices[1:numTP      ],:]),
+	 MinusPlusOneVector(labels  [shuffledIndices[1:numTP      ]  ]),
+	copy(labels2  [shuffledIndices[1:numTP      ]  ]),
+	 numTP,
+	 copy(features[shuffledIndices[(numTP+1):end],:]),
+	 MinusPlusOneVector(labels[  shuffledIndices[(numTP+1):end]  ]),
+	copy(labels2[  shuffledIndices[(numTP+1):end]  ]))
 end
 
 
 # function StrainTestRandomSeparate(features,labels)
 # 	srand(1)
 # 	shuffledIndices = shuffle([1 : size(labels)[1];])
-# 	numTrainingPoints = div(size(labels)[1]*3,4)
-# 	# println(numTrainingPoints)
-# 	# println(shuffledIndices[1:numTrainingPoints      ])
+# 	numTP = div(size(labels)[1]*3,4)
+# 	# println(numTP)
+# 	# println(shuffledIndices[1:numTP      ])
 # 	# println(features)
-# 	(copy(features[shuffledIndices[1:numTrainingPoints      ]]),
-# 	copy(labels  [shuffledIndices[1:numTrainingPoints      ]  ]),
-# 	numTrainingPoints,
-# 	copy(features[shuffledIndices[(numTrainingPoints+1):end]]),
-# 	copy(labels[  shuffledIndices[(numTrainingPoints+1):end]  ]))
+# 	(copy(features[shuffledIndices[1:numTP      ]]),
+# 	copy(labels  [shuffledIndices[1:numTP      ]  ]),
+# 	numTP,
+# 	copy(features[shuffledIndices[(numTP+1):end]]),
+# 	copy(labels[  shuffledIndices[(numTP+1):end]  ]))
 # end
 
