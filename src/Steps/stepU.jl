@@ -114,7 +114,7 @@ function uComputation(x, k, gnum, sd::USD, problem::Problem; outputLevel = 0)
 	for i in [U]
 		thisSum = spzeros(sd.numVars,1)	
 		for j in (i-1)*sd.chunkSize+1:i*sd.chunkSize
-			(f,sampleG) = (sd.f[i])(x)
+			(f,sampleG) = (sd.f[j])(x)
 			# MIGHT BE SLOW
 			thisSum+=sparse(sampleG)
 		end
@@ -125,7 +125,7 @@ function uComputation(x, k, gnum, sd::USD, problem::Problem; outputLevel = 0)
 	for i in [S]
 		thisSum = spzeros(sd.numVars,1)	
 		for j in (i-1)*sd.chunkSize+1:i*sd.chunkSize
-			(f,sampleG) = (sd.f[i])(x)
+			(f,sampleG) = (sd.f[j])(x)
 			# MIGHT BE SLOW
 			thisSum+=sparse(sampleG)
 		end
