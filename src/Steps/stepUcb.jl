@@ -14,35 +14,35 @@ type UcbSD <: StepData
 	stepString::String
 	numVars::Int64
 	sagFsagaT::Bool
-	c
+	cc
 	
-	function UcbSD(s::Function, u::Function, beta::Function, numVars::Int64, stepString::String,sagFsagaT::Bool,c)
-		new(spzeros(numVars,1),Function[], SparseMatrixCSC[], 0, s, u, beta, ucbComputation, stepString, numVars, sagFsagaT,c)
+	function UcbSD(s::Function, u::Function, beta::Function, numVars::Int64, stepString::String,sagFsagaT::Bool,cc)
+		new(spzeros(numVars,1),Function[], Array(SparseMatrixCSC,int(maximum(cc))), 0, s, u, beta, ucbComputation, stepString, numVars, sagFsagaT,cc)
 	end
 end
 
-function UcbonlyAddBeta1(u::Function, uString::String, numVars::Int64,sagFsagaT::Bool,c)
+function UcbonlyAddBeta1(u::Function, uString::String, numVars::Int64,sagFsagaT::Bool,cc)
 	
 	s = (k,I)-> 0
 	beta = (k)->1
 	
-	stepString  = "ucbAb1."*uString*".cs="*string(chunkSize)*"."*string(sagFsagaT)
+	stepString  = "ucbAb1."*uString*"."*string(sagFsagaT)
 	
-	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,c)
+	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,cc)
 
 end
 
-function UcbonlyUpdateBeta1(s::Function, sString::String, numVars::Int64, ntp::Int64, chunkSize::Int64,sagFsagaT::Bool,c)
+function UcbonlyUpdateBeta1(s::Function, sString::String, numVars::Int64, ntp::Int64,sagFsagaT::Bool,cc)
 	
 	u = (k,I)-> int(floor(k==0 ? ntp : 0))
 	beta = (k)->1
 	
-	stepString  = "ucbUb1."*sString*".cs="*string(chunkSize)*"."*string(sagFsagaT)
+	stepString  = "ucbUb1."*sString*"."*string(sagFsagaT)
 	
-	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,c)
+	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,cc)
 end
 
-function UcbuLinBeta1(c::Float64,numVars::Int64,sagFsagaT::Bool,c)
+function UcbuLinBeta1(c::Float64,numVars::Int64,sagFsagaT::Bool,cc)
 	
 	if c<1
 		error("C must be >=1")
@@ -51,32 +51,32 @@ function UcbuLinBeta1(c::Float64,numVars::Int64,sagFsagaT::Bool,c)
 	u = (k,I)-> int(c) 
 	beta = (k)->1
 	
-	stepString  = "ucbLb1"*".c="*string(c)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
+	stepString  = "ucbLb1"*".c="*string(c)*"."*string(sagFsagaT)
 	
-	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,c)
+	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,cc)
 end
 
-function UcbuQuadBeta1(c::Float64,numVars::Int64,sagFsagaT::Bool,c)
+function UcbuQuadBeta1(c::Float64,numVars::Int64,sagFsagaT::Bool,cc)
 	
 	s = (k,I)-> int(floor(k==0 ? 0 : c*k))
 	u = (k,I)-> int(ceil(c*(k+1)))
 	beta = (k)->1
 	
-	stepString  = "ucbQb1"*".c="*string(c)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
+	stepString  = "ucbQb1"*".c="*string(c)*"."*string(sagFsagaT)
 	
-	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,c)
+	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,cc)
 end
 
 
-function UcbuExpBeta1(c::Float64, r::Float64, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool,c)
+function UcbuExpBeta1(c::Float64, r::Float64, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool,cc)
 	
 	s = (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))
 	u = (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) 
 	beta = (k)->1
 	
-	stepString  = "ucbEb1"*".c="*string(c)*".r="*string(r)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
+	stepString  = "ucbEb1"*".c="*string(c)*".r="*string(r)*"."*string(sagFsagaT)
 	
-	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,c)
+	UcbSD(s, u , beta, numVars, stepString,sagFsagaT,cc)
 end
 
 
@@ -91,7 +91,7 @@ function ucbComputation(x, k, gnum, sd::UcbSD, problem::Problem; outputLevel = 0
 
 	for i in U
 		try
-				push!(sd.f,consume(problem.getNextSampleFunction))
+			push!(sd.f,consume(problem.getNextSampleFunction))
 		catch
 			error("Not producing anymore! Probably out of datapoints.")
 		end
@@ -103,7 +103,7 @@ function ucbComputation(x, k, gnum, sd::UcbSD, problem::Problem; outputLevel = 0
 	# B is the current sum of old gradients (for S)
 	B = spzeros(sd.numVars,1)
 	for i in [S]
-		B +=sd.y[i]
+		B +=sd.y[sd.cc[i]]
 	end
 
 	# sumy is the new sum of gradients (for both U and S)
@@ -114,7 +114,7 @@ function ucbComputation(x, k, gnum, sd::UcbSD, problem::Problem; outputLevel = 0
 			(f,sampleG) = (sd.f[i])(x)
 			# MIGHT BE SLOW
 		thisSum+=sparse(sampleG)
-		push!(sd.y,thisSum)
+		sd.y[sd.cc[i]]=thisSum
 		sumy += thisSum
 	end
 
@@ -123,11 +123,11 @@ function ucbComputation(x, k, gnum, sd::UcbSD, problem::Problem; outputLevel = 0
 			(f,sampleG) = (sd.f[i])(x)
 			# MIGHT BE SLOW
 			thisSum+=sparse(sampleG)
-		sd.y[i]=thisSum
+		sd.y[sd.cc[i]]=thisSum
 		sumy += thisSum
 	end
 
-	gnum += sd.chunkSize * (sd.s(k,sd.I)+sd.u(k,sd.I))
+	gnum +=  (sd.s(k,sd.I)+sd.u(k,sd.I))
 	
 	if sd.sagFsagaT == false
 		g = (sd.A - B + sumy )/((sd.I+sd.u(k,sd.I)))
