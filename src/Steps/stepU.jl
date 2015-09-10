@@ -68,13 +68,14 @@ function uQuadBeta1(c::Float64,numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 end
 
 
-function uExpBeta1(c::Float64, r::Float64, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
+function uExpBeta1(r::Float64, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
-	s = (k,I)-> int(floor(k==0 ? 0 : c*(r/(r-1))^(k-1)))
-	u = (k,I)-> int(floor(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1))) 
+	c = 1.0 / (r-1)
+	s = (k,I)-> int(ceil(k==0 ? 0 : c*(r/(r-1))^(k-1)))
+	u = (k,I)-> int(ceil(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1)))
 	beta = (k)->1
 	
-	stepString  = "uEb1"*".c="*string(c)*".r="*string(r)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
+	stepString  = "uEb1"*".r="*string(r)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
 	
 	USD(s, u , beta, numVars, stepString, chunkSize,sagFsagaT)
 end
