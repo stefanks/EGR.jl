@@ -58,7 +58,7 @@ end
 
 function uQuadBeta1(c::Float64,numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
-	s = (k,I)-> int(floor(k==0 ? 0 : c*k))
+	s = (k,I)-> int(ceil(k==0 ? 0 : c*k))
 	u = (k,I)-> int(ceil(c*(k+1)))
 	beta = (k)->1
 	
