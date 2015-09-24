@@ -1,4 +1,50 @@
+function getGatWhichFisAchieved(res, F)
+	# res[4][i,1] is the F values array
+	# res[3][i] is the correspoding g value
+	print("gettin g")
+	print(res)
+	g=Inf
+	for i in 2:size(res[4], 1)
+		thisRunValue = res[4][i,1]
+		if thisRunValue<=F && res[3][i]<=glim
+			print(i)
+			print(thisRunValue)
+			# If F is really close (but lower than) to res[4][i-1,1], multiplier should be small positive
+			# If F is really close (but higher than) to res[4][i,1], multiplier should be close to 1
+			g = res[3][i-1] + (res[3][i]-res[3][i-1])*((res[4][i-1,1]-F)/(res[4][i-1,1]-res[4][i,1]))
+			break
+		end
+	end
+	print("found g")
+	print(g)
+	g
+end
+
+
 function getF(res, glim)
+	currentBest = Inf
+	prevRunValue = Inf
+	prevG = Inf
+	for i in 1:size(res[4], 1)
+		thisRunValue = res[4][i,1]
+		if thisRunValue<currentBest && res[3][i]<=glim
+			currentBest=thisRunValue
+		end
+		if res[3][i]>glim
+			midValue  = thisRunValue + ((res[3][i]  - glim)/(res[3][i]-prevG))* (prevRunValue-thisRunValue)
+			if midValue<currentBest
+				currentBest=midValue
+			end
+			break
+		end
+		prevRunValue=thisRunValue
+		prevG=res[3][i]
+	end
+	currentBest
+end
+
+function getFoverTen(res, glim)
+	glim = glim/10
 	currentBest = Inf
 	prevRunValue = Inf
 	prevG = Inf
