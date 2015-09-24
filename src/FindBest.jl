@@ -1,4 +1,4 @@
-function getGatWhichFisAchieved(res, F)
+function getGatWhichFisAchieved(res, F,glim)
 	# res[4][i,1] is the F values array
 	# res[3][i] is the correspoding g value
 	print("gettin g")
