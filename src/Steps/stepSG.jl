@@ -13,7 +13,7 @@ function computeSGStep(x, k, gnum, sd::SGsd, problem::Problem; outputLevel =0)
 
 	func = consume(problem.getNextSampleFunction)
 
-	(f, g) = func(x)
+	(f, g) = func[1](x)
 
 	gnum += 1
 

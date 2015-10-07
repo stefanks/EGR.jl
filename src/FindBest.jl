@@ -257,11 +257,11 @@ function findBestStepsizeFactor(alg::Function, getThisRunValue::Function, bestPo
 		values[mid] = theValueB
 		outputLevel>1 && println(" For stepsizePower 0 the value is $theValueB")
 	end
-	if returnResultIfExists(10)==false
-		theValueC = getThisRunValue(alg(10))
-		values[mid+10] = theValueC
-		outputLevel>1 && println(" For stepsizePower 10 the value is $theValueC")
-	end
+	# if returnResultIfExists(10)==false
+	# 	theValueC = getThisRunValue(alg(10))
+	# 	values[mid+10] = theValueC
+	# 	outputLevel>1 && println(" For stepsizePower 10 the value is $theValueC")
+	# end
 	
 	bestI=0
 	currentBest=Inf

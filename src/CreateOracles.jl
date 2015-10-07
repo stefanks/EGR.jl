@@ -53,7 +53,7 @@ function createMLOracles(trf,trl,numTP,numClasses, tef, tel, L2reg::Bool; output
 		ResultFromOO(bs(yo)*" "*bs(f) *" "*bs(pcc), [f, pcc, yo])
 	end
 	
-	restoreGradient(cs,indices) = ML_restore_gradient(trft, trl,cs,indices)
+	restoreGradient(cs,index) = ML_restore_gradient(trft, trl,cs,index)
 	if L2reg
 		mygradientOracle(a) = L2regGradient(gradientOracle, 1/numTP, a)
 		mygradientOracle(a, b) = L2regGradient(gradientOracle, 1/numTP, a, b)
@@ -64,7 +64,7 @@ function createMLOracles(trf,trl,numTP,numClasses, tef, tel, L2reg::Bool; output
 		csDataType=Matrix{Float64}
 	end
 	
-	(mygradientOracle, size(trf)[2]*numClasses,  numTP, csDataType, "ML", Outputter(outputsFunction,  "     f-train       f         pcc    ",3), L2reg)
+	(mygradientOracle, size(trf)[2]*numClasses,  numTP, csDataType, "ML", Outputter(outputsFunction,  "     f-train       f         pcc    ",3), L2reg,restoreGradient)
 end
 
 

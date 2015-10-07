@@ -21,6 +21,37 @@ function getSequential(numTP::Int64,gradientOracle)
 end
 
 
+function getSequentialR(numTP::Int64,gradientOracle,restoreFunc)
+	# println("Start of producer")
+	indices = [1:numTP;]
+	r = MersenneTwister(1)
+	while true
+		for i in indices
+			let j=i
+				# println("before gg assign")
+				gg=(x)-> gradientOracle(x,j)
+				rf=(cs)-> restoreFunc(cs,j)
+				# println("before produce in producer")
+				produce((gg,rf))
+			end
+		end
+		shuffle!(r, indices)
+	end
+end
+
+
+function getSequentialRFinite(numTP::Int64,gradientOracle,restoreFunc)
+	indices = [1:numTP;]
+	for i in indices
+		let j=i
+			gg=(x)-> gradientOracle(x,j)
+			rf=(cs)-> restoreFunc(cs,j)
+			# println(j)
+			produce((gg,rf))
+		end
+	end
+end
+
 function getSequentialFinite(numTP::Int64,gradientOracle)
 	indices = [1:numTP;]
 	for i in indices

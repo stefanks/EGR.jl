@@ -8,7 +8,17 @@ function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Float64}, W::Mat
 	aDb=a/sum(a) 
 	g=x*aDb
 	g[:,class]-=x
-	(-log(aDb[class]),reshape(g, (numFeatures*numClasses,1)))
+	(-log(aDb[class]),reshape(g, (numFeatures*numClasses,1)),aDb)
+end
+
+function ML_restore_gradient(featuresTP::Matrix{Float64}, labels::Vector{Float64}, aDb, index::Int64)
+	numFeatures = size(featuresTP)[1]
+	numClasses = 129
+	class=labels[index]
+	x = featuresTP[:,index]
+	g=x*aDb
+	g[:,class]-=x
+	reshape(g, (numFeatures*numClasses,1))
 end
 
 function ML_get_f(features::Matrix{Float64}, labels::Vector{Float64}, W::Matrix{Float64})
