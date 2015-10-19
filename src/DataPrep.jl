@@ -4,8 +4,8 @@ function createClassLabels(labels; outputLevel = 0)
 
 	outputLevel > 0  && println("Creating class labels")
 
-	classesDict=(Any => (Int64, Int64))[]
-
+	classesDict=Dict{Any,Tuple{Int64,Int64}}()
+	
 	currentClass =0
 	classLabels = zeros(Float64,numDatapoints )
 	for i in 1:numDatapoints
@@ -35,13 +35,13 @@ end
 
 function trainTestRandomSeparate(features,labels::MinusPlusOneVector, labels2::Vector{Float64}; outputLevel = 0)
 	srand(1)
-	shuffledIndices = shuffle([1 : length(labels)])
+	shuffledIndices = shuffle(collect(1 : length(labels)))
 	numTP = div(length(labels)*3,4)
 	outputLevel > 0  && println("numTP = $numTP")
 	outputLevel > 0  && println("numTestingPoints = $(length(labels)-numTP)")
 	(copy(features[shuffledIndices[1:numTP      ],:]),
-	 MinusPlusOneVector(labels  [shuffledIndices[1:numTP      ]  ]),
-	copy(labels2  [shuffledIndices[1:numTP      ]  ]),
+	 MinusPlusOneVector(labels[shuffledIndices[1:numTP      ]  ]),
+     copy(labels2[shuffledIndices[1:numTP      ]  ]),
 	 numTP,
 	 copy(features[shuffledIndices[(numTP+1):end],:]),
 	 MinusPlusOneVector(labels[  shuffledIndices[(numTP+1):end]  ]),

@@ -11,16 +11,16 @@ type USDr <: StepData
 	u::Function # Number of new chunks to sample
 	beta::Function
 	getStep::Function
-	stepString::String
+	stepString::AbstractString
 	numVars::Int64
 	sagFsagaT::Bool
 	
-	function USDr(s::Function, u::Function, beta::Function, numVars::Int64, stepString::String,sagFsagaT::Bool)
+	function USDr(s::Function, u::Function, beta::Function, numVars::Int64, stepString::AbstractString,sagFsagaT::Bool)
 		new(zeros(numVars,1),Function[], Matrix{Float64}[], Function[], 0, s, u, beta, urComputation, stepString, numVars, sagFsagaT)
 	end
 end
 
-function onlyrAddBeta1(u::Function, uString::String, numVars::Int64,sagFsagaT::Bool)
+function onlyrAddBeta1(u::Function, uString::AbstractString, numVars::Int64,sagFsagaT::Bool)
 	
 	s = (k,I)-> 0
 	beta = (k)->1
@@ -31,7 +31,7 @@ function onlyrAddBeta1(u::Function, uString::String, numVars::Int64,sagFsagaT::B
 
 end
 
-function onlyrUpdateBeta1(s::Function, sString::String, numVars::Int64, ntp::Int64,sagFsagaT::Bool)
+function onlyrUpdateBeta1(s::Function, sString::AbstractString, numVars::Int64, ntp::Int64,sagFsagaT::Bool)
 	
 	u = (k,I)-> int(floor(k==0 ? int(floor(ntp)) : 0))
 	beta = (k)->1

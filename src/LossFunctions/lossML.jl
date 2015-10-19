@@ -7,8 +7,8 @@ function ML_get_f_g(featuresTP::Matrix{Float64}, labels::Vector{Float64}, W::Mat
 	a=exp(x'*W) 
 	aDb=a/sum(a) 
 	g=x*aDb
-	g[:,class]-=x
-	(-log(aDb[class]),reshape(g, (numFeatures*numClasses,1)),aDb)
+	g[:,round(Int,class)]-=x
+	(-log(aDb[round(Int,class)]),reshape(g, (numFeatures*numClasses,1)),aDb)
 end
 
 function ML_restore_gradient(featuresTP::Matrix{Float64}, labels::Vector{Float64}, aDb, index::Int64)
@@ -31,7 +31,7 @@ function ML_get_f(features::Matrix{Float64}, labels::Vector{Float64}, W::Matrix{
 		x=features[k,:]
 		a=exp(x*W)
 		aDb=a/sum(a)
-		f+=log(aDb[class])
+		f+=log(aDb[round(Int,class)])
 	end
 	(-f/length(labels))
 end
@@ -53,7 +53,7 @@ function ML_for_output(features::Matrix{Float64}, labels::Vector{Float64}, W::Ma
 			pcc+=1
 		end
 		aDb=a/sum(a)
-		f+=log(aDb[class])
+		f+=log(aDb[round(Int,class)])
 	end
 	(-f/length(labels),pcc/length(labels))
 end

@@ -5,8 +5,8 @@ type SAGAsd <: StepData
 	numChunks::Int64
 	batchSize::Int64
 	getStep::Function
-	stepString::String
-	function SAGAsd(numVars::Int64,y, stepString::String, numDp::Int64,numChunks::Int64, batchSize::Int64)
+	stepString::AbstractString
+	function SAGAsd(numVars::Int64,y, stepString::AbstractString, numDp::Int64,numChunks::Int64, batchSize::Int64)
 		A = sum(y)
 		new(A, y, numDp, numChunks,batchSize, SAGAComputation, stepString)
 	end
@@ -33,7 +33,7 @@ function SAGAComputation(x, k, gnum, sd::SAGAsd, problem::Problem; outputLevel =
 	
 		sd.y[i]=zeros(size(x))
 			   
-		for j in (i-1)*int(floor(sd.m/sd.numChunks))+1:i*int(floor(sd.m/sd.numChunks))
+		for j in (i-1)*round(Int,floor(sd.m/sd.numChunks))+1:i*round(Int,floor(sd.m/sd.numChunks))
 			outputLevel >1 && println(" Inner loop, j = $j")
 			(f,sampleG) = (problem.getSampleFunctionAt(j))(x)
 			sd.y[i]+=sampleG

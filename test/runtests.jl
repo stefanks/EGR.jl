@@ -9,7 +9,7 @@ using EGR
 include("TestM1P1.jl")
 include("TestRedisReadWrite.jl")
 
-Oracles = (Function,Int64,Int64,DataType,ASCIIString,Outputter,Bool,ASCIIString,Function)[]
+Oracles = Tuple{Function,Int64,Int64,DataType,ASCIIString,Outputter,Bool,ASCIIString,Function}[]
 include("LoadTestToyData.jl")
 include("LoadTestToySparseData.jl")
 include("LoadTestAgaricusData.jl")

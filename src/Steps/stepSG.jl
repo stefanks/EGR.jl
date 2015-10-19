@@ -1,7 +1,7 @@
 type SGsd <: StepData
 	getStep::Function
-	stepString::String
-	function SGsd(stepString::String)
+	stepString::AbstractString
+	function SGsd(stepString::AbstractString)
 		new(computeSGStep,stepString)
 	end
 	function SGsd()

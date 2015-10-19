@@ -4,8 +4,8 @@ type SAGAinitsd <: StepData
 	y
 	I
 	getStep::Function
-	stepString::String
-	function SAGAinitsd(numVars::Int64,dt::DataType, stepString::String, numDp::Int64)
+	stepString::AbstractString
+	function SAGAinitsd(numVars::Int64,dt::DataType, stepString::AbstractString, numDp::Int64)
 		new(zeros(numVars),Array(Function, numDp), Array(dt, numDp),0,  SAGAinitComputation, stepString)
 	end
 end

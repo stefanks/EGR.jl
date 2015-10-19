@@ -17,9 +17,13 @@ for (gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter
 	
 	print(" $thisDataName $LossFunctionString L2reg = $L2reg")
 		
-	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
-	maxG  = int(round(numEquivalentPasses*numTP))
+	maxG  = Int(round(numEquivalentPasses*numTP))
+	
+	expIndices=unique(round(Int, logspace(0,log10(maxG+1),maxOutputNum)))-1
+	
+	myOutputOpts =  OutputOpts(myOutputter,expIndices)
+			
 			
 	myOpts(stepSizePower) = Opts(zeros(numVars,1); stepSizePower=stepSizePower, maxG=maxG, outputLevel=algOutputLevel)
 		
@@ -29,9 +33,9 @@ for (gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter
 			
 	a = Task(() -> getSequentialFinite(numTP, gradientOracle))
 	b = Task(() -> getSequentialFinite(numTP, gradientOracle))
-	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(a)	, myOpts(0), USD(s,u,beta,numVars,  "EGR.SGlike.a=1",1,true), myOutputOpts, myWriteFunction, myREfunction)
+	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromEGR) = alg(thisProblem(a)	, myOpts(0), USD(s,u,beta,numVars,  "EGR.SGlike.a=1",1,true), myOutputOpts, myWriteFunction)
 	
-	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromSG)  = alg(thisProblem(b)	, myOpts(0), SGsd( "SG.a=1")                                               , myOutputOpts, myWriteFunction, myREfunction)
+	(outString, results_k, results_gnum,results_fromOutputsFunction,xFromSG)  = alg(thisProblem(b)	, myOpts(0), SGsd( "SG.a=1")                                               , myOutputOpts, myWriteFunction)
 		
 		
 		

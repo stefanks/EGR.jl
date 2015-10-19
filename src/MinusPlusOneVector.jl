@@ -1,4 +1,5 @@
 import Base.length
+import Base.getindex
 
 immutable MinusPlusOneVector
 	field  :: Vector{Float64}

@@ -4,20 +4,20 @@ abstract StepData
 
 immutable Outputter
 	outputsFunction::Function
-	outputStringHeader::String
+	outputStringHeader::AbstractString
 	numOutputsFromOutputsFunction::Int64	
 end
 
 immutable ResultFromOO
-	resultString::String
+	resultString::AbstractString
 	resultLine::Vector{Float64}
 end
 
 immutable OutputOpts
-	ooString::String
+	ooString::AbstractString
 	outputter::Outputter
 	expIndices
-	function OutputOpts(outputter::Outputter,expIndices; average::Bool=false, ooString::String="average = $average")
+	function OutputOpts(outputter::Outputter,expIndices; average::Bool=false, ooString::AbstractString="average = $average")
 		new(ooString, outputter,expIndices)
 	end
 end
@@ -28,8 +28,8 @@ immutable Opts
 	maxG::Int64
 	outputLevel::Int64
 	stepOutputLevel::Int64
-	optsString::String
-	function Opts(init::Matrix{Float64}; stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::String="stepSizePower = $stepSizePower, maxG = $maxG", stepOutputLevel::Int64=0)
+	optsString::AbstractString
+	function Opts(init::Matrix{Float64}; stepSizePower::Int64=1, maxG::Int64=typemax(Int64)-35329, outputLevel::Int64=1, optsString::AbstractString="stepSizePower = $stepSizePower, maxG = $maxG", stepOutputLevel::Int64=0)
 		outputLevel>2 && println("outputLevel is $outputLevel") 
 		(maxG>typemax(Int64)-35329 || maxG<0) && error("maxG is $maxG, and is out of range")
 		new(init, stepSizePower, maxG, outputLevel, stepOutputLevel, optsString)
@@ -38,8 +38,8 @@ end
 
 immutable Problem
 	L2reg::Bool
-	name::String
-	lossFunctionString::String
+	name::AbstractString
+	lossFunctionString::AbstractString
 	numTP::Int64 # Don't need for EGR
 	getNextSampleFunction::Task
 	getSampleFunctionAt::Function # Don't need for EGR
@@ -109,7 +109,7 @@ function alg(problem::Problem, opts::Opts, sd::StepData, oo::OutputOpts, writeFu
 		
 	end
 	
-	exit()
+	# exit()
 	
 	opts.outputLevel>0 && println("Finished alg: $(sd.stepString)")
 	 

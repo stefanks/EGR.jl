@@ -1,15 +1,15 @@
-function readData(fname::String, shape, minFeatureInd::Integer)
+function readData(fname::AbstractString, shape, minFeatureInd::Integer)
 	features = zeros(shape)
 	labels = Float64[]
 	fi = open(fname, "r")
 	cnt = 1
 	for line in eachline(fi)
 		line = split(line, " ")
-		push!(labels, float64(line[1]))
+		push!(labels, parse(Float64,line[1]))
 		line = line[2:end]
 		for itm in line
 			itm = split(itm, ":")
-			features[cnt, int(itm[1]) + 1-minFeatureInd] = float64(chomp(itm[2]))
+			features[cnt, parse(Int,itm[1]) + 1-minFeatureInd] = parse(Float64,chomp(itm[2]))
 		end
 		cnt += 1
 	end
@@ -17,7 +17,7 @@ function readData(fname::String, shape, minFeatureInd::Integer)
 	(features, labels)
 end
 
-function readDataSparse(fname::String, shape, minFeatureInd::Integer)
+function readDataSparse(fname::AbstractString, shape, minFeatureInd::Integer)
 	A = Int64[]
 	B = Int64[]
 	C = Float64[]
@@ -59,14 +59,14 @@ function readDataSparse(fname::String, shape, minFeatureInd::Integer)
 	(features, labels)
 end
 
-function writeBin(fname::String, features, labels)
+function writeBin(fname::AbstractString, features, labels)
 	fi = open(fname, "w")
 	write(fi, features)
 	write(fi, labels)
 	close(fi)
 end
 
-function readBin(fname::String,numDatapoints::Integer,numVars::Integer)
+function readBin(fname::AbstractString,numDatapoints::Integer,numVars::Integer)
 	fi = open(fname, "r")
 	features = read(fi, Float64, (numDatapoints,numVars))
 	labels = read(fi, Float64, (numDatapoints,))
@@ -74,7 +74,7 @@ function readBin(fname::String,numDatapoints::Integer,numVars::Integer)
 	(features,labels)
 end
 
-function getStats(fname::String)
+function getStats(fname::AbstractString)
 	fi = open(fname, "r")
 	n = 0
 	numTotal=0
@@ -90,10 +90,10 @@ function getStats(fname::String)
 		line = line[2:end]
 		for itm in line
 			itm = split(itm, ":")
-			minfeatureInd = min(minfeatureInd,int64(itm[1]))
-			maxfeatureInd = max(maxfeatureInd,int64(itm[1]))
-			minfeature = min(minfeature,float64(chomp(itm[2])))
-			maxfeature = max(maxfeature,float64(chomp(itm[2])))
+			minfeatureInd = min(minfeatureInd,parse(Int64,itm[1]))
+			maxfeatureInd = max(maxfeatureInd,parse(Int64,itm[1]))
+			minfeature = min(minfeature,parse(Float64,chomp(itm[2])))
+			maxfeature = max(maxfeature,parse(Float64,chomp(itm[2])))
 			numTotal+=1
 		end
 	end
@@ -109,7 +109,7 @@ function getStats(fname::String)
 end
 
 
-function getStatsHIGGSSUSY(fname::String)
+function getStatsHIGGSSUSY(fname::AbstractString)
 	fi = open(fname, "r")
 	n = 0
 	numTotal=0
@@ -132,7 +132,7 @@ function getStatsHIGGSSUSY(fname::String)
 end
 
 
-function readDataHIGGSSUSY(fname::String, shape)
+function readDataHIGGSSUSY(fname::AbstractString, shape)
 	features = zeros(shape)
 	labels = Float64[]
 	fi = open(fname, "r")
@@ -150,7 +150,7 @@ function readDataHIGGSSUSY(fname::String, shape)
 	(features, labels)
 end
 
-function getStatsIRIS(fname::String)
+function getStatsIRIS(fname::AbstractString)
 	fi = open(fname, "r")
 	n = 0
 	numTotal=0
@@ -173,7 +173,7 @@ function getStatsIRIS(fname::String)
 	(n,numTotal,minfeature,maxfeature, length(mySetOfClasses))
 end
 
-function readDataIRIS(fname::String, shape)
+function readDataIRIS(fname::AbstractString, shape)
 	features = zeros(shape)
 	labels = String[]
 	fi = open(fname, "r")

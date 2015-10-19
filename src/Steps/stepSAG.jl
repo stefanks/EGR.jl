@@ -5,8 +5,8 @@ type SAGsd <: StepData
 	numChunks::Int64
 	batchSize::Int64
 	getStep::Function
-	stepString::String
-	function SAGsd(numVars::Int64,y, stepString::String,numDp::Int64,numChunks::Int64, batchSize::Int64)
+	stepString::AbstractString
+	function SAGsd(numVars::Int64,y, stepString::AbstractString,numDp::Int64,numChunks::Int64, batchSize::Int64)
 		d= sum(y)
 		new(d, y, numDp, numChunks, batchSize, SAGComputation, stepString)
 	end
@@ -33,7 +33,7 @@ function SAGComputation(x, k, gnum, sd::SAGsd, problem::Problem; outputLevel =0)
 		sd.y[i] = zeros(sd.y[i] )
 			   
 		# step 2
-		for j in (i-1)*int(floor(sd.m/sd.numChunks))+1:i*int(floor(sd.m/sd.numChunks))
+		for j in (i-1)*round(Int,floor(sd.m/sd.numChunks))+1:i*round(Int,floor(sd.m/sd.numChunks))
 			outputLevel >1 && println("     Working on sample point $j")
 			(f,sampleG) = (problem.getSampleFunctionAt(j))(x)
 			sd.y[i]+=sampleG

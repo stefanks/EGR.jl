@@ -5,9 +5,9 @@ type SAGcbsd <: StepData
 	c::Vector{Int64}
 	batchSize::Int64
 	getStep::Function
-	stepString::String
+	stepString::AbstractString
 	m
-	function SAGcbsd(numVars::Int64,y, stepString::String, batchSize::Int64,c,m)
+	function SAGcbsd(numVars::Int64,y, stepString::AbstractString, batchSize::Int64,c,m)
 		d= sum(y)
 		new(d, y, size(y)[1], c,batchSize, SAGcbComputation, stepString,m)
 	end

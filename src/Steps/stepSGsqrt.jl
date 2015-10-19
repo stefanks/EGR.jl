@@ -1,7 +1,7 @@
 type SGsqrtsd <: StepData
 	getStep::Function
-	stepString::String
-	function SGsqrtsd(stepString::String)
+	stepString::AbstractString
+	function SGsqrtsd(stepString::AbstractString)
 		new(computeSGsqrtStep,stepString)
 	end
 	function SGsqrtsd()

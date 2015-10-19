@@ -17,7 +17,7 @@ println(" numClasses   = $numClasses")
 
 (features, labels) = readData("data/TestAgaricus/TestAgaricus", (numDatapoints,numFeatures), minFeatureInd)
 
-Redis.hmset(client, "TestAgaricus", {"name" => "TestAgaricus", "path" => "data/TestAgaricus/", "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" => numTotal })
+Redis.hmset(client, "TestAgaricus", Dict{Any,Any}("name" => "TestAgaricus", "path" => "data/TestAgaricus/", "numDatapoints" => numDatapoints, "numFeatures" => numFeatures, "minFeatureInd" => minFeatureInd, "minFeature" => minfeature, "maxFeature"=>maxfeature, "numTotal" => numTotal ))
 
 println(" Writing binary file")
 
@@ -27,7 +27,7 @@ datasetHT=Redis.hgetall(client,"TestAgaricus")
 
 println(" Reading binary file")
 #
-(features,labels) = readBin(datasetHT["path"]*datasetHT["name"]*".bin", int(datasetHT["numDatapoints"]), int(datasetHT["numFeatures"]))
+(features,labels) = readBin(datasetHT["path"]*datasetHT["name"]*".bin", parse(Int,datasetHT["numDatapoints"]), parse(Int,datasetHT["numFeatures"]))
 
 println("TestRedisReadWrite successful!")
 println()

@@ -8,8 +8,8 @@ type SSVRGsd <: StepData
 	k::Function
 	m::Int64
 	getStep::Function
-	stepString::String
-	function SSVRGsd(k::Function, m::Int64,  numVars::Int64, stepString::String)
+	stepString::AbstractString
+	function SSVRGsd(k::Function, m::Int64,  numVars::Int64, stepString::AbstractString)
 		new(0,0,zeros(numVars), zeros(numVars),k,m, SSVRGComputation, stepString)
 	end
 end

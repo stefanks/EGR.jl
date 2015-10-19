@@ -4,9 +4,9 @@ type DSSsd <: StepData
 	s::Function
 	u::Function
 	getStep::Function
-	stepString::String
+	stepString::AbstractString
 
-	function DSSsd(s::Function, u::Function, stepString::String)
+	function DSSsd(s::Function, u::Function, stepString::AbstractString)
 		new(0,s, u, DSScomputation, stepString)
 	end
 end

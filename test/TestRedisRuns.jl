@@ -7,7 +7,7 @@ println("TestRedisRuns")
 
 client = RedisConnection()
 
-run(`redis-cli keys "Test*"` |> `xargs redis-cli del`);
+run(pipeline(`redis-cli keys "Test*"`, `xargs redis-cli del`))
 
 
 createOracleOutputLevel = 1
@@ -23,58 +23,58 @@ thisOracle=Oracles[1]
 				
 (gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter, L2reg, thisDataName, thisProblem) = thisOracle
 		
-myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
-			
-maxG  = int(round(numEquivalentPasses*numTP))
+maxG  = Int(round(numEquivalentPasses*numTP))
+
+expIndices=unique(round(Int, logspace(0,log10(maxG+1),maxOutputNum)))-1
+
+myOutputOpts =  OutputOpts(myOutputter,expIndices)
 		
 thisSD = SGsd( "SG.a=1")  
 
 longKey = thisDataName*":"*LossFunctionString*":"*string(L2reg)*":"thisSD.stepString*":"*"const"*":0"
-println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
-println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
+println(" gnum:     "*string([parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]))
+println(" origWant: "*string([parse(Int64,s) for s = lrange(client, longKey*":origWant",0, -1)]))
 
 myOpts= Opts(zeros(numVars,1); stepSizePower=0, maxG=20, outputLevel=algOutputLevel)
-alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction, myREfunction)
-println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
-println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
+alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction)
+println(" gnum:     "*string([parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]))
+println(" origWant: "*string([parse(Int64,s) for s = lrange(client, longKey*":origWant",0, -1)]))
 
 myOpts= Opts(zeros(numVars,1); stepSizePower=0, maxG=10, outputLevel=algOutputLevel)
-alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts,thisSD, myOutputOpts, myWriteFunction, myREfunction)
-println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
-println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
+alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts,thisSD, myOutputOpts, myWriteFunction)
+println(" gnum:     "*string([parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]))
+println(" origWant: "*string([parse(Int64,s) for s = lrange(client, longKey*":origWant",0, -1)]))
 
 myOpts= Opts(zeros(numVars,1); stepSizePower=0, maxG=10, outputLevel=algOutputLevel)
-alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts,thisSD, myOutputOpts, myWriteFunction, myREfunction)
-println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
-println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
+alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts,thisSD, myOutputOpts, myWriteFunction)
+println(" gnum:     "*string([parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]))
+println(" origWant: "*string([parse(Int64,s) for s = lrange(client, longKey*":origWant",0, -1)]))
 
 myOpts= Opts(zeros(numVars,1); stepSizePower=0, maxG=30, outputLevel=algOutputLevel)
-alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction, myREfunction)
-println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
-println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
+alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction)
+println(" gnum:     "*string([parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]))
+println(" origWant: "*string([parse(Int64,s) for s = lrange(client, longKey*":origWant",0, -1)]))
 
 myOpts= Opts(zeros(numVars,1); stepSizePower=0, maxG=100000, outputLevel=algOutputLevel)
-alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction, myREfunction)
-println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
-println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
+alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction)
+println(" gnum:     "*string([parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]))
+println(" origWant: "*string([parse(Int64,s) for s = lrange(client, longKey*":origWant",0, -1)]))
 
 myOpts= Opts(zeros(numVars,1); stepSizePower=0, maxG=100001, outputLevel=algOutputLevel)
-myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum, logarithmic = false)
-alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction, myREfunction)
-println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
-println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
+
+alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction)
+println(" gnum:     "*string([parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]))
+println(" origWant: "*string([parse(Int64,s) for s = lrange(client, longKey*":origWant",0, -1)]))
 
 myOpts= Opts(zeros(numVars,1); stepSizePower=0, maxG=30, outputLevel=algOutputLevel)
-myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=99, logarithmic = false)
-alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction, myREfunction)
-println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
-println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
+alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction)
+println(" gnum:     "*string([parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]))
+println(" origWant: "*string([parse(Int64,s) for s = lrange(client, longKey*":origWant",0, -1)]))
 
 myOpts= Opts(zeros(numVars,1); stepSizePower=0, maxG=30, outputLevel=algOutputLevel)
-myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=99, logarithmic = false)
-alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction, myREfunction)
-println(" gnum:     "*string(int(lrange(client, longKey*":gnum",0, -1))))
-println(" origWant: "*string(int(lrange(client, longKey*":origWant",0, -1))))
+alg(thisProblem(Task(() -> getRandom(numTP, gradientOracle)))	, myOpts, thisSD, myOutputOpts, myWriteFunction)
+println(" gnum:     "*string([parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]))
+println(" origWant: "*string([parse(Int64,s) for s = lrange(client, longKey*":origWant",0, -1)]))
 
 
 println("TestRedisRuns successful!")

@@ -11,17 +11,17 @@ type USD <: StepData
 	u::Function # Number of new chunks to sample
 	beta::Function
 	getStep::Function
-	stepString::String
+	stepString::AbstractString
 	chunkSize::Int64
 	numVars::Int64
 	sagFsagaT::Bool
 	
-	function USD(s::Function, u::Function, beta::Function, numVars::Int64, stepString::String, chunkSize::Int64,sagFsagaT::Bool)
+	function USD(s::Function, u::Function, beta::Function, numVars::Int64, stepString::AbstractString, chunkSize::Int64,sagFsagaT::Bool)
 		new(spzeros(numVars,1),Function[], SparseMatrixCSC[], 0, s, u, beta, uComputation, stepString, chunkSize, numVars, sagFsagaT)
 	end
 end
 
-function onlyAddBeta1(u::Function, uString::String, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
+function onlyAddBeta1(u::Function, uString::AbstractString, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
 	s = (k,I)-> 0
 	beta = (k)->1
@@ -32,9 +32,9 @@ function onlyAddBeta1(u::Function, uString::String, numVars::Int64, chunkSize::I
 
 end
 
-function onlyUpdateBeta1(s::Function, sString::String, numVars::Int64, ntp::Int64, chunkSize::Int64,sagFsagaT::Bool)
+function onlyUpdateBeta1(s::Function, sString::AbstractString, numVars::Int64, ntp::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
-	u = (k,I)-> int(floor(k==0 ? int(floor(ntp/chunkSize)) : 0))
+	u = (k,I)-> round(Int,floor(k==0 ? int(floor(ntp/chunkSize)) : 0))
 	beta = (k)->1
 	
 	stepString  = "uUb1."*sString*".cs="*string(chunkSize)*"."*string(sagFsagaT)
@@ -47,8 +47,8 @@ function uLinBeta1(c::Float64,numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	if c<1
 		error("C must be >=1")
 	end
-	s = (k,I)-> int(floor(k==0 ? 0 : c))
-	u = (k,I)-> int(c) 
+	s = (k,I)-> round(Int,floor(k==0 ? 0 : c))
+	u = (k,I)-> round(Int,c) 
 	beta = (k)->1
 	
 	stepString  = "uLb1"*".c="*string(c)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
@@ -58,8 +58,8 @@ end
 
 function uQuadBeta1(c::Float64,numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
-	s = (k,I)-> int(ceil(k==0 ? 0 : c*k))
-	u = (k,I)-> int(ceil(c*(k+1)))
+	s = (k,I)-> round(Int,ceil(k==0 ? 0 : c*k))
+	u = (k,I)-> round(Int,ceil(c*(k+1)))
 	beta = (k)->1
 	
 	stepString  = "uQb1"*".c="*string(c)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
@@ -71,8 +71,8 @@ end
 function uExpBeta1(r::Float64, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
 	c = 1.0 / (r-1)
-	s = (k,I)-> int(ceil(k==0 ? 0 : c*(r/(r-1))^(k-1)))
-	u = (k,I)-> int(ceil(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1)))
+	s = (k,I)-> round(Int,ceil(k==0 ? 0 : c*(r/(r-1))^(k-1)))
+	u = (k,I)-> round(Int,ceil(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1)))
 	beta = (k)->1
 	
 	stepString  = "uEb1"*".r="*string(r)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
@@ -83,8 +83,8 @@ end
 function uExp2Beta1(r::Float64, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	
 	c = 1.0
-	s = (k,I)-> int(ceil(k==0 ? 0 : c*(r/(r-1))^(k-1)))
-	u = (k,I)-> int(ceil(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1)))
+	s = (k,I)-> round(Int,ceil(k==0 ? 0 : c*(r/(r-1))^(k-1)))
+	u = (k,I)-> round(Int,ceil(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1)))
 	beta = (k)->1
 	
 	stepString  = "uE2b1"*".r="*string(r)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
@@ -116,14 +116,14 @@ function uComputation(x, k, gnum, sd::USD, problem::Problem; outputLevel = 0)
 
 	# B is the current sum of old gradients (for S)
 	B = spzeros(sd.numVars,1)
-	for i in [S]
+	for i in collect(S)
 		B +=sd.y[i]
 	end
 
 	# sumy is the new sum of gradients (for both U and S)
 	sumy = spzeros(sd.numVars,1)	
 
-	for i in [U]
+	for i in collect(U)
 		thisSum = spzeros(sd.numVars,1)	
 		for j in (i-1)*sd.chunkSize+1:i*sd.chunkSize
 			(f,sampleG) = (sd.f[j])(x)
@@ -134,7 +134,7 @@ function uComputation(x, k, gnum, sd::USD, problem::Problem; outputLevel = 0)
 		sumy += thisSum
 	end
 
-	for i in [S]
+	for i in collect(S)
 		thisSum = spzeros(sd.numVars,1)	
 		for j in (i-1)*sd.chunkSize+1:i*sd.chunkSize
 			(f,sampleG) = (sd.f[j])(x)

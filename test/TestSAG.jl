@@ -22,25 +22,27 @@ for (gradientOracle, numVars, numTP, csDataType, LossFunctionString, myOutputter
 	println(" $thisDataName $LossFunctionString L2reg = $L2reg")
 	
 	println(" numTP = $numTP")
-	
-	myOutputOpts =  OutputOpts(myOutputter; maxOutputNum=maxOutputNum)
 			
-	maxG  = int(round(numEquivalentPasses*numTP))
+	maxG  = Int(round(numEquivalentPasses*numTP))
+	
+	expIndices=unique(round(Int, logspace(0,log10(maxG+1),maxOutputNum)))-1
+	
+	myOutputOpts =  OutputOpts(myOutputter,expIndices)
 	myOptss = Opts(zeros(numVars,1); stepSizePower=0, maxG=maxG, outputLevel=algOutputLevel, stepOutputLevel=0)
 	
 	problem = thisProblem(Task(() -> getSequentialFinite(numTP, gradientOracle)))
 	y=csDataType[]
 	for i in 1:numChunks
 		println("  Creating chunk $i")
-		for j in (i-1)*int(floor(numTP/numChunks))+1:i*int(floor(numTP/numChunks))
+		for j in (i-1)*round(Int,floor(numTP/numChunks))+1:i*round(Int,floor(numTP/numChunks))
 			(f,sampleG) = (problem.getSampleFunctionAt(j))(myOptss.init)
 			push!(y,sampleG)
 		end
 	end
 	
-	alg(problem,  myOptss, SAG(numVars, copy(y), numTP,numChunks,1), myOutputOpts, myWriteFunction, myREfunction)
+	alg(problem,  myOptss, SAG(numVars, copy(y), numTP,numChunks,1), myOutputOpts, myWriteFunction)
 	
-	alg(problem,  myOptss, SAG(numVars, copy(y), numTP,numChunks,2), myOutputOpts, myWriteFunction, myREfunction)
+	alg(problem,  myOptss, SAG(numVars, copy(y), numTP,numChunks,2), myOutputOpts, myWriteFunction)
 	
 end
 

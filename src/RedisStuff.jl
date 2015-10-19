@@ -19,25 +19,25 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 		
 		arrayOfStrings  = lrange(client, longKey*":gnum", 0, -1)
 		for i in arrayOfStrings
-			push!(existingListOfgunum, int(i))
+			push!(existingListOfgunum, parse(Int,i))
 		end
 		arrayOfStrings  = lrange(client, longKey*":1", 0, -1)
 		for i in arrayOfStrings
-			push!(existingListRes1, float64(i))
+			push!(existingListRes1, parse(Float64,i))
 		end
 
 		arrayOfStrings  = lrange(client, longKey*":$numOutputsFromOutputsFunction", 0, -1)
 		for i in arrayOfStrings
-			push!(existingListResEnd, float64(i))
+			push!(existingListResEnd, parse(Float64,i))
 		end
 		
 		arrayOfStrings  = lrange(client, longKey*":k", 0, -1)
 		for i in arrayOfStrings
-			push!(existingListOfk, int(i))
+			push!(existingListOfk, parse(Int,i))
 		end
 		arrayOfStrings  = lrange(client, longKey*":origWant", 0, -1)
 		for i in arrayOfStrings
-			push!(existingListOfOrigWant, int(i))
+			push!(existingListOfOrigWant, parse(Int,i))
 		end
 		
 		# CHECK IF HAVE AN OUTPUT FOR EACH INDEX IN EXPINDICES!!!!!
@@ -91,9 +91,9 @@ function returnIfExists(client::RedisConnection, problem::Problem, opts::Opts, s
 		return (
 		"Already exists!"
 		, 
-		int(lrange(client, longKey*":k", 0,-1))
+		[parse(Int64,s) for s = lrange(client, longKey*":k", 0,-1)]
 		,
-		int(lrange(client, longKey*":gnum",0, -1))
+		[parse(Int64,s) for s = lrange(client, longKey*":gnum",0, -1)]
 		,
 		kk
 		)
@@ -116,16 +116,16 @@ function writeFunction(client::RedisConnection, problem::Problem, opts::Opts, sd
 		arrayOfStrings  = lrange(client, longKey*":gnum", 0, -1)
 		currentIndex=0
 		for i in 1:length(arrayOfStrings)
-			if gnum==int(arrayOfStrings[i])
+			if gnum==parse(Int,arrayOfStrings[i])
 				outputLevel>0 && println("Not writing because exists exact same with gnum = $gnum, at i = $i")
-				ah = int(lindex(client,longKey*":origWant",i-1))
+				ah = parse(Int,lindex(client,longKey*":origWant",i-1))
 				if origWant < ah
 					outputLevel>0 && println("origWant < ah, $origWant < $ah, so replacing!")
 					lset(client, longKey*":origWant", i-1, origWant)
 				end
 				return
 			end
-			if int(arrayOfStrings[i])>gnum
+			if parse(Int,arrayOfStrings[i])>gnum
 				outputLevel>0 && println("Found where to insert: before $(i-1)")
 				currentIndex=i-1
 				break

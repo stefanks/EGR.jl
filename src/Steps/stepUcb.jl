@@ -11,17 +11,17 @@ type UcbSD <: StepData
 	u::Function # Number of new chunks to sample
 	beta::Function
 	getStep::Function
-	stepString::String
+	stepString::AbstractString
 	numVars::Int64
 	sagFsagaT::Bool
 	cc
 	
-	function UcbSD(s::Function, u::Function, beta::Function, numVars::Int64, stepString::String,sagFsagaT::Bool,cc)
+	function UcbSD(s::Function, u::Function, beta::Function, numVars::Int64, stepString::AbstractString,sagFsagaT::Bool,cc)
 		new(spzeros(numVars,1),Function[], Array(SparseMatrixCSC,int(maximum(cc))), 0, s, u, beta, ucbComputation, stepString, numVars, sagFsagaT,cc)
 	end
 end
 
-function UcbonlyAddBeta1(u::Function, uString::String, numVars::Int64,sagFsagaT::Bool,cc)
+function UcbonlyAddBeta1(u::Function, uString::AbstractString, numVars::Int64,sagFsagaT::Bool,cc)
 	
 	s = (k,I)-> 0
 	beta = (k)->1
@@ -32,7 +32,7 @@ function UcbonlyAddBeta1(u::Function, uString::String, numVars::Int64,sagFsagaT:
 
 end
 
-function UcbonlyUpdateBeta1(s::Function, sString::String, numVars::Int64, ntp::Int64,sagFsagaT::Bool,cc)
+function UcbonlyUpdateBeta1(s::Function, sString::AbstractString, numVars::Int64, ntp::Int64,sagFsagaT::Bool,cc)
 	
 	u = (k,I)-> int(floor(k==0 ? ntp : 0))
 	beta = (k)->1
