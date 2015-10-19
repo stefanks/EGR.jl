@@ -79,6 +79,18 @@ function urExpBeta1(r::Float64, numVars::Int64,sagFsagaT::Bool)
 	USDr(s, u , beta, numVars, stepString,sagFsagaT)
 end
 
+function urExp2Beta1(r::Float64, numVars::Int64,sagFsagaT::Bool)
+	
+	c = 1.0
+	s = (k,I)-> int(ceil(k==0 ? 0 : c*(r/(r-1))^(k-1)))
+	u = (k,I)-> int(ceil(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1)))
+	beta = (k)->1
+	
+	stepString  = "urE2b1"*".r="*string(r)*"."*string(sagFsagaT)
+	
+	USDr(s, u , beta, numVars, stepString,sagFsagaT)
+end
+
 function urExpBeta0(r::Float64, numVars::Int64,sagFsagaT::Bool)
 	
 	c = 1.0 / (r-1)

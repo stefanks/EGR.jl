@@ -80,6 +80,17 @@ function uExpBeta1(r::Float64, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
 	USD(s, u , beta, numVars, stepString, chunkSize,sagFsagaT)
 end
 
+function uExp2Beta1(r::Float64, numVars::Int64, chunkSize::Int64,sagFsagaT::Bool)
+	
+	c = 1.0
+	s = (k,I)-> int(ceil(k==0 ? 0 : c*(r/(r-1))^(k-1)))
+	u = (k,I)-> int(ceil(k==0 ? c*(r-1) : c*(r/(r-1))^(k-1)))
+	beta = (k)->1
+	
+	stepString  = "uE2b1"*".r="*string(r)*".cs="*string(chunkSize)*"."*string(sagFsagaT)
+	
+	USD(s, u , beta, numVars, stepString, chunkSize,sagFsagaT)
+end
 
 
 function uComputation(x, k, gnum, sd::USD, problem::Problem; outputLevel = 0)
