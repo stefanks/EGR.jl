@@ -1,8 +1,8 @@
 function getGatWhichFisAchieved(res, F,glim)
 	# res[4][i,1] is the F values array
 	# res[3][i] is the correspoding g value
-	print("gettin g")
-	print(res)
+	# print("gettin g")
+	# print(res)
 	g=Inf
 	for i in 2:size(res[4], 1)
 		thisRunValue = res[4][i,1]
@@ -91,8 +91,13 @@ end
 
 function getFfinal(res, glim)
 	currentBest = Inf
+	prevG = Inf
+	prevRunValue = Inf
 	for i in 1:size(res[4], 1)
+		# println("i = $i")
 		thisRunValue = res[4][i,1]
+		# println("thisRunValue = $thisRunValue")
+		# println("res[3][i] = $(res[3][i])")
 		if res[3][i]<=glim && ~isnan(thisRunValue)
 			currentBest=thisRunValue
 		end
@@ -110,6 +115,8 @@ end
 
 function getFtrainfinal(res, glim)
 	currentBest = Inf
+	prevG = Inf
+	prevRunValue = Inf
 	for i in 1:size(res[4], 1)
 		thisRunValue = res[4][i,end]
 		if res[3][i]<=glim && ~isnan(thisRunValue)
