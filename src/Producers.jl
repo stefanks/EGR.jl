@@ -1,6 +1,6 @@
 function shuffle!(r::AbstractRNG, a::AbstractVector)
 	for i = length(a):-1:2
-		j=int(floor(rand(r)*i)+1)
+		j=round(Int,floor(rand(r)*i)+1)
 		a[i], a[j] = a[j], a[i]
 	end
 	return a
